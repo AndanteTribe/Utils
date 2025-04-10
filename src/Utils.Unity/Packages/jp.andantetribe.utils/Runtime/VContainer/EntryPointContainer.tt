@@ -1,0 +1,85 @@
+﻿<#@ template language="C#" linePragmas="false"#>
+<#@ assembly name="System.Core" #>
+<#@ output extension=".cs" #>
+<#@ import namespace="System.Linq" #>
+#if ENABLE_VCONTAINER
+#nullable enable
+
+using System;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using VContainer;
+using VContainer.Unity;
+
+namespace AndanteTribe.Utils.VContainer
+{
+<# for (var i = 1; i < 16; i++) { var genericStr = "T" + string.Join(", T", Enumerable.Range(1, i)); #>
+    /// <summary>
+    /// エントリーポイントを一括管理するコンテナクラス.
+    /// </summary>
+<# for (var j = 1; j < i + 1; j++) { #>
+    /// <typeparam name="T<#= j #>">発火する<#= j #>番目のインスタンスの型.</typeparam>
+<# } #>
+    public sealed class EntryPointContainer<<#= genericStr #>> : IStartable
+        where T<#= string.Join(" : class where T", Enumerable.Range(1, i)) #> : class
+    {
+<# for (var j = 1; j < i + 1; j++) { #>
+        private readonly T<#= j #> _instance<#= j #>;
+<# } #>
+        private readonly CancellationToken _cancellationToken;
+        private readonly Action<<#= genericStr #>, CancellationToken> _start;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EntryPointContainer{<#= genericStr #>}"/> class.
+        /// </summary>
+<# for (var j = 1; j < i + 1; j++) { #>
+        /// <param name="instance<#= j #>">発火する<#= j #>番目のインスタンス.</param>
+<# } #>
+        /// <param name="cancellationToken">キャンセルトークン.</param>
+        /// <param name="start">発火する処理.</param>
+        public EntryPointContainer(
+<# for (var j = 1; j < i + 1; j++) { #>
+            T<#= j #> instance<#= j #>,
+<# } #>
+            CancellationToken cancellationToken,
+            Action<<#= genericStr #>, CancellationToken> start)
+        {
+<# for (var j = 1; j < i + 1; j++) { #>
+            _instance<#= j #> = instance<#= j #>;
+<# } #>
+            _cancellationToken = cancellationToken;
+            _start = start;
+        }
+
+        /// <inheritdoc />
+        void IStartable.Start()
+        {
+            _start(_instance<#= string.Join(", _instance", Enumerable.Range(1, i)) #>, _cancellationToken);
+        }
+    }
+
+<# } #>
+    /// <summary>
+    /// <see cref="VContainer"/>の拡張メソッド.
+    /// </summary>
+    public static class VContainerEntryPointExtensions
+    {
+<# for (var i = 1; i < 16; i++) { var genericStr = "T" + string.Join(", T", Enumerable.Range(1, i)); #>
+        /// <summary>
+        /// <see cref="EntryPointContainer{<#= genericStr #>}"/>に登録するエントリーポイント制御引数.
+        /// </summary>
+        /// <param name="builder"><see cref="RegistrationBuilder"/>.</param>
+        /// <param name="entry">エントリーポイント制御引数.</param>
+<# for (var j = 1; j < i + 1; j++) { #>
+        /// <typeparam name="T<#= j #>">エントリーポイント制御引数の<#= j #>番目の型.</typeparam>
+<# } #>
+        /// <returns><see cref="RegistrationBuilder.WithParameter{T}(T)"/>で登録済みの<see cref="RegistrationBuilder"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static RegistrationBuilder WithEntryParameter<<#= genericStr #>>(this RegistrationBuilder builder, Action<<#= genericStr #>, CancellationToken> entry)
+        {
+            return builder.WithParameter(entry);
+        }
+<#= i == 15 ? "    }" : "" #>
+<# } #>
+}
+#endif

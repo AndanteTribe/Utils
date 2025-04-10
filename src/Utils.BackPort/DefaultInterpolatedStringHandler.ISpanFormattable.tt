@@ -1,0 +1,94 @@
+<#@ template language="C#" linePragmas="false"#>
+<#@ assembly name="System.Core" #>
+<#@ output extension=".cs" #>
+<#
+    var spanFormattableTypes = new (string name, bool isFormat, bool isProvider)[]
+    {
+        ("byte", true, true),
+        ("sbyte", true, true),
+        ("short", true, true),
+        ("ushort", true, true),
+        ("int", true, true),
+        ("uint", true, true),
+        ("long", true, true),
+        ("ulong", true, true),
+        ("float", true, true),
+        ("double", true, true),
+        ("decimal", true, true),
+        ("DateTime", true, true),
+        ("DateTimeOffset", true, true),
+        ("TimeSpan", true, true),
+        ("Guid", true, false),
+        ("bool", false, false),
+    };
+#>
+<#= "#if !NET6_0_OR_GREATER" #>
+<#= "#nullable enable" #>
+
+namespace System.Runtime.CompilerServices
+{
+    public ref partial struct DefaultInterpolatedStringHandler
+    {
+<# foreach (var (name, isFormat, isProvider) in spanFormattableTypes) { #>
+        public void AppendFormatted(<#= name #> value)
+        {
+            // If there's a custom formatter, always use it.
+            if (_hasCustomFormatter)
+            {
+                AppendCustomFormatter(value, format: null);
+                return;
+            }
+
+            int charsWritten;
+            while (!value.TryFormat(_chars.Slice(_pos), out charsWritten<#= isFormat ? ", format: null" : "" #><#= isProvider ? ", _provider" : "" #>)) // constrained call avoiding boxing for value types
+            {
+                Grow();
+            }
+
+            _pos += charsWritten;
+        }
+
+        public void AppendFormatted(<#= name #> value, int alignment)
+        {
+            int startingPos = _pos;
+            AppendFormatted(value);
+            if (alignment != 0)
+            {
+                AppendOrInsertAlignmentIfNeeded(startingPos, alignment);
+            }
+        }
+
+        public void AppendFormatted(<#= name #> value, string? format)
+        {
+            // If there's a custom formatter, always use it.
+            if (_hasCustomFormatter)
+            {
+                AppendCustomFormatter(value, format);
+                return;
+            }
+
+            int charsWritten;
+            while (!value.TryFormat(_chars.Slice(_pos), out charsWritten<#= isFormat ? ", format: format" : "" #><#= isProvider ? ", _provider" : "" #>)) // constrained call avoiding boxing for value types
+            {
+                Grow();
+            }
+
+            _pos += charsWritten;
+        }
+
+        public void AppendFormatted(<#= name #> value, int alignment, string? format)
+        {
+            int startingPos = _pos;
+            AppendFormatted(value, format);
+            if (alignment != 0)
+            {
+                AppendOrInsertAlignmentIfNeeded(startingPos, alignment);
+            }
+        }
+
+<# } #>
+    }
+}
+
+<#= "#endif" #>
+

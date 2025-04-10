@@ -1,0 +1,67 @@
+{
+    "name": "AndanteTribe.Utils",
+    "rootNamespace": "AndanteTribe.Utils",
+    "references": [
+        "R3.Unity",
+        "UniTask",
+        "VContainer",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro",
+        "AndanteTribe.Utils.Core",
+        "AndanteTribe.Utils.BackPort"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Utils.Core.dll",
+        "R3.dll",
+        "Microsoft.Bcl.TimeProvider.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.cysharp.unitask",
+            "expression": "",
+            "define": "ENABLE_UNITASK"
+        },
+        {
+            "name": "com.cysharp.r3",
+            "expression": "",
+            "define": "ENABLE_R3"
+        },
+        {
+            "name": "com.unity.ugui",
+            "expression": "",
+            "define": "ENABLE_UGUI"
+        },
+        {
+            "name": "com.unity.modules.uielements",
+            "expression": "",
+            "define": "ENABLE_UITOOLKIT"
+        },
+        {
+            "name": "jp.hadashikick.vcontainer",
+            "expression": "",
+            "define": "ENABLE_VCONTAINER"
+        },
+        {
+            "name": "com.unity.modules.unitywebrequest",
+            "expression": "",
+            "define": "ENABLE_WEBREQUEST"
+        },
+        {
+            "name": "com.unity.textmeshpro",
+            "expression": "",
+            "define": "ENABLE_TEXTMESHPRO"
+        },
+        {
+            "name": "com.unity.ugui",
+            "expression": "2.0.0",
+            "define": "ENABLE_TEXTMESHPRO"
+        }
+    ],
+    "noEngineReferences": false
+}

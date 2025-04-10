@@ -1,0 +1,88 @@
+<#@ template language="C#" linePragmas="false"#>
+<#@ assembly name="System.Core" #>
+<#@ output extension=".cs" #>
+<#
+    var formattableTypes = new string[]
+    {
+        "UnityEngine.Bounds",
+        "UnityEngine.BoundsInt",
+        "UnityEngine.Color",
+        "UnityEngine.Color32",
+        "UnityEngine.Matrix4x4",
+        "UnityEngine.Plane",
+        "UnityEngine.Quaternion",
+        "UnityEngine.Ray",
+        "UnityEngine.Ray2D",
+        "UnityEngine.Rect",
+        "UnityEngine.RectInt",
+        "UnityEngine.RectOffset",
+        "UnityEngine.Vector2",
+        "UnityEngine.Vector2Int",
+        "UnityEngine.Vector3",
+        "UnityEngine.Vector3Int",
+        "UnityEngine.Vector4",
+    };
+#>
+<#= "#if !NET6_0_OR_GREATER && UNITY_2022_3_OR_NEWER" #>
+<#= "#nullable enable" #>
+
+namespace System.Runtime.CompilerServices
+{
+    public ref partial struct DefaultInterpolatedStringHandler
+    {
+<# foreach (var typeStr in formattableTypes) { #>
+        public void AppendFormatted(<#= typeStr #> value)
+        {
+            // If there's a custom formatter, always use it.
+            if (_hasCustomFormatter)
+            {
+                AppendCustomFormatter(value, format: null);
+                return;
+            }
+
+            // The value should be able to format itself directly into our buffer, so do.
+            var s = value.ToString(format: null, _provider); // constrained call avoiding boxing for value types
+
+            AppendLiteral(s);
+        }
+
+        public void AppendFormatted(<#= typeStr #> value, int alignment)
+        {
+            int startingPos = _pos;
+            AppendFormatted(value);
+            if (alignment != 0)
+            {
+                AppendOrInsertAlignmentIfNeeded(startingPos, alignment);
+            }
+        }
+
+        public void AppendFormatted(<#= typeStr #> value, string? format)
+        {
+            // If there's a custom formatter, always use it.
+            if (_hasCustomFormatter)
+            {
+                AppendCustomFormatter(value, format);
+                return;
+            }
+
+            // The value should be able to format itself directly into our buffer, so do.
+            var s = value.ToString(format, _provider); // constrained call avoiding boxing for value types
+
+            AppendLiteral(s);
+        }
+
+        public void AppendFormatted(<#= typeStr #> value, int alignment, string? format)
+        {
+            int startingPos = _pos;
+            AppendFormatted(value, format);
+            if (alignment != 0)
+            {
+                AppendOrInsertAlignmentIfNeeded(startingPos, alignment);
+            }
+        }
+
+<# } #>
+    }
+}
+
+<#= "#endif" #>
