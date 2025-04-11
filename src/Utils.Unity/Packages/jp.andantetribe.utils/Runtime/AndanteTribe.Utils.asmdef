@@ -15,7 +15,8 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "Utils.Core.dll",
+        "AndanteTribe.Utils.Core.dll",
+        "AndanteTribe.Utils.BackPort.dll",
         "R3.dll",
         "Microsoft.Bcl.TimeProvider.dll"
     ],
