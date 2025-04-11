@@ -1,0 +1,25 @@
+name: Publish Core to Nuget
+on:
+  workflow_dispatch: {}
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      - name: Restore
+        run: dotnet restore src/Utils.Core/Utils.Core.csproj
+      - name: Build
+        run: dotnet build src/Utils.Core/Utils.Core.csproj --configuration Release
+      - name: Pack
+        run: dotnet pack src/Utils.Core/Utils.Core.csproj  --configuration Release -o src/Utils.Core/artifacts/
+      - uses: actions/upload-artifact@master
+        with:
+          path: src/Utils.Core/artifacts
+          retention-days: 2
