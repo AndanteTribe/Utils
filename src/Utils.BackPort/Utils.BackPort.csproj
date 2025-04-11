@@ -23,17 +23,8 @@
         <None Remove="**\package.json" />
         <None Remove="**\*.asmdef" />
         <None Remove="**\*.meta" />
+        <None Remove="**\*.tt" />
         <None Remove=".gitignore" />
-        <None Update="DefaultInterpolatedStringHandler.IFormattable.tt">
-          <Generator>TextTemplatingFileGenerator</Generator>
-          <LastGenOutput>DefaultInterpolatedStringHandler.IFormattable.cs</LastGenOutput>
-        </None>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Update="DefaultInterpolatedStringHandler.IFormattable.cs">
-        <DependentUpon>DefaultInterpolatedStringHandler.IFormattable.tt</DependentUpon>
-      </Compile>
     </ItemGroup>
 
     <ItemGroup>
