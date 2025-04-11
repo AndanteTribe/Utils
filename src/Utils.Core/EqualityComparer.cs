@@ -73,7 +73,7 @@ namespace AndanteTribe.Utils
                 this._getHashCode = getHashCode;
             }
 
-            public bool Equals(T x, T y) => _equals(x, y);
+            public bool Equals(T? x, T? y) => _equals(x!, y!);
 
             public int GetHashCode(T obj) => _getHashCode(obj);
 
