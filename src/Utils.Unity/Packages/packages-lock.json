@@ -87,6 +87,12 @@
       "source": "local",
       "dependencies": {}
     },
+    "jp.andantetribe.utils.tests": {
+      "version": "file:../../Utils.Tests",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "jp.hadashikick.vcontainer": {
       "version": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer",
       "depth": 0,

@@ -1,4 +1,5 @@
 ﻿<Solution>
   <Project Path="..\Utils.BackPort\Utils.BackPort.csproj" Type="Classic C#" />
+  <Project Path="..\Utils.Tests\Utils.Tests.csproj" Type="Classic C#" />
   <Project Path="Utils.Core.csproj" Type="Classic C#" />
 </Solution>

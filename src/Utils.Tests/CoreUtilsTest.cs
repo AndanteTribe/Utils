@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using AndanteTribe.Utils;
 using NUnit.Framework;
 
-namespace Tests.Editor
+namespace AndanteTribe.Utils.Tests
 {
     public class CoreUtilsTest
     {

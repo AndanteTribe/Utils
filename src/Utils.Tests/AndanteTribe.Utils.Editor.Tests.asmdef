@@ -2,9 +2,6 @@
     "name": "AndanteTribe.Utils.Editor.Tests",
     "rootNamespace": "AndanteTribe.Utils.Editor.Tests",
     "references": [
-        "UnityEditor.TestRunner",
-        "UnityEngine.TestRunner",
-        "AndanteTribe.Utils",
         "AndanteTribe.Utils.Core"
     ],
     "includePlatforms": [
