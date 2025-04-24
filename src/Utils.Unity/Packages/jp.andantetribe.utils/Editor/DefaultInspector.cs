@@ -32,9 +32,9 @@ namespace AndanteTribe.Utils.Editor
                     {
                         text = attr.ButtonName
                     };
-                    btn.RegisterCallback<ClickEvent, (MethodInfo method, UnityEngine.Object target, object[] args)>(static (_, method) =>
+                    btn.RegisterCallback<ClickEvent, (MethodInfo method, UnityEngine.Object target, object[] args)>(static (_, args) =>
                     {
-                        method.method.Invoke(method.target, method.args);
+                        args.method.Invoke(args.target, args.args);
                     }, (methodInfo, target, attr.Parameters));
                     root.Add(btn);
                 }
