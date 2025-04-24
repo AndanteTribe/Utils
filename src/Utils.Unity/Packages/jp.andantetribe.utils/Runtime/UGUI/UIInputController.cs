@@ -38,7 +38,8 @@ namespace AndanteTribe.Utils.UGUI
             public override bool GetButtonDown(string _) => false;
         }
 
-        private readonly BaseInput _emptyInput = EventSystem.current.TryGetComponent<EmptyBaseInput>(out var input) ? input : EventSystem.current.gameObject.AddComponent<EmptyBaseInput>();
+        private readonly BaseInput _emptyInput
+            = EventSystem.current.TryGetComponent<EmptyBaseInput>(out var input) ? input : EventSystem.current.gameObject.AddComponent<EmptyBaseInput>();
 
         private uint _refCount;
 

@@ -1,4 +1,7 @@
-﻿using System;
+﻿#if ENABLE_UNITASK
+#nullable enable
+
+using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -10,3 +13,5 @@ namespace AndanteTribe.Utils
         UniTask<T> LoadAsync(CancellationToken cancellationToken);
     }
 }
+
+#endif
