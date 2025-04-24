@@ -1,5 +1,5 @@
 ﻿using System;
-using AndanteTribe.Utils.Internal;
+using System.Runtime.CompilerServices;
 
 namespace AndanteTribe.Utils
 {
@@ -20,8 +20,8 @@ namespace AndanteTribe.Utils
         /// </remarks>
         public static bool HasBitFlags<T>(this T value, T flag) where T : struct, Enum
         {
-            var v = UnsafeUtils.As<T, int>(ref value);
-            var f = UnsafeUtils.As<T, int>(ref flag);
+            var v = Unsafe.As<T, int>(ref value);
+            var f = Unsafe.As<T, int>(ref flag);
             return (v & f) == f;
         }
 
@@ -36,7 +36,7 @@ namespace AndanteTribe.Utils
         /// </remarks>
         public static bool ConstructFlags<T>(this T value) where T : struct, Enum
         {
-            var v = UnsafeUtils.As<T, int>(ref value);
+            var v = Unsafe.As<T, int>(ref value);
             return v != 0 && (v & (v - 1)) == 0;
         }
 
@@ -66,7 +66,7 @@ namespace AndanteTribe.Utils
 
             internal Enumerator(T value)
             {
-                _value = UnsafeUtils.As<T, int>(ref value);
+                _value = Unsafe.As<T, int>(ref value);
                 Current = default;
             }
 
@@ -82,7 +82,7 @@ namespace AndanteTribe.Utils
                 }
 
                 var f = _value & -_value; // get lowest flag
-                Current = UnsafeUtils.As<int, T>(ref f);
+                Current = Unsafe.As<int, T>(ref f);
                 _value &= ~f;
                 return true;
             }

@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using AndanteTribe.Utils.Internal;
 
 namespace AndanteTribe.Utils
 {
@@ -24,7 +23,7 @@ namespace AndanteTribe.Utils
 #if NET5_0_OR_GREATER
             return System.Runtime.InteropServices.CollectionsMarshal.AsSpan(list);
 #else
-            return UnsafeUtils.As<List<T>, ListDummy<T>>(ref list).Items.AsSpan(0, list.Count);
+            return Unsafe.As<List<T>, ListDummy<T>>(ref list).Items.AsSpan(0, list.Count);
 #endif
         }
 
