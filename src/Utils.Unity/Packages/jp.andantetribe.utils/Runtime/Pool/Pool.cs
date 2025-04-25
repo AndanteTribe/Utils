@@ -84,7 +84,7 @@ namespace AndanteTribe.Utils
 
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(_disposableTokenSource.Token, cancellationToken);
             var original = await _reference.LoadAsync(cts.Token);
-            var results = await Object.InstantiateAsync(original, _root).WithCancellation(cancellationToken);
+            var results = await Object.InstantiateAsync(original, _root).WithCancellation(cts.Token);
             return results[0];
         }
 
@@ -141,7 +141,7 @@ namespace AndanteTribe.Utils
         /// <inheritdoc/>
         public void Dispose()
         {
-            if (!_disposableTokenSource.IsCancellationRequested)
+            if (!IsDisposed)
             {
                 Clear();
                 _disposableTokenSource.Cancel();
