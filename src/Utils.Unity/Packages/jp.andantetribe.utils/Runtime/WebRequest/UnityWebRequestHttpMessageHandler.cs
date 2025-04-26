@@ -36,7 +36,7 @@ namespace AndanteTribe.Utils.WebRequest
             var response = new HttpResponseMessage((HttpStatusCode)webRequest.responseCode)
             {
                 RequestMessage = requestMessage,
-                Content = new NativeArrayContent(downloadHandler.nativeData, webRequest),
+                Content = new ByteArrayContent(downloadHandler.data),
                 Version = HttpVersion.Version10
             };
 

@@ -4,14 +4,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace AndanteTribe.Utils
+namespace AndanteTribe.Utils.Tasks
 {
-    public sealed class Pool<T> : IDisposable, IReadOnlyCollection<T> where T : MonoBehaviour
+    public sealed class GameObjectPool<T> : IDisposable, IReadOnlyCollection<T> where T : MonoBehaviour
     {
         /// <summary>
         /// プールのルートオブジェクト.
@@ -21,7 +22,7 @@ namespace AndanteTribe.Utils
         /// <summary>
         /// プールのオリジナルの参照.
         /// </summary>
-        private readonly IOriginalReference<T> _reference;
+        private readonly IObjectReference<T> _reference;
 
         /// <summary>
         /// プールのスタック.
@@ -41,7 +42,7 @@ namespace AndanteTribe.Utils
         /// </summary>
         public bool IsDisposed => _disposableTokenSource.IsCancellationRequested;
 
-        public Pool(Transform root, IOriginalReference<T> reference, int capacity)
+        public GameObjectPool(Transform root, IObjectReference<T> reference, int capacity)
         {
             _root = root;
             _reference = reference;
@@ -115,11 +116,12 @@ namespace AndanteTribe.Utils
         /// 破棄済みかどうかをチェックする.
         /// </summary>
         /// <exception cref="ObjectDisposedException">破棄済みの場合にスローされる例外.</exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ThrowIfDisposed()
         {
             if (IsDisposed)
             {
-                throw new ObjectDisposedException(nameof(Pool<T>));
+                throw new ObjectDisposedException(nameof(GameObjectPool<T>));
             }
         }
 
@@ -144,6 +146,7 @@ namespace AndanteTribe.Utils
             if (!IsDisposed)
             {
                 Clear();
+                _reference.Dispose();
                 _disposableTokenSource.Cancel();
                 _disposableTokenSource.Dispose();
             }
@@ -163,16 +166,16 @@ namespace AndanteTribe.Utils
         /// </remarks>
         public readonly struct Handle : IDisposable
         {
-            private readonly Pool<T> _pool;
+            private readonly GameObjectPool<T> _gameObjectPool;
             private readonly T _instance;
 
-            internal Handle(Pool<T> pool, T instance)
+            internal Handle(GameObjectPool<T> gameObjectPool, T instance)
             {
-                _pool = pool;
+                _gameObjectPool = gameObjectPool;
                 _instance = instance;
             }
 
-            void IDisposable.Dispose() => _pool.Return(_instance);
+            void IDisposable.Dispose() => _gameObjectPool.Return(_instance);
         }
     }
 }
