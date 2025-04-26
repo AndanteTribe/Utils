@@ -2,14 +2,17 @@
     "name": "AndanteTribe.Utils",
     "rootNamespace": "AndanteTribe.Utils",
     "references": [
+        "AndanteTribe.Utils.Core",
+        "AndanteTribe.Utils.BackPort",
         "R3.Unity",
         "UniTask",
         "VContainer",
         "UnityEngine.UI",
         "Unity.TextMeshPro",
         "Unity.InputSystem",
-        "AndanteTribe.Utils.Core",
-        "AndanteTribe.Utils.BackPort"
+        "Unity.Addressables",
+        "Unity.ResourceManager",
+        "UniTask.Addressables"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -63,6 +66,11 @@
             "name": "com.unity.ugui",
             "expression": "2.0.0",
             "define": "ENABLE_TEXTMESHPRO"
+        },
+        {
+            "name": "com.unity.addressables",
+            "expression": "",
+            "define": "ENABLE_ADDRESSABLES"
         }
     ],
     "noEngineReferences": false

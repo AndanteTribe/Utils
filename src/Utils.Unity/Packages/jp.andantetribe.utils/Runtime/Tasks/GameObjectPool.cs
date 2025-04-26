@@ -4,8 +4,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading;
+using AndanteTribe.Utils.Internal;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -27,7 +27,7 @@ namespace AndanteTribe.Utils.Tasks
         /// <summary>
         /// プールのスタック.
         /// </summary>
-        private readonly Stack<T> _pool;
+        private readonly List<T> _pool;
 
         /// <summary>
         /// <see cref="Dispose"/>されたら破棄されるトークン.
@@ -46,7 +46,7 @@ namespace AndanteTribe.Utils.Tasks
         {
             _root = root;
             _reference = reference;
-            _pool = new Stack<T>(capacity);
+            _pool = new List<T>(capacity);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace AndanteTribe.Utils.Tasks
         /// <param name="cancellationToken"></param>
         public async UniTask PreallocateAsync(int count, CancellationToken cancellationToken = default)
         {
-            ThrowIfDisposed();
+            ThrowHelper.ThrowIfObjectDisposedException(IsDisposed, this);
             cancellationToken.ThrowIfCancellationRequested();
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(_disposableTokenSource.Token, cancellationToken);
             var original = await _reference.LoadAsync(cts.Token);
@@ -64,7 +64,7 @@ namespace AndanteTribe.Utils.Tasks
             foreach (var instance in instances)
             {
                 instance.gameObject.SetActive(false);
-                _pool.Push(instance);
+                _pool.Add(instance);
             }
             _pool.TrimExcess();
         }
@@ -76,11 +76,14 @@ namespace AndanteTribe.Utils.Tasks
         /// <returns></returns>
         public async UniTask<T> RentAsync(CancellationToken cancellationToken = default)
         {
-            ThrowIfDisposed();
+            ThrowHelper.ThrowIfObjectDisposedException(IsDisposed, this);
             cancellationToken.ThrowIfCancellationRequested();
-            if (_pool.TryPop(out var v))
+            if (_pool.Count > 0)
             {
-                return v;
+                var instance = _pool[0];
+                _pool.RemoveAt(0);
+                instance.gameObject.SetActive(true);
+                return instance;
             }
 
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(_disposableTokenSource.Token, cancellationToken);
@@ -106,23 +109,10 @@ namespace AndanteTribe.Utils.Tasks
         /// <param name="element">返却するインスタンス.</param>
         public void Return(T element)
         {
-            ThrowIfDisposed();
+            ThrowHelper.ThrowIfObjectDisposedException(IsDisposed, this);
             element.gameObject.SetActive(false);
             element.transform.SetParent(_root);
-            _pool.Push(element);
-        }
-
-        /// <summary>
-        /// 破棄済みかどうかをチェックする.
-        /// </summary>
-        /// <exception cref="ObjectDisposedException">破棄済みの場合にスローされる例外.</exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ThrowIfDisposed()
-        {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(GameObjectPool<T>));
-            }
+            _pool.Add(element);
         }
 
         /// <summary>
@@ -130,15 +120,15 @@ namespace AndanteTribe.Utils.Tasks
         /// </summary>
         public void Clear()
         {
-            ThrowIfDisposed();
-            foreach (var item in _pool)
+            ThrowHelper.ThrowIfObjectDisposedException(IsDisposed, this);
+            foreach (var item in _pool.AsSpan())
             {
                 Object.Destroy(item.gameObject);
             }
             _pool.Clear();
         }
 
-        public Stack<T>.Enumerator GetEnumerator() => _pool.GetEnumerator();
+        public List<T>.Enumerator GetEnumerator() => _pool.GetEnumerator();
 
         /// <inheritdoc/>
         public void Dispose()
