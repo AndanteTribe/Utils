@@ -18,18 +18,13 @@ namespace AndanteTribe.Utils.Tasks
         {
         }
 
+#if !ENABLE_INPUT_SYSTEM
         protected override void SubscribeOnLeftClick()
-        {
-#if ENABLE_INPUT_SYSTEM
-            var inputSystemModule = (UnityEngine.InputSystem.UI.InputSystemUIInputModule)CurrentInputModule;
-            inputSystemModule.leftClick.action.performed += OnLeftClick;
-#else
-            ObserveLeftClickAsync(DisposableToken).Forget();
+            => ObserveLeftClickAsync(DisposableToken).Forget();
 #endif
-        }
 
 #if ENABLE_INPUT_SYSTEM
-        private void OnLeftClick(UnityEngine.InputSystem.InputAction.CallbackContext _)
+        protected override void OnLeftClick(UnityEngine.InputSystem.InputAction.CallbackContext _)
         {
             var screenPos = UnityEngine.InputSystem.Pointer.current?.position.ReadValue() ?? Vector2.zero;
             if (screenPos == Vector2.zero)

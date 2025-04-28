@@ -8,5 +8,15 @@
   "version": "0.0.0",
   "unity": "2022.3",
   "description": "Utility library used across projects in AndanteTribe.",
-  "license": "MIT"
+  "license": "MIT",
+  "samples": [
+    {
+      "displayName": "Tap Effect Particle (URP)",
+      "path": ".Samples/jp.andantetribe.utils.sample/Tap_Effect_URP"
+    },
+    {
+      "displayName": "Base Canvas",
+      "path": ".Samples/jp.andantetribe.utils.sample/Base_Canvas"
+    }
+  ]
 }

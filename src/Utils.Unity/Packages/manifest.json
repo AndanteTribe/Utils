@@ -11,6 +11,7 @@
     "com.unity.ugui": "2.0.0",
     "jp.andantetribe.utils.backport": "file:../../Utils.BackPort",
     "jp.andantetribe.utils.core": "file:../../Utils.Core",
+    "jp.andantetribe.utils.sample": "file:jp.andantetribe.utils/.Sample/jp.andantetribe.utils.sample",
     "jp.andantetribe.utils.tests": "file:../../Utils.Tests",
     "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer",
     "com.unity.modules.accessibility": "1.0.0",

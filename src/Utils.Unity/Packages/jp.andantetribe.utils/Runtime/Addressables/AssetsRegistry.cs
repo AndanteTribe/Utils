@@ -25,6 +25,8 @@ namespace AndanteTribe.Utils.Addressables
 
         public bool IsDisposed { get; private set; }
 
+        public int Count => _handles.Count;
+
         /// <summary>
         /// アセットのロード.
         /// </summary>

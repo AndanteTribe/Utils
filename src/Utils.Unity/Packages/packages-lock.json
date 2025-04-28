@@ -125,6 +125,12 @@
       "source": "local",
       "dependencies": {}
     },
+    "jp.andantetribe.utils.sample": {
+      "version": "file:jp.andantetribe.utils/.Sample/jp.andantetribe.utils.sample",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "jp.andantetribe.utils.tests": {
       "version": "file:../../Utils.Tests",
       "depth": 0,

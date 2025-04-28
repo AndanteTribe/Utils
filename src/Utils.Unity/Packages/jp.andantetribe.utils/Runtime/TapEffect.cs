@@ -28,22 +28,28 @@ namespace AndanteTribe.Utils
         {
             Reference = reference;
             EffectCam = effectCam;
-
-            SubscribeOnLeftClick();
         }
+
+        public void Start() => SubscribeOnLeftClick();
 
         protected virtual void SubscribeOnLeftClick()
         {
 #if ENABLE_INPUT_SYSTEM
             var inputSystemModule = (UnityEngine.InputSystem.UI.InputSystemUIInputModule)CurrentInputModule;
             inputSystemModule.leftClick.action.performed += OnLeftClick;
+            DisposableToken.Register(static obj =>
+            {
+                var self = (TapEffect)obj;
+                var inputSystemModule = (UnityEngine.InputSystem.UI.InputSystemUIInputModule)CurrentInputModule;
+                inputSystemModule.leftClick.action.performed -= self.OnLeftClick;
+            }, this);
 #else
             CurrentInputModule.StartCoroutine(ObserveLeftClick());
 #endif
         }
 
 #if ENABLE_INPUT_SYSTEM
-        private void OnLeftClick(UnityEngine.InputSystem.InputAction.CallbackContext _)
+        protected virtual void OnLeftClick(UnityEngine.InputSystem.InputAction.CallbackContext _)
         {
             var screenPos = UnityEngine.InputSystem.Pointer.current?.position.ReadValue() ?? Vector2.zero;
             if (screenPos == Vector2.zero)
