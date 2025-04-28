@@ -57,7 +57,7 @@ namespace AndanteTribe.Utils
                 return;
             }
 
-            var effect = Reference.LoadAsync(_disposableTokenSource.Token).GetAwaiter().GetResult();
+            var effect = Reference.LoadAsync(DisposableToken).GetAwaiter().GetResult();
             SpawnEffect(screenPos, effect);
         }
 #else
@@ -69,7 +69,7 @@ namespace AndanteTribe.Utils
                 {
                     var screenPos = Input.mousePosition;
 
-                    var effect = Reference.LoadAsync(DisposableTokenSource.Token).GetAwaiter().GetResult();
+                    var effect = Reference.LoadAsync(DisposableToken).GetAwaiter().GetResult();
                     SpawnEffect(screenPos, effect);
                 }
 
