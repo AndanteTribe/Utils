@@ -126,7 +126,7 @@
       "dependencies": {}
     },
     "jp.andantetribe.utils.sample": {
-      "version": "file:jp.andantetribe.utils/.Sample/jp.andantetribe.utils.sample",
+      "version": "file:jp.andantetribe.utils/.Samples/jp.andantetribe.utils.sample",
       "depth": 0,
       "source": "local",
       "dependencies": {}

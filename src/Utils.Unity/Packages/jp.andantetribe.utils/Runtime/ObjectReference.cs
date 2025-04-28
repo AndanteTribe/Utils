@@ -16,10 +16,17 @@ namespace AndanteTribe.Utils
     public sealed class SerializableObjectReference<T> : IObjectReference<T> where T : UnityEngine.Object
     {
         [SerializeField]
-        private T? _object;
+        private T? _value;
 
-        public ValueTask<T> LoadAsync(CancellationToken cancellationToken) =>
-            _object != null ? new ValueTask<T>(_object) : throw new NullReferenceException("Object reference is null.");
+        public ValueTask<T> LoadAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (_value == null)
+            {
+                throw new NullReferenceException("Object reference is null.");
+            }
+            return new ValueTask<T>(_value);
+        }
 
         public void Dispose()
         {

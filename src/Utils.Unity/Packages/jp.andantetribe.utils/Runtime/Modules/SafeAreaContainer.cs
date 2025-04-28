@@ -8,7 +8,7 @@ using Screen = UnityEngine.Device.Screen;
 using Screen = UnityEngine.Screen;
 #endif
 
-namespace AndanteTribe.Utils.UIToolkit
+namespace AndanteTribe.Utils.Modules
 {
     /// <summary>
     /// セーフエリアを考慮した<see cref="VisualElement"/>.
@@ -52,4 +52,5 @@ namespace AndanteTribe.Utils.UIToolkit
         }
     }
 }
+
 #endif

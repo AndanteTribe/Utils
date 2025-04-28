@@ -1,11 +1,12 @@
-﻿#nullable enable
+﻿#if ENABLE_PARTICLESYSTEM
+#nullable enable
 
 using System;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace AndanteTribe.Utils
+namespace AndanteTribe.Utils.Modules
 {
     public class TapEffect : IDisposable
     {
@@ -95,3 +96,5 @@ namespace AndanteTribe.Utils
         }
     }
 }
+
+#endif

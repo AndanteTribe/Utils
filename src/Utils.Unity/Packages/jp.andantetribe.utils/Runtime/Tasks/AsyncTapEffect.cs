@@ -1,4 +1,4 @@
-﻿#if ENABLE_UNITASK
+﻿#if ENABLE_UNITASK && ENABLE_PARTICLESYSTEM
 #nullable enable
 
 using System.Threading;
@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace AndanteTribe.Utils.Tasks
 {
-    public sealed class AsyncTapEffect : TapEffect
+    public sealed class AsyncTapEffect : Modules.TapEffect
     {
         /// <summary>
         /// Initialize a new instance of <see cref="AsyncTapEffect"/>.

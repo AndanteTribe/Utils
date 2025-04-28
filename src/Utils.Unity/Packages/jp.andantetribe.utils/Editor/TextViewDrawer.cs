@@ -15,9 +15,11 @@ namespace AndanteTribe.Utils.Editor
     {
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
-            var root = new Foldout();
-            var foldoutCheck = root.Q(className: Foldout.checkmarkUssClassName);
-            foldoutCheck.parent.Add(new Label(property.type)
+            var root = UIElementUtils.CreateBox();
+            var foldout = new Foldout { style = { marginLeft = 10, paddingRight = 3 } };
+            root.Add(foldout);
+            var foldoutCheck = foldout.Q(className: Foldout.checkmarkUssClassName);
+            foldoutCheck.parent.Add(new Label(property.displayName)
             {
                 style =
                 {
@@ -34,7 +36,7 @@ namespace AndanteTribe.Utils.Editor
             objectField.Q(className: ObjectField.ussClassName + "-display__label").style.marginLeft = 2;
             foldoutCheck.parent.Add(objectField);
 
-            var formatProperty = property.FindPropertyRelative("_format");
+            var formatProperty = property.FindPropertyRelative("Format");
             var value = formatProperty.stringValue;
             var defaultValue = new FormatSettings.KeyValuePair { Value = string.IsNullOrEmpty(value) ? "" : value };
             var options = FormatSettings.instance.GetFormats(property.type switch
@@ -54,7 +56,7 @@ namespace AndanteTribe.Utils.Editor
                 property.stringValue = evt.newValue.Value;
                 property.serializedObject.ApplyModifiedProperties();
             }, formatProperty);
-            root.Add(popupField);
+            foldout.Add(popupField);
 
             var range = property.FindPropertyRelative("_range");
             if (range != null)
@@ -62,24 +64,24 @@ namespace AndanteTribe.Utils.Editor
                 switch (range.propertyType)
                 {
                     case SerializedPropertyType.Vector2:
-                        root.Add(new FloatField("Min")
+                        foldout.Add(new FloatField("Min")
                         {
                             bindingPath = "_range.x",
                             style = { marginBottom = 3 }
                         });
-                        root.Add(new FloatField("Max")
+                        foldout.Add(new FloatField("Max")
                         {
                             bindingPath = "_range.y",
                             style = { marginBottom = 3 }
                         });
                         break;
                     case SerializedPropertyType.Vector2Int:
-                        root.Add(new IntegerField("Min")
+                        foldout.Add(new IntegerField("Min")
                         {
                             bindingPath = "_range.x",
                             style = { marginBottom = 3 }
                         });
-                        root.Add(new IntegerField("Max")
+                        foldout.Add(new IntegerField("Max")
                         {
                             bindingPath = "_range.y",
                             style = { marginBottom = 3 }

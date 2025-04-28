@@ -71,6 +71,16 @@
             "name": "com.unity.addressables",
             "expression": "",
             "define": "ENABLE_ADDRESSABLES"
+        },
+        {
+            "name": "com.unity.modules.particlesystem",
+            "expression": "",
+            "define": "ENABLE_PARTICLESYSTEM"
+        },
+        {
+            "name": "com.unity.modules.audio",
+            "expression": "",
+            "define": "ENABLE_AUDIO"
         }
     ],
     "noEngineReferences": false
