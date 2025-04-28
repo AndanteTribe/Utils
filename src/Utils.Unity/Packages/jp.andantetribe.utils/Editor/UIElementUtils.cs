@@ -38,6 +38,7 @@ namespace AndanteTribe.Utils.Editor
             {
                 box.Add(new Label(label)
                 {
+                    name = label,
                     style =
                     {
                         marginTop = 3,
