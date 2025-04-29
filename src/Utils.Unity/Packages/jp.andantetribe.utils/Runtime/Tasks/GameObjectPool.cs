@@ -58,9 +58,9 @@ namespace AndanteTribe.Utils.Tasks
         {
             ThrowHelper.ThrowIfObjectDisposedException(IsDisposed, this);
             cancellationToken.ThrowIfCancellationRequested();
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(_disposableTokenSource.Token, cancellationToken);
-            var original = await _reference.LoadAsync(cts.Token);
-            var instances = await Object.InstantiateAsync(original, count, _root).WithCancellation(cts.Token);
+            await using var _ = cancellationToken.LinkTo(_disposableTokenSource);
+            var original = await _reference.LoadAsync(_disposableTokenSource.Token);
+            var instances = await Object.InstantiateAsync(original, count, _root).WithCancellation(_disposableTokenSource.Token);
             foreach (var instance in instances)
             {
                 instance.gameObject.SetActive(false);
@@ -86,9 +86,9 @@ namespace AndanteTribe.Utils.Tasks
                 return instance;
             }
 
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(_disposableTokenSource.Token, cancellationToken);
-            var original = await _reference.LoadAsync(cts.Token);
-            var results = await Object.InstantiateAsync(original, _root).WithCancellation(cts.Token);
+            await using var _ = cancellationToken.LinkTo(_disposableTokenSource);
+            var original = await _reference.LoadAsync(_disposableTokenSource.Token);
+            var results = await Object.InstantiateAsync(original, _root).WithCancellation(_disposableTokenSource.Token);
             return results[0];
         }
 
