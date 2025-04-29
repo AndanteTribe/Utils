@@ -131,8 +131,10 @@ namespace AndanteTribe.Utils.Addressables
             }
         }
 
-        /// <inheritdoc/>
-        public void Dispose()
+        /// <summary>
+        /// キャッシュしているアセットを全てアンロード.
+        /// </summary>
+        public void Clear()
         {
             foreach (var handle in _handles.AsSpan())
             {
@@ -141,8 +143,18 @@ namespace AndanteTribe.Utils.Addressables
                     handle.Release();
                 }
             }
-            ListPool<AsyncOperationHandle>.Release(_handles);
-            IsDisposed = true;
+            _handles.Clear();
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            if (!IsDisposed)
+            {
+                Clear();
+                ListPool<AsyncOperationHandle>.Release(_handles);
+                IsDisposed = true;
+            }
         }
     }
 }

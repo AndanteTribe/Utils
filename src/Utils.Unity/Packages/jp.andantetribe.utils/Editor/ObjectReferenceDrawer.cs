@@ -24,7 +24,11 @@ namespace AndanteTribe.Utils.Editor
         {
             var root = UIElementUtils.CreateBox(property.displayName);
 
-            SetOptionButton(root, property);
+            // SerializeReferenceの時だけ表示
+            if (property.propertyType == SerializedPropertyType.ManagedReference)
+            {
+                SetOptionButton(root, property);
+            }
 
             var valueProperty = property.FindPropertyRelative("_value");
             if (valueProperty != null)
@@ -37,12 +41,6 @@ namespace AndanteTribe.Utils.Editor
 
         private static void SetOptionButton(VisualElement root, SerializedProperty property)
         {
-            // SerializeReferenceの時だけ表示
-            if (property.propertyType != SerializedPropertyType.ManagedReference)
-            {
-                return;
-            }
-
             var opBtn = new Button()
             {
                 style =
@@ -60,7 +58,6 @@ namespace AndanteTribe.Utils.Editor
                 var genericDropdown = new GenericDropdownMenu();
                 foreach (var type in s_objectReferenceTypes.Value)
                 {
-                    var data = new DropDownData { Type = type, Property = property };
                     genericDropdown.AddItem(type.Name.AsSpan()[..^5].ToString(), false, static d =>
                     {
                         var data = (DropDownData)d;
@@ -89,7 +86,7 @@ namespace AndanteTribe.Utils.Editor
 
                         property.managedReferenceValue = Activator.CreateInstance(type.MakeGenericType(genericType));
                         property.serializedObject.ApplyModifiedProperties();
-                    }, data);
+                    }, new DropDownData { Type = type, Property = property });
                 }
 
                 genericDropdown.DropDown(btn.worldBound, btn, false);
