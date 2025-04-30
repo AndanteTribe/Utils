@@ -56,7 +56,7 @@ namespace AndanteTribe.Utils.Tasks
         /// <param name="cancellationToken"></param>
         public async UniTask PreallocateAsync(int count, CancellationToken cancellationToken = default)
         {
-            ThrowHelper.ThrowIfObjectDisposedException(IsDisposed, this);
+            ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
             cancellationToken.ThrowIfCancellationRequested();
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(_disposableTokenSource.Token, cancellationToken);
             var original = await _reference.LoadAsync(cts.Token);
@@ -76,7 +76,7 @@ namespace AndanteTribe.Utils.Tasks
         /// <returns></returns>
         public async UniTask<T> RentAsync(CancellationToken cancellationToken = default)
         {
-            ThrowHelper.ThrowIfObjectDisposedException(IsDisposed, this);
+            ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
             cancellationToken.ThrowIfCancellationRequested();
             if (_pool.Count > 0)
             {
@@ -109,7 +109,7 @@ namespace AndanteTribe.Utils.Tasks
         /// <param name="element">返却するインスタンス.</param>
         public void Return(T element)
         {
-            ThrowHelper.ThrowIfObjectDisposedException(IsDisposed, this);
+            ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
             element.gameObject.SetActive(false);
             element.transform.SetParent(_root);
             _pool.Add(element);
@@ -120,7 +120,7 @@ namespace AndanteTribe.Utils.Tasks
         /// </summary>
         public void Clear()
         {
-            ThrowHelper.ThrowIfObjectDisposedException(IsDisposed, this);
+            ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
             foreach (var item in _pool.AsSpan())
             {
                 Object.Destroy(item.gameObject);

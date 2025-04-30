@@ -38,7 +38,7 @@ namespace AndanteTribe.Utils.Addressables
             string address, CancellationToken cancellationToken) where TObject : Object
         {
             cancellationToken.ThrowIfCancellationRequested();
-            ThrowHelper.ThrowIfObjectDisposedException(IsDisposed, this);
+            ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
             var handle = Addressables.LoadAssetAsync<TObject>(address);
             var result = await handle.ToUniTask(cancellationToken: cancellationToken, autoReleaseWhenCanceled: true);
             _handles.Add(handle);
@@ -56,7 +56,7 @@ namespace AndanteTribe.Utils.Addressables
             AssetReferenceT<TObject> reference, CancellationToken cancellationToken) where TObject : Object
         {
             cancellationToken.ThrowIfCancellationRequested();
-            ThrowHelper.ThrowIfObjectDisposedException(IsDisposed, this);
+            ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
             var handle = Addressables.LoadAssetAsync<TObject>(reference);
             var result = await handle.ToUniTask(cancellationToken: cancellationToken, autoReleaseWhenCanceled: true);
             _handles.Add(handle);
@@ -78,7 +78,7 @@ namespace AndanteTribe.Utils.Addressables
             string address, Transform parent, CancellationToken cancellationToken) where TComponent : Component
         {
             cancellationToken.ThrowIfCancellationRequested();
-            ThrowHelper.ThrowIfObjectDisposedException(IsDisposed, this);
+            ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
             var handle = Addressables.LoadAssetAsync<GameObject>(address);
             var obj = await handle.ToUniTask(cancellationToken: cancellationToken, autoReleaseWhenCanceled: true);
             if (!obj.TryGetComponent<TComponent>(out var component))
@@ -111,7 +111,7 @@ namespace AndanteTribe.Utils.Addressables
             AssetReferenceT<GameObject> reference, Transform parent, CancellationToken cancellationToken) where TComponent : Component
         {
             cancellationToken.ThrowIfCancellationRequested();
-            ThrowHelper.ThrowIfObjectDisposedException(IsDisposed, this);
+            ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
             var handle = Addressables.LoadAssetAsync<GameObject>(reference);
             var obj = await handle.ToUniTask(cancellationToken: cancellationToken, autoReleaseWhenCanceled: true);
             if (!obj.TryGetComponent<TComponent>(out var component))

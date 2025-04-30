@@ -9,7 +9,7 @@ namespace AndanteTribe.Utils.Internal
     internal static class ThrowHelper
     {
         [HideInCallstack]
-        internal static void ThrowIfObjectDisposedException([DoesNotReturnIf(true)] bool condition, object instance)
+        internal static void ThrowIfDisposedException([DoesNotReturnIf(true)] bool condition, object instance)
         {
             if (condition)
             {
