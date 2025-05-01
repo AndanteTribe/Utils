@@ -1,23 +1,16 @@
 ﻿#if ENABLE_PARTICLESYSTEM
 #nullable enable
 
-using System;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace AndanteTribe.Utils.Modules
 {
-    public class TapEffect : IDisposable
+    public class TapEffect : CancellationDisposable
     {
         protected readonly IObjectReference<ParticleSystem> Reference;
         protected readonly Camera EffectCam;
 
-        private readonly CancellationTokenSource _disposableTokenSource = new();
-
-        public bool IsDisposed => _disposableTokenSource.IsCancellationRequested;
-
-        protected CancellationToken DisposableToken => _disposableTokenSource.Token;
         protected static BaseInputModule CurrentInputModule => EventSystem.current.currentInputModule;
 
         /// <summary>
@@ -85,14 +78,14 @@ namespace AndanteTribe.Utils.Modules
             effect.Emit(1);
         }
 
-        public void Dispose()
+        /// <inheritdoc/>
+        public override void Dispose()
         {
             if (!IsDisposed)
             {
                 Reference.Dispose();
-                _disposableTokenSource.Cancel();
-                _disposableTokenSource.Dispose();
             }
+            base.Dispose();
         }
     }
 }

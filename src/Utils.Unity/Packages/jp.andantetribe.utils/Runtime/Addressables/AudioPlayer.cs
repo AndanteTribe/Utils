@@ -3,6 +3,7 @@
 
 using System;
 using System.Threading;
+using AndanteTribe.Utils.Internal;
 using Cysharp.Threading.Tasks;
 #if ENABLE_R3
 using R3;
@@ -16,7 +17,7 @@ namespace AndanteTribe.Utils.Addressables
     /// <summary>
     /// 汎用オーディオ再生クラス.
     /// </summary>
-    public class AudioPlayer
+    public class AudioPlayer : CancellationDisposable
     {
         protected const int BgmChannelCount = 2;
 
@@ -49,22 +50,22 @@ namespace AndanteTribe.Utils.Addressables
         /// <param name="root"></param>
         public AudioPlayer(GameObject root)
         {
-            var bgmChannels = new AudioSource[BgmChannelCount];
-            for (var i = 0; i < BgmChannelCount; i++)
+            _bgmChannels = new AudioSource[BgmChannelCount];
+            var bgmChannels = _bgmChannels.AsSpan();
+            for (var i = 0; i < bgmChannels.Length; i++)
             {
                 var channel = root.AddComponent<AudioSource>();
                 channel.playOnAwake = false;
                 channel.loop = true;
                 bgmChannels[i] = channel;
             }
-            _bgmChannels = bgmChannels;
             SeChannel = root.AddComponent<AudioSource>();
             BgmRegistry = new AssetsRegistry();
 
 #if ENABLE_R3
             BgmVolume
                 .CombineLatest(MasterVolume, static (bgmVolume, masterVolume) => bgmVolume * masterVolume)
-                .Subscribe(bgmChannels, static (value, channels) =>
+                .Subscribe(_bgmChannels, static (value, channels) =>
                 {
                     foreach (var channel in channels)
                     {
@@ -88,11 +89,13 @@ namespace AndanteTribe.Utils.Addressables
         public async UniTask PlayBGMAsync(string address, bool loop = true, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var clip = await BgmRegistry.LoadAsync<AudioClip>(address, cancellationToken);
-
+            ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
+            using var _ = CreateLinkedToken(cancellationToken, out var ct);
+            var clip = await BgmRegistry.LoadAsync<AudioClip>(address, ct);
             var channel = Array.Find(_bgmChannels, static c => !c.isPlaying);
             channel ??= _bgmChannels[0];
 
+            channel.Stop();
             channel.clip = clip;
             channel.loop = loop;
             channel.Play();
@@ -103,7 +106,8 @@ namespace AndanteTribe.Utils.Addressables
         /// </summary>
         public void StopAllBGM()
         {
-            foreach (var channel in _bgmChannels.AsSpan())
+            ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
+            foreach (var channel in BgmChannels)
             {
                 if (channel.isPlaying)
                 {
@@ -122,8 +126,10 @@ namespace AndanteTribe.Utils.Addressables
         public async UniTask PlaySEAsync(string address, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
+            using var _ = CreateLinkedToken(cancellationToken, out var ct);
             var handle = Addressables.LoadAssetAsync<AudioClip>(address);
-            var result = await handle.ToUniTask(cancellationToken: cancellationToken, autoReleaseWhenCanceled: true);
+            var result = await handle.ToUniTask(cancellationToken: ct, autoReleaseWhenCanceled: true);
             if (result == null)
             {
                 Debug.LogError($"Failed to load SE: {address}");
@@ -132,11 +138,21 @@ namespace AndanteTribe.Utils.Addressables
 
             SeChannel.PlayOneShot(result);
 
-            await UniTask.Delay(TimeSpan.FromSeconds(result.length), cancellationToken: cancellationToken);
+            await UniTask.Delay(TimeSpan.FromSeconds(result.length), cancellationToken: ct);
             if (handle.IsValid())
             {
                 handle.Release();
             }
+        }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            base.Dispose();
+            StopAllBGM();
+            SeChannel.Stop();
+            SeChannel.clip = null;
+            BgmRegistry.Clear();
         }
     }
 }

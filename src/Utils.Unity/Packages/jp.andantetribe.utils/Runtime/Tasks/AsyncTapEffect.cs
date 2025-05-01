@@ -37,7 +37,7 @@ namespace AndanteTribe.Utils.Tasks
 #else
         private async UniTask ObserveLeftClickAsync(CancellationToken cancellationToken)
         {
-            while (!cancellationToken.IsCancellationRequested)
+            while (!IsDisposed)
             {
                 if (Input.GetMouseButtonDown(0))
                 {

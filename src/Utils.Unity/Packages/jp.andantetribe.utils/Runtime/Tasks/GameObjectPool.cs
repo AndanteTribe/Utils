@@ -12,7 +12,7 @@ using Object = UnityEngine.Object;
 
 namespace AndanteTribe.Utils.Tasks
 {
-    public sealed class GameObjectPool<T> : IDisposable, IReadOnlyCollection<T> where T : MonoBehaviour
+    public sealed class GameObjectPool<T> : CancellationDisposable, IReadOnlyCollection<T> where T : MonoBehaviour
     {
         /// <summary>
         /// プールのルートオブジェクト.
@@ -29,18 +29,8 @@ namespace AndanteTribe.Utils.Tasks
         /// </summary>
         private readonly List<T> _pool;
 
-        /// <summary>
-        /// <see cref="Dispose"/>されたら破棄されるトークン.
-        /// </summary>
-        private readonly CancellationTokenSource _disposableTokenSource = new();
-
         /// <inheritdoc/>
         public int Count => _pool.Count;
-
-        /// <summary>
-        /// 破棄済みかどうか.
-        /// </summary>
-        public bool IsDisposed => _disposableTokenSource.IsCancellationRequested;
 
         public GameObjectPool(Transform root, IObjectReference<T> reference, int capacity)
         {
@@ -58,9 +48,9 @@ namespace AndanteTribe.Utils.Tasks
         {
             ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
             cancellationToken.ThrowIfCancellationRequested();
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(_disposableTokenSource.Token, cancellationToken);
-            var original = await _reference.LoadAsync(cts.Token);
-            var instances = await Object.InstantiateAsync(original, count, _root).WithCancellation(cts.Token);
+            using var _ = CreateLinkedToken(cancellationToken, out var ct);
+            var original = await _reference.LoadAsync(ct);
+            var instances = await Object.InstantiateAsync(original, count, _root).WithCancellation(ct);
             foreach (var instance in instances)
             {
                 instance.gameObject.SetActive(false);
@@ -86,9 +76,9 @@ namespace AndanteTribe.Utils.Tasks
                 return instance;
             }
 
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(_disposableTokenSource.Token, cancellationToken);
-            var original = await _reference.LoadAsync(cts.Token);
-            var results = await Object.InstantiateAsync(original, _root).WithCancellation(cts.Token);
+            using var _ = CreateLinkedToken(cancellationToken, out var ct);
+            var original = await _reference.LoadAsync(ct);
+            var results = await Object.InstantiateAsync(original, _root).WithCancellation(ct);
             return results[0];
         }
 
@@ -131,15 +121,14 @@ namespace AndanteTribe.Utils.Tasks
         public List<T>.Enumerator GetEnumerator() => _pool.GetEnumerator();
 
         /// <inheritdoc/>
-        public void Dispose()
+        public override void Dispose()
         {
             if (!IsDisposed)
             {
                 Clear();
                 _reference.Dispose();
-                _disposableTokenSource.Cancel();
-                _disposableTokenSource.Dispose();
             }
+            base.Dispose();
         }
 
         /// <inheritdoc/>

@@ -19,11 +19,9 @@ namespace AndanteTribe.Utils.Addressables
     /// <summary>
     /// ロードしたアセットのハンドルをキャッシュしているレジストリ.
     /// </summary>
-    public class AssetsRegistry : IDisposable
+    public class AssetsRegistry : CancellationDisposable
     {
         private readonly List<AsyncOperationHandle> _handles = ListPool<AsyncOperationHandle>.Get();
-
-        public bool IsDisposed { get; private set; }
 
         public int Count => _handles.Count;
 
@@ -39,8 +37,9 @@ namespace AndanteTribe.Utils.Addressables
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
+            using var _ = CreateLinkedToken(cancellationToken, out var ct);
             var handle = Addressables.LoadAssetAsync<TObject>(address);
-            var result = await handle.ToUniTask(cancellationToken: cancellationToken, autoReleaseWhenCanceled: true);
+            var result = await handle.ToUniTask(cancellationToken: ct, autoReleaseWhenCanceled: true);
             _handles.Add(handle);
             return result;
         }
@@ -57,8 +56,9 @@ namespace AndanteTribe.Utils.Addressables
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
+            using var _ = CreateLinkedToken(cancellationToken, out var ct);
             var handle = Addressables.LoadAssetAsync<TObject>(reference);
-            var result = await handle.ToUniTask(cancellationToken: cancellationToken, autoReleaseWhenCanceled: true);
+            var result = await handle.ToUniTask(cancellationToken: ct, autoReleaseWhenCanceled: true);
             _handles.Add(handle);
             return result;
         }
@@ -79,8 +79,9 @@ namespace AndanteTribe.Utils.Addressables
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
+            using var _ = CreateLinkedToken(cancellationToken, out var ct);
             var handle = Addressables.LoadAssetAsync<GameObject>(address);
-            var obj = await handle.ToUniTask(cancellationToken: cancellationToken, autoReleaseWhenCanceled: true);
+            var obj = await handle.ToUniTask(cancellationToken: ct, autoReleaseWhenCanceled: true);
             if (!obj.TryGetComponent<TComponent>(out var component))
             {
                 handle.Release();
@@ -88,10 +89,11 @@ namespace AndanteTribe.Utils.Addressables
             }
             try
             {
-                var result = await Object.InstantiateAsync(component, parent).WithCancellation(cancellationToken);
+                var result = await Object.InstantiateAsync(component, parent).WithCancellation(ct);
+                _handles.Add(handle);
                 return result[0];
             }
-            catch (OperationCanceledException e) when(e.CancellationToken == cancellationToken)
+            catch (OperationCanceledException e) when(e.CancellationToken == ct)
             {
                 handle.Release();
                 throw;
@@ -112,8 +114,9 @@ namespace AndanteTribe.Utils.Addressables
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
+            using var _ = CreateLinkedToken(cancellationToken, out var ct);
             var handle = Addressables.LoadAssetAsync<GameObject>(reference);
-            var obj = await handle.ToUniTask(cancellationToken: cancellationToken, autoReleaseWhenCanceled: true);
+            var obj = await handle.ToUniTask(cancellationToken: ct, autoReleaseWhenCanceled: true);
             if (!obj.TryGetComponent<TComponent>(out var component))
             {
                 handle.Release();
@@ -121,10 +124,11 @@ namespace AndanteTribe.Utils.Addressables
             }
             try
             {
-                var result = await Object.InstantiateAsync(component, parent).WithCancellation(cancellationToken);
+                var result = await Object.InstantiateAsync(component, parent).WithCancellation(ct);
+                _handles.Add(handle);
                 return result[0];
             }
-            catch (OperationCanceledException e) when(e.CancellationToken == cancellationToken)
+            catch (OperationCanceledException e) when(e.CancellationToken == ct)
             {
                 handle.Release();
                 throw;
@@ -136,6 +140,7 @@ namespace AndanteTribe.Utils.Addressables
         /// </summary>
         public void Clear()
         {
+            ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
             foreach (var handle in _handles.AsSpan())
             {
                 if (handle.IsValid())
@@ -147,14 +152,14 @@ namespace AndanteTribe.Utils.Addressables
         }
 
         /// <inheritdoc/>
-        public void Dispose()
+        public override void Dispose()
         {
             if (!IsDisposed)
             {
                 Clear();
                 ListPool<AsyncOperationHandle>.Release(_handles);
-                IsDisposed = true;
             }
+            base.Dispose();
         }
     }
 }

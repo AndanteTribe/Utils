@@ -278,5 +278,20 @@ namespace AndanteTribe.Utils.Tests
             Assert.That(list[5], Is.EqualTo(77));
             Assert.That(list[6], Is.EqualTo(88));
         }
+
+        [Test]
+        public void CancellationDisposableTest()
+        {
+            var disposable = new CancellationDisposableSample();
+            Assert.That(disposable.IsDisposed, Is.False);
+
+            disposable.Dispose();
+            Assert.That(disposable.IsDisposed, Is.True);
+            Assert.That(disposable.DisposableToken.IsCancellationRequested, Is.True);
+        }
+
+        private sealed class CancellationDisposableSample : CancellationDisposable
+        {
+        }
     }
 }
