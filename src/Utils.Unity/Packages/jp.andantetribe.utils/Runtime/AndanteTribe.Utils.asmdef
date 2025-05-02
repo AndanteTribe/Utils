@@ -12,7 +12,8 @@
         "Unity.InputSystem",
         "Unity.Addressables",
         "Unity.ResourceManager",
-        "UniTask.Addressables"
+        "UniTask.Addressables",
+        "LitMotion"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -81,6 +82,11 @@
             "name": "com.unity.modules.audio",
             "expression": "",
             "define": "ENABLE_AUDIO"
+        },
+        {
+            "name": "com.annulusgames.lit-motion",
+            "expression": "",
+            "define": "ENABLE_LITMOTION"
         }
     ],
     "noEngineReferences": false

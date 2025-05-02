@@ -38,8 +38,14 @@ namespace AndanteTribe.Utils.Addressables
             cancellationToken.ThrowIfCancellationRequested();
             ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
             using var _ = CreateLinkedToken(cancellationToken, out var ct);
+            return await LoadAsyncInternal<TObject>(address, ct);
+        }
+
+        internal async UniTask<TObject> LoadAsyncInternal<TObject>(
+            string address, CancellationToken cancellationToken) where TObject : Object
+        {
             var handle = Addressables.LoadAssetAsync<TObject>(address);
-            var result = await handle.ToUniTask(cancellationToken: ct, autoReleaseWhenCanceled: true);
+            var result = await handle.ToUniTask(cancellationToken: cancellationToken, autoReleaseWhenCanceled: true);
             _handles.Add(handle);
             return result;
         }
