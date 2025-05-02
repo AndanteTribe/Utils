@@ -61,6 +61,9 @@ namespace AndanteTribe.Utils.Addressables
                     self.SetBgmVolume(next, Mathf.Sin(f));
                 })
                 .ToUniTask(cts.Token);
+
+            currentChannel.Stop();
+            currentChannel.clip = null;
         }
     }
 }
