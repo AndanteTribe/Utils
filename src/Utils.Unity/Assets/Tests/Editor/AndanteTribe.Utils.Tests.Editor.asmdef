@@ -1,0 +1,21 @@
+{
+    "name": "AndanteTribe.Utils.Tests.Editor",
+    "rootNamespace": "AndanteTribe.Utils.Tests.Editor",
+    "references": [
+        "GUID:bf0b7d05fd3af8e4aa4966bcda55ac92",
+        "GUID:0acc523941302664db1f4e527237feb3"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
