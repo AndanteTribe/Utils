@@ -309,5 +309,11 @@ csharp_prefer_system_threading_lock = true:suggestion
 # IDE1005: 条件付き代理呼び出しを使用する.
 csharp_style_conditional_delegate_call = true:suggestion
 
+# フィールド等と属性を別の行にする(ただし引数につけるものは除外)
+csharp_place_type_attribute_on_same_line = false
+csharp_place_method_attribute_on_same_line = false
+csharp_place_accessorholder_attribute_on_same_line = false
+csharp_place_field_attribute_on_same_line = false
+
 [*.{csproj,vbproj,proj,nativeproj,locproj}]
 charset = utf-8
