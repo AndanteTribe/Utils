@@ -12,7 +12,7 @@ namespace AndanteTribe.Utils.Addressables
 {
     public partial class AudioPlayer
     {
-        public virtual TimeSpan FadeDuration { get; } = TimeSpan.FromSeconds(3.0f);
+        public virtual TimeSpan FadeDuration { get; init; } = TimeSpan.FromSeconds(3.0f);
 
         public async UniTask CrossFadeBGMAsync(string address, bool loop = true, CancellationToken cancellationToken = default)
         {
