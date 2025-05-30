@@ -2,7 +2,7 @@
     "name": "AndanteTribe.Utils.Core",
     "rootNamespace": "AndanteTribe.Utils",
     "references": [
-        "GUID:eb014bd0dae606c44a234c52ffeb53e2"
+        "AndanteTribe.Utils.BackPort"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
