@@ -4,6 +4,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace AndanteTribe.Utils.Tasks
 {
@@ -14,7 +15,8 @@ namespace AndanteTribe.Utils.Tasks
         /// </summary>
         /// <param name="reference"></param>
         /// <param name="effectCam"></param>
-        public AsyncTapEffect(IObjectReference<ParticleSystem> reference, Camera effectCam) : base(reference, effectCam)
+        public AsyncTapEffect(IObjectReference<ParticleSystem> reference, Camera effectCam, BaseInputModule? currentInputModule = null)
+            : base(reference, effectCam, currentInputModule)
         {
         }
 

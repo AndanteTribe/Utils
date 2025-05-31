@@ -10,18 +10,19 @@ namespace AndanteTribe.Utils.Modules
     {
         protected readonly IObjectReference<ParticleSystem> Reference;
         protected readonly Camera EffectCam;
-
-        protected static BaseInputModule CurrentInputModule => EventSystem.current.currentInputModule;
+        protected readonly BaseInputModule CurrentInputModule;
 
         /// <summary>
         /// Initialize a new instance of <see cref="TapEffect"/>.
         /// </summary>
         /// <param name="reference"></param>
         /// <param name="effectCam"></param>
-        public TapEffect(IObjectReference<ParticleSystem> reference, Camera effectCam)
+        /// <param name="currentInputModule"></param>
+        public TapEffect(IObjectReference<ParticleSystem> reference, Camera effectCam, BaseInputModule? currentInputModule = null)
         {
             Reference = reference;
             EffectCam = effectCam;
+            CurrentInputModule = currentInputModule ?? EventSystem.current.currentInputModule;
         }
 
         public void Start() => SubscribeOnLeftClick();
@@ -34,7 +35,7 @@ namespace AndanteTribe.Utils.Modules
             DisposableToken.Register(static obj =>
             {
                 var self = (TapEffect)obj;
-                var inputSystemModule = (UnityEngine.InputSystem.UI.InputSystemUIInputModule)CurrentInputModule;
+                var inputSystemModule = (UnityEngine.InputSystem.UI.InputSystemUIInputModule)self.CurrentInputModule;
                 inputSystemModule.leftClick.action.performed -= self.OnLeftClick;
             }, this);
 #else
