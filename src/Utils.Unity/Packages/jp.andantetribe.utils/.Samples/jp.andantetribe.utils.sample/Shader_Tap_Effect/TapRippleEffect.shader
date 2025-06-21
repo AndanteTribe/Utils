@@ -4,8 +4,7 @@ Shader "UI/TapRippleEffect"
     {
         _MainTex ("Texture", 2D) = "white" {}
         _Color ("Color", Color) = (1,1,1,1)
-        _RippleWidth ("Ripple Width", Range(0.0, 0.5)) = 0.1
-        _Progress ("Progress", Range(0.0, 1.0)) = 0.0
+        _RippleWidth ("Ripple Width", Range(0.0, 0.5)) = 0.01
     }
     SubShader
     {
@@ -13,56 +12,81 @@ Shader "UI/TapRippleEffect"
         Blend SrcAlpha OneMinusSrcAlpha
         ZWrite Off
         Cull Off
-        
+
         Pass
         {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            
+
             #include "UnityCG.cginc"
 
             struct appdata
             {
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
+                float4 color : COLOR;
             };
 
             struct v2f
             {
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
+                float4 color : COLOR;
             };
 
             sampler2D _MainTex;
+            float4 _MainTex_TexelSize;
             float4 _Color;
             float _RippleWidth;
-            float _Progress;
-            
+
+            #define MAX_TAPS 10
+            float4 _TapPositions[MAX_TAPS];
+            float _TapProgresses[MAX_TAPS];
+            int _TapCount;
+
             v2f vert (appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = v.uv;
+                o.color = v.color;
                 return o;
             }
-            
+
             fixed4 frag (v2f i) : SV_Target
             {
-                float2 center = float2(0.5, 0.5);
-                float dist = distance(i.uv, center);
-                
-                float radius = _Progress * 0.5;
-                float alpha = 0;
-                
-                if (dist < radius && dist > radius - _RippleWidth)
+                float4 finalColor = float4(0, 0, 0, 0);
+                float aspectRatio = _ScreenParams.x / _ScreenParams.y;
+
+                for (int idx = 0; idx < _TapCount; idx++)
                 {
-                    // リング内部の場合、中心からの距離に応じて透明度を計算
-                    alpha = 1.0 - (_Progress * 0.8); // プログレスに応じてフェードアウト
-                    alpha *= smoothstep(radius - _RippleWidth, radius, dist);
+                    float2 tapCenter = _TapPositions[idx].xy;
+                    float progress = _TapProgresses[idx];
+                    
+                    float2 delta = i.uv - tapCenter;
+                    
+                    float2 aspectCorrectedDelta = delta;
+                    aspectCorrectedDelta.x *= aspectRatio;
+                    float dist = length(aspectCorrectedDelta);
+                    
+                    float radius = progress * 0.1;
+                    float alpha = 0;
+                    
+                    if (dist < radius && dist > radius - _RippleWidth)
+                    {
+                        alpha = 1.0 - (progress * 0.8);
+                        alpha *= smoothstep(radius - _RippleWidth, radius, dist);
+                    
+                        float4 rippleColor = float4(_Color.rgb, alpha * _Color.a);
+                        finalColor = float4(
+                            lerp(finalColor.rgb, rippleColor.rgb, rippleColor.a * (1 - finalColor.a)),
+                            finalColor.a + rippleColor.a * (1 - finalColor.a)
+                        );
+                    }
                 }
-                
-                return float4(_Color.rgb, alpha * _Color.a);
+
+                return finalColor;
             }
             ENDCG
         }

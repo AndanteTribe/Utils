@@ -29,6 +29,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AspectRatio: 1
+    - _MaxSize: 0.5
     - _Progress: 0
     - _RippleWidth: 0.1
     m_Colors:
