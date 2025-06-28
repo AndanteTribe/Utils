@@ -2,13 +2,11 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;
-using System.Collections.Generic;
 
 namespace AndanteTribe.Utils.Modules
 {
     public class ShaderTapEffect : CancellationDisposable
     {
-        // エフェクト情報を保持する構造体
         private struct TapEffectData
         {
             public Vector2 Position;
@@ -17,61 +15,69 @@ namespace AndanteTribe.Utils.Modules
             public bool IsActive;
         }
 
-        protected readonly RectTransform CanvasRect;
-        protected readonly Image EffectImage;
-        protected readonly BaseInputModule CurrentInputModule;
-        protected readonly float Duration = 0.5f;
+        private readonly RectTransform _canvasRect;
+        private readonly Image _effectImage;
+        private readonly BaseInputModule _currentInputModule;
+        private readonly float _duration;
 
-        // エフェクトデータ配列（固定長）
         private readonly TapEffectData[] _effectsData;
         private readonly int _maxEffects;
+        private readonly Vector4[] _positions;
+        private readonly float[] _progresses;
 
-        // シェーダープロパティID
         private static readonly int s_positionsID = Shader.PropertyToID("_TapPositions");
         private static readonly int s_progressesID = Shader.PropertyToID("_TapProgresses");
         private static readonly int s_countID = Shader.PropertyToID("_TapCount");
 
-        private Vector4[] _positions;
-        private float[] _progresses;
         private Coroutine _updateCoroutine;
 
+        /// <summary>
+        /// Initialize a new instance of  <see cref="ShaderTapEffect"/>.
+        /// </summary>
+        /// <param name="canvasRect"></param>
+        /// <param name="effectImage"></param>
+        /// <param name="effectMaterial"></param>
+        /// <param name="currentInputModule"></param>
+        /// <param name="duration"></param>
+        /// <param name="maxEffects"></param>
         public ShaderTapEffect(RectTransform canvasRect, Image effectImage, Material effectMaterial,
             BaseInputModule currentInputModule = null, float duration = 0.5f, int maxEffects = 10)
         {
-            CanvasRect = canvasRect;
-            EffectImage = effectImage;
-            CurrentInputModule = currentInputModule ?? EventSystem.current.currentInputModule;
-            Duration = duration;
+            _canvasRect = canvasRect;
+            _effectImage = effectImage;
+            _currentInputModule = currentInputModule ?? EventSystem.current.currentInputModule;
+            _duration = duration;
             _maxEffects = maxEffects;
 
-            // 効率化のためにエフェクトデータを初期化
             _effectsData = new TapEffectData[_maxEffects];
             _positions = new Vector4[_maxEffects];
             _progresses = new float[_maxEffects];
 
-            // 1つのマテリアルインスタンスを使用
-            EffectImage.material = new Material(effectMaterial);
-            EffectImage.enabled = true;
+            _effectImage.material = new Material(effectMaterial);
+            _effectImage.enabled = true;
         }
 
         public void Start()
         {
             SubscribeOnLeftClick();
-            _updateCoroutine = CurrentInputModule.StartCoroutine(UpdateEffects());
+            _updateCoroutine = _currentInputModule.StartCoroutine(UpdateEffects());
         }
 
         protected virtual void SubscribeOnLeftClick()
         {
 #if ENABLE_INPUT_SYSTEM
-            var inputSystemModule = (UnityEngine.InputSystem.UI.InputSystemUIInputModule)CurrentInputModule;
-            inputSystemModule.leftClick.action.performed += OnLeftClick;
+            var inputSystemModule = (UnityEngine.InputSystem.UI.InputSystemUIInputModule)_currentInputModule;
+            inputSystemModule.leftClick.action.performed+= OnLeftClick;
+            Debug.Log("TapEffect: Subscribed to left click action.");
             DisposableToken.Register(static obj =>
             {
                 var self = (ShaderTapEffect)obj;
-                var inputSystemModule = (UnityEngine.InputSystem.UI.InputSystemUIInputModule)self.CurrentInputModule;
-                inputSystemModule.leftClick.action.performed -= self.OnLeftClick;
-                if (self._updateCoroutine != null)
-                    inputSystemModule.StopCoroutine(self._updateCoroutine);
+                if (self._currentInputModule != null)
+                {
+                    var inputSystemModule = (UnityEngine.InputSystem.UI.InputSystemUIInputModule)self._currentInputModule;
+                    inputSystemModule.leftClick.action.performed -= self.OnLeftClick;
+                    Debug.Log("TapEffect: Subscribed to left click action.");
+                }
             }, this);
 #else
             CurrentInputModule.StartCoroutine(ObserveLeftClick());
@@ -79,15 +85,13 @@ namespace AndanteTribe.Utils.Modules
         }
 
 #if ENABLE_INPUT_SYSTEM
-        protected virtual void OnLeftClick(UnityEngine.InputSystem.InputAction.CallbackContext _)
+        protected virtual void OnLeftClick(UnityEngine.InputSystem.InputAction.CallbackContext context)
         {
             var screenPos = UnityEngine.InputSystem.Pointer.current?.position.ReadValue() ?? Vector2.zero;
-            if (screenPos == Vector2.zero)
+            if (screenPos != Vector2.zero)
             {
-                return;
+                CreateEffect(screenPos);
             }
-
-            CreateEffect(screenPos);
         }
 #else
         private System.Collections.IEnumerator ObserveLeftClick()
@@ -96,10 +100,8 @@ namespace AndanteTribe.Utils.Modules
             {
                 if (Input.GetMouseButtonDown(0))
                 {
-                    var screenPos = Input.mousePosition;
-                    CreateEffect(screenPos);
+                    CreateEffect(Input.mousePosition);
                 }
-
                 yield return null;
             }
         }
@@ -107,35 +109,11 @@ namespace AndanteTribe.Utils.Modules
 
         protected void CreateEffect(in Vector2 screenPos)
         {
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                CanvasRect, screenPos, null, out var localPoint);
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                _canvasRect, screenPos, null, out var localPoint))
+                return;
 
-            // 使用可能なスロットを探す
-            int index = -1;
-            for (int i = 0; i < _maxEffects; i++)
-            {
-                if (!_effectsData[i].IsActive)
-                {
-                    index = i;
-                    break;
-                }
-            }
-
-            // 空きがない場合は最も古いエフェクトを上書き
-            if (index == -1)
-            {
-                float oldestTime = float.MaxValue;
-                for (int i = 0; i < _maxEffects; i++)
-                {
-                    if (_effectsData[i].StartTime < oldestTime)
-                    {
-                        oldestTime = _effectsData[i].StartTime;
-                        index = i;
-                    }
-                }
-            }
-
-            // 新しいエフェクトデータを設定
+            int index = FindAvailableSlot();
             _effectsData[index] = new TapEffectData
             {
                 Position = localPoint,
@@ -144,89 +122,111 @@ namespace AndanteTribe.Utils.Modules
                 IsActive = true
             };
 
-            // シェーダーに渡すデータを更新
             UpdateShaderData();
+        }
+
+        private int FindAvailableSlot()
+        {
+            for (int i = 0; i < _maxEffects; i++)
+            {
+                if (!_effectsData[i].IsActive)
+                    return i;
+            }
+
+            int oldestIndex = 0;
+            float oldestTime = _effectsData[0].StartTime;
+            for (int i = 1; i < _maxEffects; i++)
+            {
+                if (_effectsData[i].StartTime < oldestTime)
+                {
+                    oldestTime = _effectsData[i].StartTime;
+                    oldestIndex = i;
+                }
+            }
+            return oldestIndex;
         }
 
         private IEnumerator UpdateEffects()
         {
             while (!IsDisposed)
             {
-                bool dataChanged = false;
-                float currentTime = Time.time;
-
-                // すべてのアクティブなエフェクトを更新
-                for (int i = 0; i < _maxEffects; i++)
-                {
-                    if (_effectsData[i].IsActive)
-                    {
-                        float elapsed = currentTime - _effectsData[i].StartTime;
-                        float progress = Mathf.Clamp01(elapsed / Duration);
-
-                        _effectsData[i].Progress = progress;
-
-                        // 完了したエフェクトを非アクティブにする
-                        if (progress >= 1.0f)
-                        {
-                            var data = _effectsData[i];
-                            data.IsActive = false;
-                            _effectsData[i] = data;
-                        }
-
-                        dataChanged = true;
-                    }
-                }
-
-                // データが変更された場合のみシェーダーを更新
+                bool dataChanged = UpdateEffectProgress();
                 if (dataChanged)
                 {
                     UpdateShaderData();
                 }
-
                 yield return null;
             }
+        }
+
+        private bool UpdateEffectProgress()
+        {
+            bool dataChanged = false;
+            float currentTime = Time.time;
+
+            for (int i = 0; i < _maxEffects; i++)
+            {
+                if (!_effectsData[i].IsActive) continue;
+
+                float elapsed = currentTime - _effectsData[i].StartTime;
+                float progress = Mathf.Clamp01(elapsed / _duration);
+
+                var data = _effectsData[i];
+                data.Progress = progress;
+
+                if (progress >= 1.0f)
+                {
+                    data.IsActive = false;
+                }
+
+                _effectsData[i] = data;
+                dataChanged = true;
+            }
+
+            return dataChanged;
         }
 
         private void UpdateShaderData()
         {
             int activeCount = 0;
 
-            // アクティブなエフェクトの位置とプログレスを配列に設定
             for (int i = 0; i < _maxEffects; i++)
             {
-                if (_effectsData[i].IsActive)
-                {
-                    // シェーダーに渡すためにUV座標に変換
-                    Vector2 normalizedPos = new Vector2(
-                        (_effectsData[i].Position.x + CanvasRect.rect.width/2) / CanvasRect.rect.width,
-                        (_effectsData[i].Position.y + CanvasRect.rect.height/2) / CanvasRect.rect.height
-                    );
-                    Debug.Log(normalizedPos);
+                if (!_effectsData[i].IsActive) continue;
 
-                    _positions[activeCount] = new Vector4(normalizedPos.x, normalizedPos.y, 0, 0);
-                    _progresses[activeCount] = _effectsData[i].Progress;
-                    activeCount++;
-                }
+                Vector2 normalizedPos = NormalizePosition(_effectsData[i].Position);
+                _positions[activeCount] = new Vector4(normalizedPos.x, normalizedPos.y, 0, 0);
+                _progresses[activeCount] = _effectsData[i].Progress;
+                activeCount++;
             }
 
-            // シェーダーにデータを渡す
-            EffectImage.material.SetVectorArray(s_positionsID, _positions);
-            EffectImage.material.SetFloatArray(s_progressesID, _progresses);
-            EffectImage.material.SetInt(s_countID, activeCount);
+            var material = _effectImage.material;
+            material.SetVectorArray(s_positionsID, _positions);
+            material.SetFloatArray(s_progressesID, _progresses);
+            material.SetInt(s_countID, activeCount);
+        }
+
+        private Vector2 NormalizePosition(Vector2 localPos)
+        {
+            var rect = _canvasRect.rect;
+            return new Vector2(
+                (localPos.x + rect.width * 0.5f) / rect.width,
+                (localPos.y + rect.height * 0.5f) / rect.height
+            );
         }
 
         public override void Dispose()
         {
             if (!IsDisposed)
             {
-                if (EffectImage != null && EffectImage.material != null)
+                if (_effectImage?.material != null)
                 {
-                    Object.Destroy(EffectImage.material);
+                    Object.Destroy(_effectImage.material);
                 }
 
-                if (_updateCoroutine != null)
+                if (_updateCoroutine != null && _currentInputModule != null)
                 {
-                    CurrentInputModule.StopCoroutine(_updateCoroutine);
+                    _currentInputModule.StopCoroutine(_updateCoroutine);
                     _updateCoroutine = null;
                 }
             }
