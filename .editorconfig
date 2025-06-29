@@ -4,10 +4,8 @@
 # 最上位のEditorConfigファイル.
 root = true
 
-# C# files
-[*.cs]
-
 #### Core EditorConfig Options ####
+[*]
 # インデントに使用する文字. tab または space.
 indent_style = space
 # インデントのサイズ.
@@ -15,15 +13,18 @@ indent_size = 4
 # タブのサイズ. indent_sizeに同じ
 tab_width = 4
 # 改行文字. lf or cr or crlf.
-end_of_line = crlf
+end_of_line = lf
 # 文字コード. utf-8, utf-16, utf-8-bom, utf-16-be, utf-16-le. EditorConfig公式によると、utf-8-bomは非推奨.
 charset = utf-8
 # スペルチェックの言語. 残念ながら1つだけ指定.
 spelling_language = en-US
 # 改行文字の前にある空白文字をすべて削除するか否か.
-trim_trailing_whitespace =true
+trim_trailing_whitespace = true
 # ファイルの最後に改行を追加するか否か. 絶対いらん.
 insert_final_newline = false
+
+# C# files
+[*.cs]
 
 #### C# 命名規則 ####
 # name all constant fields using PascalCase
