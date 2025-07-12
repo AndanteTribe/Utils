@@ -1,0 +1,20 @@
+{
+    "name": "Utils.Tests",
+    "rootNamespace": "AndanteTribe.Utils.Tests",
+    "references": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Utils.Core.dll",
+        "Utils.BackPort.dll",
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

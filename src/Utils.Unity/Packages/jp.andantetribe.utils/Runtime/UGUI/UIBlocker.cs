@@ -18,11 +18,11 @@ namespace AndanteTribe.Utils.UGUI
         /// 入力を一時的に剥奪します.
         /// </summary>
         /// <returns>入力を復元するためのハンドル.</returns>
-        public Handle Deactivate()
+        public Handle Disable()
         {
             if (_refCount == 0)
             {
-                EventSystem.current.enabled = false;
+                _eventSystem.enabled = false;
             }
             _refCount++;
             return new Handle(this);

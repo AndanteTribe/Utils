@@ -94,10 +94,8 @@ namespace AndanteTribe.Utils
         /// <param name="rectTransform">対象の<see cref="RectTransform"/>.</param>
         /// <param name="width">横の長さ.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SetWidth(this RectTransform rectTransform, in float width)
-        {
+        public static void SetWidth(this RectTransform rectTransform, in float width) =>
             rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
-        }
 
         /// <summary>
         /// <see cref="RectTransform.sizeDelta"/>よりも安全な縦幅設定.
@@ -122,10 +120,8 @@ namespace AndanteTribe.Utils
         /// <param name="rectTransform">対象の<see cref="RectTransform"/>.</param>
         /// <param name="height">縦の長さ.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SetHeight(this RectTransform rectTransform, in float height)
-        {
+        public static void SetHeight(this RectTransform rectTransform, in float height) =>
             rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
-        }
 
         /// <summary>
         /// <see cref="RectTransform.sizeDelta"/>よりも安全なサイズ取得.
@@ -179,7 +175,7 @@ namespace AndanteTribe.Utils
         /// <param name="top">上端のオフセット.</param>
         /// <param name="bottom">下端のオフセット.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SetFullStretch(this RectTransform rectTransform, in float left = default, in float right = default, in float top = default, in float bottom = default)
+        public static void SetFullStretch(this RectTransform rectTransform, in float left = 0, in float right = 0, in float top = 0, in float bottom = 0)
         {
             rectTransform.anchorMin = Vector2.zero;
             rectTransform.anchorMax = Vector2.one;
@@ -244,7 +240,7 @@ namespace AndanteTribe.Utils
                     fourCornersSpan[i] = localToWorldMatrix.MultiplyPoint(fourCornersSpan[i]);
                 }
             }
-            return fourCornersSpan;
+            return fourCornersSpan[..4];
         }
 
         /// <summary>
@@ -301,7 +297,7 @@ namespace AndanteTribe.Utils
             {
                 rectTransform.GetCalculateLocalCorners(fourCornersSpan);
             }
-            return fourCornersSpan;
+            return fourCornersSpan[..4];
         }
 
         /// <summary>
@@ -314,12 +310,11 @@ namespace AndanteTribe.Utils
         /// <param name="fourCornersSpan">取得した角の座標を格納する<see cref="Span{T}"/>.</param>
         /// <returns>取得した角の座標を格納した<see cref="ReadOnlySpan{T}"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static ReadOnlySpan<Vector3> GetCalculateLocalCorners(this RectTransform rectTransform, in Span<Vector3> fourCornersSpan)
+        internal static void GetCalculateLocalCorners(this RectTransform rectTransform, in Span<Vector3> fourCornersSpan)
         {
             var rect = rectTransform.rect;
             var (x, y, xMax, yMax) = (rect.x, rect.y, rect.xMax, rect.yMax);
             stackalloc Vector3[] { new(x, y), new(x, yMax), new(xMax, yMax), new(xMax, y) }.TryCopyTo(fourCornersSpan);
-            return fourCornersSpan;
         }
     }
 }

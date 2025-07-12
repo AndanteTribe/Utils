@@ -160,14 +160,8 @@
       "source": "embedded",
       "dependencies": {}
     },
-    "jp.andantetribe.utils.backport": {
-      "version": "file:../../Utils.BackPort",
-      "depth": 0,
-      "source": "local",
-      "dependencies": {}
-    },
     "jp.andantetribe.utils.core": {
-      "version": "file:../../Utils.Core",
+      "version": "file:../../../bin",
       "depth": 0,
       "source": "local",
       "dependencies": {}

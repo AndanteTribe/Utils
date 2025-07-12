@@ -3,7 +3,6 @@
 
 using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace AndanteTribe.Utils.UGUI
@@ -13,12 +12,10 @@ namespace AndanteTribe.Utils.UGUI
     /// </summary>
     public class SimpleGauge : RectMask2D
     {
-        [FormerlySerializedAs("mode")]
         [SerializeField]
         [Tooltip("ゲージの表示方向")]
         private RectTransform.Edge _mode = RectTransform.Edge.Right;
 
-        [FormerlySerializedAs("value")]
         [SerializeField]
         [Tooltip("ゲージの値(0.0 ～ 1.0)")]
         [Range(0, 1)]
@@ -39,7 +36,7 @@ namespace AndanteTribe.Utils.UGUI
                     (int)RectTransform.Edge.Right => new Vector4(0, 0, rectTransform.rect.width * (1 - _value), 0),
                     (int)RectTransform.Edge.Top => new Vector4(0, 0, 0, rectTransform.rect.height * (1 - _value)),
                     (int)RectTransform.Edge.Bottom => new Vector4(0, rectTransform.rect.height * (1 - _value), 0, 0),
-                    _ => throw new ArgumentOutOfRangeException(nameof(this.Value))
+                    _ => throw new ArgumentOutOfRangeException(nameof(Value))
                 };
             }
         }
@@ -48,10 +45,7 @@ namespace AndanteTribe.Utils.UGUI
         protected override void Start()
         {
             base.Start();
-            if (TryGetComponent<MaskableGraphic>(out var graphic))
-            {
-                AddClippable(graphic);
-            }
+            AddClippable(GetComponent<MaskableGraphic>());
         }
 
 #if UNITY_EDITOR

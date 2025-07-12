@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 #if !NET6_0_OR_GREATER
-#nullable enable
 
 using System.Buffers;
 using System.Diagnostics;
@@ -13,7 +12,7 @@ namespace System.Runtime.CompilerServices
 {
     /// <summary>Provides a handler used by the language compiler to process interpolated strings into <see cref="string"/> instances.</summary>
     [InterpolatedStringHandler]
-    public ref partial struct DefaultInterpolatedStringHandler
+    public ref struct DefaultInterpolatedStringHandler
     {
         // Implementation note:
         // As this type lives in CompilerServices and is only intended to be targeted by the compiler,
@@ -107,8 +106,8 @@ namespace System.Runtime.CompilerServices
         /// <remarks>
         /// This releases any resources used by the handler. The method should be invoked only
         /// once and as the last thing performed on the handler. Subsequent use is erroneous, ill-defined,
-        /// and may destabilize the process, as may using any other copies of the handler after ToStringAndClear
-        /// is called on any one of them.
+        /// and may destabilize the process, as may using any other copies of the handler after
+        /// <see cref="ToStringAndClear" /> is called on any one of them.
         /// </remarks>
         public string ToStringAndClear()
         {
@@ -117,19 +116,30 @@ namespace System.Runtime.CompilerServices
             return result;
         }
 
-        /// <summary>Clears the handler, returning any rented array to the pool.</summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] // used only on a few hot paths
+        /// <summary>Clears the handler.</summary>
+        /// <remarks>
+        /// This releases any resources used by the handler. The method should be invoked only
+        /// once and as the last thing performed on the handler. Subsequent use is erroneous, ill-defined,
+        /// and may destabilize the process, as may using any other copies of the handler after <see cref="Clear"/>
+        /// is called on any one of them.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void Clear()
         {
             char[]? toReturn = _arrayToReturnToPool;
-            this = default; // defensive clear
+
+            // Defensive clear
+            _arrayToReturnToPool = null;
+            _chars = default;
+            _pos = 0;
+
             if (toReturn is not null)
             {
                 ArrayPool<char>.Shared.Return(toReturn);
             }
         }
 
-        /// <summary>Gets a span of the written characters thus far.</summary>
+        /// <summary>Gets a span of the characters appended to the handler.</summary>
         internal ReadOnlySpan<char> Text => _chars.Slice(0, _pos);
 
         /// <summary>Writes the specified string to the handler.</summary>
@@ -239,6 +249,11 @@ namespace System.Runtime.CompilerServices
                 return;
             }
 
+            if (value is null)
+            {
+                return;
+            }
+
             // Check first for IFormattable, even though we'll prefer to use ISpanFormattable, as the latter
             // requires the former.  For value types, it won't matter as the type checks devolve into
             // JIT-time constants.  For reference types, they're more likely to implement IFormattable
@@ -247,15 +262,25 @@ namespace System.Runtime.CompilerServices
             // if it only implements IFormattable, we come out even: only if it implements both do we
             // end up paying for an extra interface check.
             string? s;
+            var formatter = AndanteTribe.Utils.BackPort.Internal.CustomSpanFormatter.GetFormatter<T>();
+            if (formatter != null)
+            {
+                int charsWritten;
+                while (!formatter(value, _chars.Slice(_pos), out charsWritten, default, _provider)) // constrained call avoiding boxing for value types
+                {
+                    Grow();
+                }
+
+                _pos += charsWritten;
+                return;
+            }
             if (value is IFormattable formattable)
             {
-                // If the value can format itself directly into our buffer, do so.
-
                 s = formattable.ToString(format: null, _provider); // constrained call avoiding boxing for value types
             }
             else
             {
-                s = value?.ToString();
+                s = value.ToString();
             }
 
             if (s is not null)
@@ -277,6 +302,11 @@ namespace System.Runtime.CompilerServices
                 return;
             }
 
+            if (value is null)
+            {
+                return;
+            }
+
             // Check first for IFormattable, even though we'll prefer to use ISpanFormattable, as the latter
             // requires the former.  For value types, it won't matter as the type checks devolve into
             // JIT-time constants.  For reference types, they're more likely to implement IFormattable
@@ -285,15 +315,25 @@ namespace System.Runtime.CompilerServices
             // if it only implements IFormattable, we come out even: only if it implements both do we
             // end up paying for an extra interface check.
             string? s;
+            var formatter = AndanteTribe.Utils.BackPort.Internal.CustomSpanFormatter.GetFormatter<T>();
+            if (formatter != null)
+            {
+                int charsWritten;
+                while (!formatter(value, _chars.Slice(_pos), out charsWritten, format, _provider)) // constrained call avoiding boxing for value types
+                {
+                    Grow();
+                }
+
+                _pos += charsWritten;
+                return;
+            }
             if (value is IFormattable formattable)
             {
-                // If the value can format itself directly into our buffer, do so.
-
                 s = formattable.ToString(format, _provider); // constrained call avoiding boxing for value types
             }
             else
             {
-                s = value?.ToString();
+                s = value.ToString();
             }
 
             if (s is not null)
@@ -335,7 +375,7 @@ namespace System.Runtime.CompilerServices
         #region AppendFormatted ReadOnlySpan<char>
         /// <summary>Writes the specified character span to the handler.</summary>
         /// <param name="value">The span to write.</param>
-        public void AppendFormatted(ReadOnlySpan<char> value)
+        public void AppendFormatted(scoped ReadOnlySpan<char> value)
         {
             // Fast path for when the value fits in the current buffer
             if (value.TryCopyTo(_chars.Slice(_pos)))
@@ -352,7 +392,7 @@ namespace System.Runtime.CompilerServices
         /// <param name="value">The span to write.</param>
         /// <param name="alignment">Minimum number of characters that should be written for this value.  If the value is negative, it indicates left-aligned and the required minimum is the absolute value.</param>
         /// <param name="format">The format string.</param>
-        public void AppendFormatted(ReadOnlySpan<char> value, int alignment = 0, string? format = null)
+        public void AppendFormatted(scoped ReadOnlySpan<char> value, int alignment = 0, string? format = null)
         {
             bool leftAlign = false;
             if (alignment < 0)
@@ -545,7 +585,7 @@ namespace System.Runtime.CompilerServices
         /// <summary>Fallback for <see cref="AppendFormatted(ReadOnlySpan{char})"/> for when not enough space exists in the current buffer.</summary>
         /// <param name="value">The span to write.</param>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private void GrowThenCopySpan(ReadOnlySpan<char> value)
+        private void GrowThenCopySpan(scoped ReadOnlySpan<char> value)
         {
             Grow(value.Length);
             value.CopyTo(_chars.Slice(_pos));
@@ -583,7 +623,8 @@ namespace System.Runtime.CompilerServices
             // ints that could technically overflow if someone tried to, for example, append a huge string to a huge string, we also clamp to int.MaxValue.
             // Even if the array creation fails in such a case, we may later fail in ToStringAndClear.
 
-            uint newCapacity = Math.Max(requiredMinCapacity, Math.Min((uint)_chars.Length * 2, 0x3FFFFFDF));
+            const int stringMaxLength = 100000;
+            uint newCapacity = Math.Max(requiredMinCapacity, Math.Min((uint)_chars.Length * 2, stringMaxLength));
             int arraySize = (int)Math.Clamp(newCapacity, MinimumArrayPoolLength, int.MaxValue);
 
             char[] newArray = ArrayPool<char>.Shared.Rent(arraySize);

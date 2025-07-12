@@ -5,14 +5,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using AndanteTribe.Utils.Internal;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace AndanteTribe.Utils.Tasks
 {
-    public sealed class GameObjectPool<T> : CancellationDisposable, IReadOnlyCollection<T> where T : MonoBehaviour
+    public sealed class GameObjectPool<T> : IDisposable, IReadOnlyCollection<T> where T : MonoBehaviour
     {
         /// <summary>
         /// プールのルートオブジェクト.
@@ -28,6 +27,11 @@ namespace AndanteTribe.Utils.Tasks
         /// プールのスタック.
         /// </summary>
         private readonly List<T> _pool;
+
+        /// <summary>
+        /// キャンセルトークンソース.
+        /// </summary>
+        private readonly CancellationTokenSource _cancellationDisposable = new();
 
         /// <inheritdoc/>
         public int Count => _pool.Count;
@@ -46,11 +50,11 @@ namespace AndanteTribe.Utils.Tasks
         /// <param name="cancellationToken"></param>
         public async UniTask PreallocateAsync(int count, CancellationToken cancellationToken = default)
         {
-            ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
+            _cancellationDisposable.ThrowIfDisposed(this);
             cancellationToken.ThrowIfCancellationRequested();
-            using var _ = CreateLinkedToken(cancellationToken, out var ct);
-            var original = await _reference.LoadAsync(ct);
-            var instances = await Object.InstantiateAsync(original, count, _root).WithCancellation(ct);
+            using var cts = _cancellationDisposable.CreateLinkedTokenSource(cancellationToken);
+            var original = await _reference.LoadAsync(cts.Token);
+            var instances = await Object.InstantiateAsync(original, count, _root).WithCancellation(cts.Token);
             foreach (var instance in instances)
             {
                 instance.gameObject.SetActive(false);
@@ -66,7 +70,7 @@ namespace AndanteTribe.Utils.Tasks
         /// <returns></returns>
         public async UniTask<T> RentAsync(CancellationToken cancellationToken = default)
         {
-            ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
+            _cancellationDisposable.ThrowIfDisposed(this);
             cancellationToken.ThrowIfCancellationRequested();
             if (_pool.Count > 0)
             {
@@ -76,9 +80,9 @@ namespace AndanteTribe.Utils.Tasks
                 return instance;
             }
 
-            using var _ = CreateLinkedToken(cancellationToken, out var ct);
-            var original = await _reference.LoadAsync(ct);
-            var results = await Object.InstantiateAsync(original, _root).WithCancellation(ct);
+            using var cts = _cancellationDisposable.CreateLinkedTokenSource(cancellationToken);
+            var original = await _reference.LoadAsync(cts.Token);
+            var results = await Object.InstantiateAsync(original, _root).WithCancellation(cts.Token);
             return results[0];
         }
 
@@ -99,7 +103,7 @@ namespace AndanteTribe.Utils.Tasks
         /// <param name="element">返却するインスタンス.</param>
         public void Return(T element)
         {
-            ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
+            _cancellationDisposable.ThrowIfDisposed(this);
             element.gameObject.SetActive(false);
             element.transform.SetParent(_root);
             _pool.Add(element);
@@ -110,7 +114,7 @@ namespace AndanteTribe.Utils.Tasks
         /// </summary>
         public void Clear()
         {
-            ThrowHelper.ThrowIfDisposedException(IsDisposed, this);
+            _cancellationDisposable.ThrowIfDisposed(this);
             foreach (var item in _pool.AsSpan())
             {
                 Object.Destroy(item.gameObject);
@@ -121,14 +125,12 @@ namespace AndanteTribe.Utils.Tasks
         public List<T>.Enumerator GetEnumerator() => _pool.GetEnumerator();
 
         /// <inheritdoc/>
-        public override void Dispose()
+        public void Dispose()
         {
-            if (!IsDisposed)
-            {
-                Clear();
-                _reference.Dispose();
-            }
-            base.Dispose();
+            Clear();
+            _reference.Dispose();
+            _cancellationDisposable.Cancel();
+            _cancellationDisposable.Dispose();
         }
 
         /// <inheritdoc/>

@@ -28,10 +28,7 @@ namespace AndanteTribe.Utils.UGUI
         }
 
         /// <inheritdoc/>
-        protected override void OnPopulateMesh(VertexHelper vh)
-        {
-            vh.Clear();
-        }
+        protected override void OnPopulateMesh(VertexHelper vh) => vh.Clear();
     }
 }
 #endif

@@ -1,9 +1,4 @@
-﻿#nullable enable
-
-using System;
-using System.Collections.Generic;
-
-namespace AndanteTribe.Utils
+﻿namespace AndanteTribe.Utils
 {
     /// <summary>
     /// <see cref="EqualityComparer{T}"/>の拡張クラス.
@@ -62,22 +57,13 @@ namespace AndanteTribe.Utils
             return new DelegateEqualityComparer<T>(equals, getHashCode);
         }
 
-        private sealed class DelegateEqualityComparer<T> : IEqualityComparer<T>
+        private sealed class DelegateEqualityComparer<T>(Func<T, T, bool> equals, Func<T, int> getHashCode) : IEqualityComparer<T>
         {
-            private readonly Func<T, T, bool> _equals;
-            private readonly Func<T, int> _getHashCode;
+            public bool Equals(T? x, T? y) => equals(x!, y!);
 
-            public DelegateEqualityComparer(Func<T, T, bool> equals, Func<T, int> getHashCode)
-            {
-                this._equals = equals;
-                this._getHashCode = getHashCode;
-            }
+            public int GetHashCode(T obj) => getHashCode(obj);
 
-            public bool Equals(T? x, T? y) => _equals(x!, y!);
-
-            public int GetHashCode(T obj) => _getHashCode(obj);
-
-            public override int GetHashCode() => HashCode.Combine(_equals.GetHashCode(), _getHashCode.GetHashCode());
+            public override int GetHashCode() => HashCode.Combine(equals.GetHashCode(), getHashCode.GetHashCode());
         }
     }
 }

@@ -4,7 +4,6 @@
 using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
-using UnityEngine.Serialization;
 using VContainer;
 using VContainer.Unity;
 
@@ -15,7 +14,6 @@ namespace AndanteTribe.Utils.VContainer
     /// </summary>
     public class LifetimeScopeBase : LifetimeScope
     {
-        [FormerlySerializedAs("autoBindComponents")]
         [SerializeField]
         [Tooltip("Bind も Inject もする")]
         private Component[] _autoBindComponents = Array.Empty<Component>();
@@ -38,10 +36,7 @@ namespace AndanteTribe.Utils.VContainer
         {
             private readonly object _instance;
 
-            public AnonymousBuilder(object instance) : base(instance.GetType(), Lifetime.Singleton)
-            {
-                this._instance = instance;
-            }
+            public AnonymousBuilder(object instance) : base(instance.GetType(), Lifetime.Singleton) => _instance = instance;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public override Registration Build()
@@ -55,10 +50,7 @@ namespace AndanteTribe.Utils.VContainer
         {
             private readonly object _instance;
 
-            public AnonymousProvider(object instance)
-            {
-                this._instance = instance;
-            }
+            public AnonymousProvider(object instance) => _instance = instance;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public object SpawnInstance(IObjectResolver resolver) => _instance;

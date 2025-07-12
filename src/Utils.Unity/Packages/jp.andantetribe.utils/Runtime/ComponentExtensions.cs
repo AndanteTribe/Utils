@@ -61,7 +61,10 @@ namespace AndanteTribe.Utils
         {
             var transform = self.transform;
             var limit = transform.childCount;
-            if (limit == 0) return ReadOnlyMemory<T>.Empty;
+            if (limit == 0)
+            {
+                return ReadOnlyMemory<T>.Empty;
+            }
 
             var array = new T[limit];
             var span = array.AsSpan();
@@ -71,7 +74,11 @@ namespace AndanteTribe.Utils
                 var gameObject = transform.GetChild(i).gameObject;
                 if (gameObject.TryGetComponent<T>(out var component))
                 {
-                    if (!includeInactive && !gameObject.activeSelf) continue;
+                    if (!includeInactive && !gameObject.activeSelf)
+                    {
+                        continue;
+                    }
+
                     span[count++] = component;
                 }
             }

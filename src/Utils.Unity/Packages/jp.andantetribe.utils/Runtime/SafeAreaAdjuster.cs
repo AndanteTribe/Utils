@@ -18,6 +18,7 @@ namespace AndanteTribe.Utils
     {
         private void Start() => Padding();
 
+        // ReSharper disable once ExplicitCallerInfoArgument
         [Button("Adjust SafeArea")]
         private void Padding()
         {

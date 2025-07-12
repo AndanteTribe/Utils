@@ -30,8 +30,8 @@ namespace AndanteTribe.Utils
         /// <param name="parameters">引数.</param>
         public ButtonAttribute([CallerMemberName] string buttonName = "", params object[] parameters)
         {
-            this.ButtonName = buttonName;
-            this.Parameters = parameters;
+            ButtonName = buttonName;
+            Parameters = parameters;
         }
     }
 }

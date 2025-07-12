@@ -54,6 +54,17 @@ namespace AndanteTribe.Utils.Tests
             Assert.That(container, Is.SameAs(disposable));
         }
 
+        [Test]
+        public void CancellationTokenSourceThrowIfDisposed()
+        {
+            var cts = new System.Threading.CancellationTokenSource();
+            Assert.That(() => cts.ThrowIfDisposed(), Throws.Nothing);
+
+            cts.Cancel();
+            Assert.That(() => cts.ThrowIfDisposed(cts),
+                Throws.TypeOf<ObjectDisposedException>().With.Property("ObjectName").EqualTo("System.Threading.CancellationTokenSource"));
+        }
+
         [System.Flags]
         public enum TestFlags : int
         {
@@ -277,21 +288,6 @@ namespace AndanteTribe.Utils.Tests
             Assert.That(list[4], Is.EqualTo(64));
             Assert.That(list[5], Is.EqualTo(77));
             Assert.That(list[6], Is.EqualTo(88));
-        }
-
-        [Test]
-        public void CancellationDisposableTest()
-        {
-            var disposable = new CancellationDisposableSample();
-            Assert.That(disposable.IsDisposed, Is.False);
-
-            disposable.Dispose();
-            Assert.That(disposable.IsDisposed, Is.True);
-            Assert.That(disposable.DisposableToken.IsCancellationRequested, Is.True);
-        }
-
-        private sealed class CancellationDisposableSample : CancellationDisposable
-        {
         }
     }
 }

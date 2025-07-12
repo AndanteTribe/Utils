@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: UI_TapRippleEffect
-  m_Shader: {fileID: 4800000, guid: 709fca08052da5943803bc4215aaed6c, type: 3}
+  m_Shader: {fileID: 4800000, guid: f8e9ee248798ff54cb3a9147bec6b8a8, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -30,9 +30,11 @@ Material:
     m_Ints: []
     m_Floats:
     - _AspectRatio: 1
+    - _Duration: 0.5
     - _MaxSize: 0.5
     - _Progress: 0
     - _RippleWidth: 0.1
+    - _TapCount: 10
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

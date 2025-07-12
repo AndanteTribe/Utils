@@ -2,8 +2,6 @@
 #nullable enable
 
 using System;
-using System.Buffers;
-using System.Threading;
 using TMPro;
 using UnityEngine;
 
@@ -12,36 +10,19 @@ namespace AndanteTribe.Utils.UGUI
     public abstract class TextView
     {
         [SerializeField]
-        private TextMeshProUGUI? _textMeshProUGUI;
+        private TextMeshProUGUI? _text;
         [SerializeField, HideInInspector]
         protected string Format = "";
 
-        [NonSerialized]
-        protected char[] Cache = Array.Empty<char>();
-        protected CancellationTokenRegistration Subscription { get; private set; }
-
-        public TextMeshProUGUI TextMeshProUGUI => _textMeshProUGUI ?? throw new NullReferenceException(nameof(_textMeshProUGUI));
-
-        protected void SetSubscription()
+        public TextMeshProUGUI Text
         {
-            var restoreFlow = false;
-            if (!ExecutionContext.IsFlowSuppressed())
+            get
             {
-                ExecutionContext.SuppressFlow();
-                restoreFlow = true;
-            }
-
-            try
-            {
-                Subscription = TextMeshProUGUI.destroyCancellationToken
-                    .Register(static cache => ArrayPool<char>.Shared.Return((char[])cache), Cache, false);
-            }
-            finally
-            {
-                if (restoreFlow)
+                if (_text == null)
                 {
-                    ExecutionContext.RestoreFlow();
+                    throw new NullReferenceException(nameof(_text));
                 }
+                return _text;
             }
         }
     }
@@ -55,28 +36,18 @@ namespace AndanteTribe.Utils.UGUI
         public void Bind(in int value)
         {
             var v = Math.Clamp(value, _range.x, _range.y);
-            if (v.TryFormat(Cache, out var written, Format))
-            {
-                TextMeshProUGUI.SetCharArray(Cache, 0, written);
-                return;
-            }
+            TrySetValue(v);
 
-            var bufferLength = Math.Max(Cache.Length, 16);
-            Subscription.Dispose();
-            (Cache, written) = GetCharArray(v, Format, bufferLength);
-            TextMeshProUGUI.SetCharArray(Cache, 0, written);
-            SetSubscription();
-
-            static (char[], int) GetCharArray(in int value, in ReadOnlySpan<char> format, int bufferLength)
+            void TrySetValue(in int value, int bufferLength = 16)
             {
-                var span = (Span<char>)stackalloc char[bufferLength];
-                if (value.TryFormat(span, out var written, format))
+                var buffer = (Span<char>)stackalloc char[bufferLength];
+                if (value.TryFormat(buffer, out var written, Format))
                 {
-                    var array = ArrayPool<char>.Shared.Rent(written);
-                    span[..written].CopyTo(array);
-                    return (array, written);
+                    Text.SetCharArray(buffer[..written]);
+                    return;
                 }
-                return GetCharArray(value, format, bufferLength * 2);
+
+                TrySetValue(value, bufferLength * 2);
             }
         }
     }
@@ -90,28 +61,18 @@ namespace AndanteTribe.Utils.UGUI
         public void Bind(in float value)
         {
             var v = Math.Clamp(value, _range.x, _range.y);
-            if (v.TryFormat(Cache, out var written, Format))
-            {
-                TextMeshProUGUI.SetCharArray(Cache, 0, written);
-                return;
-            }
+            TrySetValue(v);
 
-            var bufferLength = Math.Max(Cache.Length, 16);
-            Subscription.Dispose();
-            (Cache, written) = GetCharArray(v, Format, bufferLength);
-            TextMeshProUGUI.SetCharArray(Cache, 0, written);
-            SetSubscription();
-
-            static (char[], int) GetCharArray(in float value, in ReadOnlySpan<char> format, int bufferLength)
+            void TrySetValue(in float value, int bufferLength = 16)
             {
-                var span = (Span<char>)stackalloc char[bufferLength];
-                if (value.TryFormat(span, out var written, format))
+                var buffer = (Span<char>)stackalloc char[bufferLength];
+                if (value.TryFormat(buffer, out var written, Format))
                 {
-                    var array = ArrayPool<char>.Shared.Rent(written);
-                    span[..written].CopyTo(array);
-                    return (array, written);
+                    Text.SetCharArray(buffer[..written]);
+                    return;
                 }
-                return GetCharArray(value, format, bufferLength * 2);
+
+                TrySetValue(value, bufferLength * 2);
             }
         }
     }
@@ -121,28 +82,18 @@ namespace AndanteTribe.Utils.UGUI
     {
         public void Bind(in DateTime value)
         {
-            if (value.TryFormat(Cache, out var written, Format))
-            {
-                TextMeshProUGUI.SetCharArray(Cache, 0, written);
-                return;
-            }
+            TrySetValue(value);
 
-            var bufferLength = Math.Max(Cache.Length, 16);
-            Subscription.Dispose();
-            (Cache, written) = GetCharArray(value, Format, bufferLength);
-            TextMeshProUGUI.SetCharArray(Cache, 0, written);
-            SetSubscription();
-
-            static (char[], int) GetCharArray(in DateTime value, in ReadOnlySpan<char> format, int bufferLength)
+            void TrySetValue(in DateTime value, int bufferLength = 16)
             {
-                var span = (Span<char>)stackalloc char[bufferLength];
-                if (value.TryFormat(span, out var written, format))
+                var buffer = (Span<char>)stackalloc char[bufferLength];
+                if (value.TryFormat(buffer, out var written, Format))
                 {
-                    var array = ArrayPool<char>.Shared.Rent(written);
-                    span[..written].CopyTo(array);
-                    return (array, written);
+                    Text.SetCharArray(buffer[..written]);
+                    return;
                 }
-                return GetCharArray(value, format, bufferLength * 2);
+
+                TrySetValue(value, bufferLength * 2);
             }
         }
     }
@@ -152,28 +103,18 @@ namespace AndanteTribe.Utils.UGUI
     {
         public void Bind(in TimeSpan value)
         {
-            if (value.TryFormat(Cache, out var written, Format))
-            {
-                TextMeshProUGUI.SetCharArray(Cache, 0, written);
-                return;
-            }
+            TrySetValue(value);
 
-            var bufferLength = Math.Max(Cache.Length, 16);
-            Subscription.Dispose();
-            (Cache, written) = GetCharArray(value, Format, bufferLength);
-            TextMeshProUGUI.SetCharArray(Cache, 0, written);
-            SetSubscription();
-
-            static (char[], int) GetCharArray(in TimeSpan value, in ReadOnlySpan<char> format, int bufferLength)
+            void TrySetValue(in TimeSpan value, int bufferLength = 16)
             {
-                var span = (Span<char>)stackalloc char[bufferLength];
-                if (value.TryFormat(span, out var written, format))
+                var buffer = (Span<char>)stackalloc char[bufferLength];
+                if (value.TryFormat(buffer, out var written, Format))
                 {
-                    var array = ArrayPool<char>.Shared.Rent(written);
-                    span[..written].CopyTo(array);
-                    return (array, written);
+                    Text.SetCharArray(buffer[..written]);
+                    return;
                 }
-                return GetCharArray(value, format, bufferLength * 2);
+
+                TrySetValue(value, bufferLength * 2);
             }
         }
     }
