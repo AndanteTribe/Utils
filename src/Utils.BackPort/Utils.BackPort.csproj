@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFrameworks>netstandard2.1;net5.0;net6.0</TargetFrameworks>
         <LangVersion>13</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -24,10 +24,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Remove="**\package.json" />
-        <None Remove="**\*.asmdef" />
-        <None Remove="**\*.meta" />
-        <None Remove="**\*.tt" />
         <None Remove=".gitignore" />
     </ItemGroup>
 
@@ -38,5 +34,9 @@
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
             <_Parameter1>Utils.Unity</_Parameter1>
         </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
     </ItemGroup>
 </Project>

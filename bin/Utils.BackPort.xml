@@ -241,6 +241,19 @@
         <member name="M:System.Runtime.CompilerServices.InterpolatedStringHandlerAttribute.#ctor">
             <summary>Initializes the <see cref="T:System.Runtime.CompilerServices.InterpolatedStringHandlerAttribute"/>.</summary>
         </member>
+        <member name="T:System.Runtime.InteropServices.CollectionsMarshal">
+            <summary>
+            An unsafe class that provides a set of methods to access the underlying data representations of collections.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.InteropServices.CollectionsMarshal.AsSpan``1(System.Collections.Generic.List{``0})">
+            <summary>
+            Get a <see cref="T:System.Span`1"/> view over a <see cref="T:System.Collections.Generic.List`1"/>'s data.
+            Items should not be added or removed from the <see cref="T:System.Collections.Generic.List`1"/> while the <see cref="T:System.Span`1"/> is in use.
+            </summary>
+            <param name="list">The list to get the data view over.</param>
+            <typeparam name="T">The type of the elements in the list.</typeparam>
+        </member>
         <member name="T:System.ISpanFormattable">
             <summary>Provides functionality to format the string representation of an object into a span.</summary>
         </member>

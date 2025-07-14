@@ -14,18 +14,6 @@ public static class CollectionsExtensions
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Span<T> AsSpan<T>(this List<T> list)
-    {
-#if NET5_0_OR_GREATER
-        return System.Runtime.InteropServices.CollectionsMarshal.AsSpan(list);
-    }
-#else
-        return Unsafe.As<List<T>, ListDummy<T>>(ref list).Items.AsSpan(0, list.Count);
-    }
-
-    private sealed class ListDummy<T>
-    {
-        public T[] Items = null!;
-    }
-#endif
+    public static Span<T> AsSpan<T>(this List<T> list) =>
+        System.Runtime.InteropServices.CollectionsMarshal.AsSpan(list);
 }
