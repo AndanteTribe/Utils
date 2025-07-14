@@ -16,16 +16,21 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version:
+          - 5.0.x
+          - 9.0.x
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 9.0.x
+        dotnet-version: ${{ matrix.dotnet-version }}
     - run: dotnet restore ./src/Utils.Tests
     - run: dotnet build ./src/Utils.Tests --configuration Release --no-restore
-    - run: dotnet test ./src/Utils.Tests --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage"
+    - run: dotnet test ./src/Utils.Tests --configuration Release --no-build --verbosity normal --framework net${{ matrix.dotnet-version }} --collect:"XPlat Code Coverage"
     - name: Find coverage output path
       run: |
         cp $(find . -name "coverage.cobertura.xml") .
