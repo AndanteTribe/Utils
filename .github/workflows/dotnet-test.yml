@@ -22,10 +22,12 @@ jobs:
         fetch-depth: 0
     - uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 9.0.x
+        dotnet-version: |
+          5.0.x
+          9.0.x
     - run: dotnet restore ./src/Utils.Tests
     - run: dotnet build ./src/Utils.Tests --configuration Release --no-restore
-    - run: dotnet test ./src/Utils.Tests --configuration Release --no-build --verbosity detailed --collect:"XPlat Code Coverage"
+    - run: dotnet test ./src/Utils.Tests --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage"
     - name: Find coverage output path
       run: |
         cp $(find . -name "coverage.cobertura.xml") .
