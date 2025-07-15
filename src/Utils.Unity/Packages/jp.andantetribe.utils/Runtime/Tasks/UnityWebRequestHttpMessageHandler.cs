@@ -28,7 +28,7 @@ namespace AndanteTribe.Utils.Tasks
 
             foreach (var (key, values) in requestMessage.Headers)
             {
-                webRequest.SetRequestHeader(key, StringUtils.Join(',', values));
+                webRequest.SetRequestHeader(key, string.Join(',', values));
             }
 
             await webRequest.SendWebRequest().WithCancellation(cancellationToken);
