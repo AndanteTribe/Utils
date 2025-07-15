@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFrameworks>net5.0;net9.0;</TargetFrameworks>
     <LangVersion>9</LangVersion>
     <RootNamespace>AndanteTribe.Utils.Tests</RootNamespace>
     <IsPackable>false</IsPackable>
@@ -19,4 +19,10 @@
     <ProjectReference Include="..\Utils.Core\Utils.Core.csproj" />
   </ItemGroup>
 
+    <ItemGroup>
+        <None Remove="**\package.json" />
+        <None Remove="**\*.asmdef" />
+        <None Remove="**\*.meta" />
+        <None Remove=".gitignore" />
+    </ItemGroup>
 </Project>
