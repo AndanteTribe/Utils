@@ -275,38 +275,6 @@
             </summary>
             <returns>列挙が可能な場合はtrue.</returns>
         </member>
-        <member name="T:AndanteTribe.Utils.StringUtils">
-            <summary>
-            文字列を扱うための静的メソッド群を提供します.
-            </summary>
-        </member>
-        <member name="M:AndanteTribe.Utils.StringUtils.Join(System.String@,System.Collections.Generic.IEnumerable{System.String})">
-            <summary>
-            内部で<see cref="T:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler"/>を使用した<see cref="M:System.String.Join(System.String,System.Collections.Generic.IEnumerable{System.String})"/>.
-            </summary>
-            <param name="separator">区切り文字列.</param>
-            <param name="values">連結する文字列のコレクション.</param>
-            <returns>連結された文字列.</returns>
-            <exception cref="T:System.ArgumentNullException"><paramref name="values"/>がnullの場合にスローされます.</exception>
-        </member>
-        <member name="M:AndanteTribe.Utils.StringUtils.Join(System.Char@,System.Collections.Generic.IEnumerable{System.String})">
-            <summary>
-            内部で<see cref="T:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler"/>を使用した<see cref="M:System.String.Join``1(System.Char,System.Collections.Generic.IEnumerable{``0})"/>.
-            </summary>
-            <param name="separator">区切り文字.</param>
-            <param name="values">連結する文字列のコレクション.</param>
-            <returns>連結された文字列.</returns>
-            <exception cref="T:System.ArgumentNullException"><paramref name="values"/>がnullの場合にスローされます.</exception>
-        </member>
-        <member name="M:AndanteTribe.Utils.StringUtils.Join(System.ReadOnlySpan{System.Char}@,System.Collections.Generic.IEnumerable{System.String})">
-            <summary>
-            内部で<see cref="T:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler"/>を使用したstring.Join.
-            </summary>
-            <param name="separator">区切り文字列.</param>
-            <param name="values">連結する文字列のコレクション.</param>
-            <returns>連結された文字列.</returns>
-            <exception cref="T:System.ArgumentNullException"><paramref name="values"/>がnullの場合にスローされます.</exception>
-        </member>
         <member name="T:AndanteTribe.Utils.ValueTupleExtensions">
             <summary>
             <see cref="T:System.ValueTuple"/>の拡張メソッド.

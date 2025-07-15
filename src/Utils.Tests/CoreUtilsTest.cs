@@ -183,16 +183,6 @@ namespace AndanteTribe.Utils.Tests
         }
 
         [Test]
-        [TestCase("apple", "banana", "cherry")]
-        [TestCase("")]
-        [TestCase()]
-        public void StringUtilsJoin(params string[] array)
-        {
-            var result = StringUtils.Join(',', array);
-            Assert.That(result, Is.EqualTo(string.Join(',', array)));
-        }
-
-        [Test]
         public void ValueTuple2()
         {
             var list = new List<int>();
