@@ -15,15 +15,11 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Install libssl1.1 for .NET 5.0
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libssl1.1 || sudo apt-get install -y libssl1.1=1.1.1f-1ubuntu2.16
     - uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 5.0.x
