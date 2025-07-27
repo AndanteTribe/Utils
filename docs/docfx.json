@@ -1,0 +1,73 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "../src/Utils.Core",
+          "files": [
+            "*.cs"
+          ]
+        },
+        {
+          "src": "../src/Utils.Unity/Packages/jp.andantetribe.utils",
+          "files": [
+            "**/*.cs"
+          ]
+        },
+      ],
+      "dest": "api",
+      "disableGitFeatures": false,
+      "disableDefaultFilter": false,
+      "allowCompilationErrors": true,
+      "properties": {
+        "DefineConstants": "ENABLE_UNITASK;ENABLE_R3;ENABLE_UGUI;ENABLE_UITOOLKIT;ENABLE_VCONTAINER;ENABLE_WEBREQUEST;ENABLE_TEXTMESHPRO;ENABLE_ADDRESSABLES;ENABLE_PARTICLESYSTEM;ENABLE_AUDIO;ENABLE_LITMOTION"
+      }
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "**/*.{md,yml}"
+        ],
+        "exclude": [
+          "_site/**"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+          "images/**"
+        ]
+      }
+    ],
+    "output": "_site",
+    "template": [
+      "default",
+      "modern"
+    ],
+    "globalMetadata": {
+      "_appName": "AndanteTribe.Utils",
+      "_appTitle": "AndanteTribe.Utils",
+      "_appFooter": "<span>Copyright © 2024 AndanteTribe. Generated with <a href=\"https://dotnet.github.io/docfx\">DocFX</a></span>",
+      "_enableSearch": true,
+      "pdf": true,
+      "_gitContribute": {
+        "repo": "https://github.com/AndanteTribe/Utils"
+      },
+      "_gitUrlPattern": "github"
+    },
+    "xref": [
+      "https://normanderwan.github.io/UnityXrefMaps/xrefmap.yml",
+      "https://docs.unity3d.com/Packages/com.unity.ugui@1.0/xrefmap.yml"
+    ],
+    "xrefService": [
+      "https://xref.docs.microsoft.com/query?uid={uid}"
+    ],
+    "sitemap": {
+      "baseUrl": "https://kochounoyume.github.io/AndanteTribe/"
+    }
+  }
+}
