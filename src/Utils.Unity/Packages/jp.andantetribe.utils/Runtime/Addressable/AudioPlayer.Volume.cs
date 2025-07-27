@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
 
-namespace AndanteTribe.Utils.Addressable
+namespace AndanteTribe.Utils.Unity.Addressable
 {
     public partial class AudioPlayer
     {

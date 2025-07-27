@@ -5,7 +5,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace AndanteTribe.Utils.UGUI
+namespace AndanteTribe.Utils.Unity.UGUI
 {
     /// <summary>
     /// <see cref="UnityEngine.UI.Selectable"/>を使用するうえで最低限の機能を持つグラフィック.

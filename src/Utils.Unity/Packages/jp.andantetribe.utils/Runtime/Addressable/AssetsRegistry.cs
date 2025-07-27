@@ -11,7 +11,7 @@ using UnityEngine.Pool;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using Object = UnityEngine.Object;
 
-namespace AndanteTribe.Utils.Addressable
+namespace AndanteTribe.Utils.Unity.Addressable
 {
     /// <summary>
     /// ロードしたアセットのハンドルをキャッシュしているレジストリ.

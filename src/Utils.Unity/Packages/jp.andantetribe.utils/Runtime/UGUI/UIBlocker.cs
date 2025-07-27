@@ -4,7 +4,7 @@
 using System;
 using UnityEngine.EventSystems;
 
-namespace AndanteTribe.Utils.UGUI
+namespace AndanteTribe.Utils.Unity.UGUI
 {
     /// <summary>
     /// uGUIの全入力を一時的に剥奪するなどの入力制御を行う.

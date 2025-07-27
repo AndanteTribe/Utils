@@ -3,7 +3,7 @@
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace AndanteTribe.Utils
+namespace AndanteTribe.Utils.Unity
 {
     /// <summary>
     /// <see cref="Transform"/>の拡張メソッド.

@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace AndanteTribe.Utils
+namespace AndanteTribe.Utils.Unity
 {
     public interface IObjectReference<T> : IDisposable where T : UnityEngine.Object
     {

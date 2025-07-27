@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEngine.Networking;
 
-namespace AndanteTribe.Utils.Tasks
+namespace AndanteTribe.Utils.Unity.Tasks
 {
     /// <summary>
     /// UniTaskのサポートを活用した、<see cref="UnityWebRequest"/>を使用する<see cref="HttpMessageHandler"/>.

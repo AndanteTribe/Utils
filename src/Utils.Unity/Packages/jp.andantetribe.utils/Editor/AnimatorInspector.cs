@@ -4,7 +4,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace AndanteTribe.Utils.Editor
+namespace AndanteTribe.Utils.Unity.Editor
 {
     /// <summary>
     /// <see cref="Animator.keepAnimatorStateOnDisable"/>や<see cref="Animator.writeDefaultValuesOnDisable"/>も編集できる

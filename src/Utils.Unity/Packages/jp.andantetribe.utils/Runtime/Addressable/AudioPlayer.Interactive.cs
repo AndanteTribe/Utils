@@ -7,7 +7,7 @@ using Cysharp.Threading.Tasks;
 using LitMotion;
 using UnityEngine;
 
-namespace AndanteTribe.Utils.Addressable
+namespace AndanteTribe.Utils.Unity.Addressable
 {
     public partial class AudioPlayer
     {

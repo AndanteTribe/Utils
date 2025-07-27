@@ -3,7 +3,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace AndanteTribe.Utils.Editor
+namespace AndanteTribe.Utils.Unity.Editor
 {
     public static class UIElementUtils
     {

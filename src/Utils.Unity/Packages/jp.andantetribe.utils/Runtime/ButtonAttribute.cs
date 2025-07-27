@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace AndanteTribe.Utils
+namespace AndanteTribe.Utils.Unity
 {
     /// <summary>
     /// 指定したメソッドをUnityのInspector上に表示したボタンでテスト実行できるようになる属性.

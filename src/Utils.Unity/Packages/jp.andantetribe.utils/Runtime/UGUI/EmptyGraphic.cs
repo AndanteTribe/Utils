@@ -4,7 +4,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace AndanteTribe.Utils.UGUI
+namespace AndanteTribe.Utils.Unity.UGUI
 {
     /// <summary>
     /// 空処理のグラフィック.

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace AndanteTribe.Utils.Editor
+namespace AndanteTribe.Utils.Unity.Editor
 {
     internal sealed class FormatSettingsProvider : SettingsProvider
     {

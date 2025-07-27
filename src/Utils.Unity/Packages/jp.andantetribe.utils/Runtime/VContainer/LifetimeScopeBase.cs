@@ -7,7 +7,7 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-namespace AndanteTribe.Utils.VContainer
+namespace AndanteTribe.Utils.Unity.VContainer
 {
     /// <summary>
     /// <see cref="LifetimeScope"/>の共通基底クラス.

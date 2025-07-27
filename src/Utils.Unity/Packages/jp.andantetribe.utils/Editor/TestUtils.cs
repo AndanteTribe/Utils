@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEditor.Build.Player;
 
-namespace AndanteTribe.Utils.Editor
+namespace AndanteTribe.Utils.Unity.Editor
 {
     /// <summary>
     /// テスト関連のユーティリティ.

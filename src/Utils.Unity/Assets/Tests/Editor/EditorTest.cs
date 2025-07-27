@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-using AndanteTribe.Utils.Editor;
+using AndanteTribe.Utils.Unity.Editor;
 using NUnit.Framework;
 using UnityEditor;
 

@@ -6,7 +6,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace AndanteTribe.Utils.Editor
+namespace AndanteTribe.Utils.Unity.Editor
 {
     [CustomPropertyDrawer(typeof(IObjectReference<>), true)]
     public class ObjectReferenceDrawer : PropertyDrawer

@@ -5,22 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Pool;
 using UnityEngine.UI;
-#if ENABLE_VCONTAINER
-using IStartable = VContainer.Unity.IStartable;
-#endif
 
-namespace AndanteTribe.Utils.Tasks
+namespace AndanteTribe.Utils.Unity.Tasks
 {
-    public class TapEffect : IDisposable
-#if ENABLE_VCONTAINER
-    , IStartable
-#endif
+    public class TapEffect : IInitializable
     {
         private const int MaxCountDefault = 10;
 
@@ -31,7 +26,6 @@ namespace AndanteTribe.Utils.Tasks
 
         private readonly IObjectReference<Material> _material;
         private readonly Image _image;
-        private readonly CancellationTokenSource _cancellationDisposable;
         private readonly List<Vector3> _records;
         private readonly GraphicsBuffer _graphicsBuffer = new(GraphicsBuffer.Target.Structured, MaxCountDefault, sizeof(float) * 3);
 
@@ -40,16 +34,8 @@ namespace AndanteTribe.Utils.Tasks
         /// </summary>
         public uint MaxCount
         {
-            get
-            {
-                _cancellationDisposable.ThrowIfDisposed(this);
-                return (uint)_graphicsBuffer.count;
-            }
-            set
-            {
-                _cancellationDisposable.ThrowIfDisposed(this);
-                _graphicsBuffer.SetCounterValue(value);
-            }
+            get => (uint)_graphicsBuffer.count;
+            set => _graphicsBuffer.SetCounterValue(value);
         }
 
         /// <summary>
@@ -66,34 +52,40 @@ namespace AndanteTribe.Utils.Tasks
         {
             _material = material;
             _image = image;
-            _cancellationDisposable = CancellationTokenSource.CreateLinkedTokenSource(image.destroyCancellationToken);
             _records = ListPool<Vector3>.Get();
             if (_records.Capacity < MaxCountDefault)
             {
                 _records.Capacity = MaxCountDefault;
             }
-            _cancellationDisposable.Token.UnsafeRegister(static state =>
-            {
-                var self = (TapEffect)state!;
-                self._material.Dispose();
-                self._graphicsBuffer.Dispose();
-                ListPool<Vector3>.Release(self._records);
-            }, this);
         }
 
         /// <summary>
         /// EntryPoint.
         /// </summary>
-        public void Start()
+        public async ValueTask InitializeAsync(CancellationToken cancellationToken)
         {
-            _cancellationDisposable.ThrowIfDisposed(this);
+            cancellationToken.ThrowIfCancellationRequested();
             var module = EventSystem.current.currentInputModule ?? EventSystem.current.GetComponent<BaseInputModule>();
+
+            cancellationToken.UnsafeRegister(static state =>
+            {
+                var self = (TapEffect)state!;
+                self._material.Dispose();
+                self._graphicsBuffer.Dispose();
+                ListPool<Vector3>.Release(self._records);
+
+                if (self._image != null && self._image.material != null)
+                {
+                    UnityEngine.Object.Destroy(self._image.material);
+                    self._image.material = null;
+                }
+            }, this);
 
 #if ENABLE_INPUT_SYSTEM
             var isModule = (UnityEngine.InputSystem.UI.InputSystemUIInputModule)module;
-            var callback = new Action<UnityEngine.InputSystem.InputAction.CallbackContext>(_ => OnLeftClick());
+            var callback = new Action<UnityEngine.InputSystem.InputAction.CallbackContext>(_ => OnLeftClickAsync(cancellationToken).Forget());
             isModule.leftClick.action.performed += callback;
-            _cancellationDisposable.Token.UnsafeRegister(static state =>
+            cancellationToken.UnsafeRegister(static state =>
             {
                 var pair = ((UnityEngine.InputSystem.UI.InputSystemUIInputModule module, Action<UnityEngine.InputSystem.InputAction.CallbackContext> callback))state!;
                 if (pair.module != null)
@@ -101,50 +93,31 @@ namespace AndanteTribe.Utils.Tasks
                     pair.module.leftClick.action.performed -= pair.callback;
                 }
             }, (isModule, callback));
-#else
-            UniTask.Void(static async self =>
-            {
-                while (!self._cancellationDisposable.IsCancellationRequested)
-                {
-                    if (Input.GetMouseButtonDown(0))
-                    {
-                        self.OnLeftClick();
-                    }
-
-                    await UniTask.Yield();
-                }
-            }, this);
 #endif
 
-            // マテリアルのロードと設定項目の更新
-            UniTask.Void(static async self =>
+            // マテリアルのロード
+            var material = _image.material = new Material(await _material.LoadAsync(cancellationToken));
+
+            while (!cancellationToken.IsCancellationRequested)
             {
-                var cancellationToken = self._cancellationDisposable.Token;
-                var material = self._image.material = new Material(await self._material.LoadAsync(cancellationToken));
+                UpdateMaterial(material);
 
-                while (!self._cancellationDisposable.IsCancellationRequested)
+#if !ENABLE_INPUT_SYSTEM
+                if (Input.GetMouseButtonDown(0))
                 {
-                    var count = self._records.Count;
-                    material.SetInt(self._countID, count);
-
-                    if (count > 0)
-                    {
-                        var records = new NativeArray<Vector3>(count, Allocator.Temp);
-                        self._records.AsSpan().CopyTo(records);
-
-                        var graphicsBuffer = self._graphicsBuffer;
-                        graphicsBuffer.SetData(records);
-                        material.SetBuffer(self._recordsID, graphicsBuffer);
-                        material.SetFloat(self._durationID, (float)self.Duration.TotalSeconds);
-                    }
-
-                    await UniTask.Yield();
+                    OnLeftClickAsync(cancellationToken).Forget();
                 }
-            }, this);
+#endif
+
+                await UniTask.Yield();
+            }
         }
 
-        // 左クリック（クリック or タップ）されたときに呼び出される処理
-        private void OnLeftClick()
+        /// <summary>
+        /// 左クリック（クリック or タップ）されたときに呼び出される処理
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        private async UniTaskVoid OnLeftClickAsync(CancellationToken cancellationToken)
         {
             if (_records.Count >= MaxCount)
             {
@@ -166,24 +139,27 @@ namespace AndanteTribe.Utils.Tasks
             var record = new Vector3(normalizedPos.x, normalizedPos.y, Time.time);
             _records.Add(record);
 
-            UniTask.Void(static async args =>
-            {
-                await UniTask.Delay(args.self.Duration, cancellationToken: args.self._cancellationDisposable.Token);
-                args.self._records.Remove(args.record);
-            }, (self: this, record));
+            await UniTask.Delay(Duration, cancellationToken: cancellationToken);
+            _records.Remove(record);
         }
 
-        /// <inheritdoc />
-        public void Dispose()
+        /// <summary>
+        /// マテリアルの更新処理
+        /// </summary>
+        /// <param name="material"></param>
+        private void UpdateMaterial(Material material)
         {
-            _cancellationDisposable.ThrowIfDisposed(this);
-            _cancellationDisposable.Cancel();
-            _cancellationDisposable.Dispose();
+            var count = _records.Count;
+            material.SetInt(_countID, count);
 
-            if (_image != null && _image.material != null)
+            if (count > 0)
             {
-                UnityEngine.Object.Destroy(_image.material);
-                _image.material = null;
+                var records = new NativeArray<Vector3>(count, Allocator.Temp);
+                _records.AsSpan().CopyTo(records);
+
+                _graphicsBuffer.SetData(records);
+                material.SetBuffer(_recordsID, _graphicsBuffer);
+                material.SetFloat(_durationID, (float)Duration.TotalSeconds);
             }
         }
     }

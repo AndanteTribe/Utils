@@ -7,7 +7,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-namespace AndanteTribe.Utils.Addressable
+namespace AndanteTribe.Utils.Unity.Addressable
 {
     /// <summary>
     /// 汎用オーディオ再生クラス.

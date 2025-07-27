@@ -5,7 +5,7 @@ using System;
 using System.Runtime.CompilerServices;
 using R3;
 
-namespace AndanteTribe.Utils.R3
+namespace AndanteTribe.Utils.Unity.R3
 {
     /// <content>
     /// Observableの拡張メソッド.

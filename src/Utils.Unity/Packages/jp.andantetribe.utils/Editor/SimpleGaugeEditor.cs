@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
-namespace AndanteTribe.Utils.Editor
+namespace AndanteTribe.Utils.Unity.Editor
 {
     [CustomEditor(typeof(UGUI.SimpleGauge))]
     public class SimpleGaugeEditor : UnityEditor.Editor

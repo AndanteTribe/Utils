@@ -7,7 +7,7 @@ using Screen = UnityEngine.Device.Screen;
 using Screen = UnityEngine.Screen;
 #endif
 
-namespace AndanteTribe.Utils
+namespace AndanteTribe.Utils.Unity
 {
     /// <summary>
     /// セーフエリア調整スクリプト.

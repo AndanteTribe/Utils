@@ -73,8 +73,9 @@ public static class ValueTupleExtensions
     public struct Enumerator<T>
     {
         private readonly (T, T, T, T, T, T, T) _tuple;
-        private readonly int _length;
-        private int _index;
+        private readonly byte _length;
+        private sbyte _index;
+        private bool _moveNext;
 
         /// <summary>
         /// <see cref="System.Collections.Generic.IEnumerator{T}.Current"/>に同じ.
@@ -83,11 +84,11 @@ public static class ValueTupleExtensions
         {
             0 => _tuple.Item1,
             1 => _tuple.Item2,
-            2 => _tuple.Item3,
-            3 => _tuple.Item4,
-            4 => _tuple.Item5,
-            5 => _tuple.Item6,
-            6 => _tuple.Item7,
+            2 when _moveNext => _tuple.Item3,
+            3 when _moveNext  => _tuple.Item4,
+            4 when _moveNext  => _tuple.Item5,
+            5 when _moveNext  => _tuple.Item6,
+            6 when _moveNext  => _tuple.Item7,
             _ => throw new IndexOutOfRangeException(),
         };
 
@@ -96,7 +97,7 @@ public static class ValueTupleExtensions
         /// </summary>
         /// <param name="tuple"></param>
         /// <param name="length"></param>
-        internal Enumerator(in (T, T, T, T, T, T, T) tuple, int length)
+        internal Enumerator(in (T, T, T, T, T, T, T) tuple, byte length)
         {
             _tuple = tuple;
             _length = length;
@@ -107,6 +108,6 @@ public static class ValueTupleExtensions
         /// <see cref="System.Collections.Generic.IEnumerator{T}.MoveNext"/>に同じ.
         /// </summary>
         /// <returns>列挙が可能な場合はtrue.</returns>
-        public bool MoveNext() => _index < _length && ++_index < _length;
+        public bool MoveNext() => _moveNext = _index <= _length && ++_index < _length;
     }
 }

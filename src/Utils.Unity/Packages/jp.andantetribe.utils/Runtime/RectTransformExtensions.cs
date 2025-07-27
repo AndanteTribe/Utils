@@ -4,7 +4,7 @@ using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace AndanteTribe.Utils
+namespace AndanteTribe.Utils.Unity
 {
     /// <summary>
     /// <see cref="RectTransform"/>の拡張メソッド.

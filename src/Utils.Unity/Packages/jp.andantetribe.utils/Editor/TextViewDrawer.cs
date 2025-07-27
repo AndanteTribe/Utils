@@ -2,13 +2,13 @@
 #nullable enable
 
 using System;
-using AndanteTribe.Utils.UGUI;
+using AndanteTribe.Utils.Unity.UGUI;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace AndanteTribe.Utils.Editor
+namespace AndanteTribe.Utils.Unity.Editor
 {
     [CustomPropertyDrawer(typeof(TextView), true)]
     internal sealed class TextViewDrawer : PropertyDrawer

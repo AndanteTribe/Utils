@@ -3,7 +3,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace AndanteTribe.Utils.Editor
+namespace AndanteTribe.Utils.Unity.Editor
 {
     /// <summary>
     /// ワールドの座標・回転・大きさも表示する<see cref="Transform"/>カスタムエディタ.

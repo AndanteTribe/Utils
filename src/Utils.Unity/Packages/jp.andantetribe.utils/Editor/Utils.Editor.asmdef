@@ -1,6 +1,6 @@
 {
     "name": "Utils.Editor",
-    "rootNamespace": "AndanteTribe.Utils.Editor",
+    "rootNamespace": "AndanteTribe.Utils.Unity.Editor",
     "references": [
         "GUID:2294a65d721f9974ca66d13b434e6b7b",
         "GUID:2bafac87e7f4b9b418d9448d219b01ab",

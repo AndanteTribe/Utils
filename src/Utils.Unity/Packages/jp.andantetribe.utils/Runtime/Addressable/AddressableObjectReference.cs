@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-namespace AndanteTribe.Utils.Addressable
+namespace AndanteTribe.Utils.Unity.Addressable
 {
     public sealed class AddressableObjectReference<T> : IObjectReference<T> where T : UnityEngine.Object
     {

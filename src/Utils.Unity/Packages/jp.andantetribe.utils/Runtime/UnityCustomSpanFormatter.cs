@@ -9,7 +9,7 @@ using UnityEngine;
 
 [assembly: UnityEngine.Scripting.AlwaysLinkAssembly]
 
-namespace AndanteTribe.Utils
+namespace AndanteTribe.Utils.Unity
 {
 #if UNITY_EDITOR
     [UnityEditor.InitializeOnLoad]

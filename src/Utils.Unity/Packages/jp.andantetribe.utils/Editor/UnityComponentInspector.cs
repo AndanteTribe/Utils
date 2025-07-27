@@ -2,7 +2,7 @@
 
 using UnityEditor;
 
-namespace AndanteTribe.Utils.Editor
+namespace AndanteTribe.Utils.Unity.Editor
 {
     /// <summary>
     /// 既存のUnityコンポーネントのカスタムエディタを作成するための基底クラスです.

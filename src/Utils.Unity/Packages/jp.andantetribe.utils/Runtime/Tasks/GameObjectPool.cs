@@ -9,7 +9,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace AndanteTribe.Utils.Tasks
+namespace AndanteTribe.Utils.Unity.Tasks
 {
     public sealed class GameObjectPool<T> : IDisposable, IReadOnlyCollection<T> where T : MonoBehaviour
     {
