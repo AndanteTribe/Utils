@@ -16,7 +16,7 @@
 ## これらの実装のバックポートがもたらす副次的効果
 - `init`アクセサ
     - [init 専用セッター - C# feature specifications](https://learn.microsoft.com/ja-jp/dotnet/csharp/language-reference/proposals/csharp-9.0/init)
-    - [init キーワード - init のみのプロパティ - C# reference[]()](https://learn.microsoft.com/ja-jp/dotnet/csharp/language-reference/keywords/init)
+    - [init キーワード - init のみのプロパティ - C# reference](https://learn.microsoft.com/ja-jp/dotnet/csharp/language-reference/keywords/init)
 - `record`型
     - [レコード - C# reference](https://learn.microsoft.com/ja-jp/dotnet/csharp/language-reference/builtin-types/record)
 - 補間文字列の強化
