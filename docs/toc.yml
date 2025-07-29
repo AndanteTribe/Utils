@@ -5,6 +5,6 @@
 - name: Repository
   href: https://github.com/AndanteTribe/Utils
   homepage: https://github.com/AndanteTribe/Utils
-- name: Releases
-  href: https://github.com/AndanteTribe/Utils/releases
-  homepage: https://github.com/AndanteTribe/Utils/releases
+#- name: Releases
+#  href: https://github.com/AndanteTribe/Utils/releases
+#  homepage: https://github.com/AndanteTribe/Utils/releases
