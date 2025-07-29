@@ -2,3 +2,9 @@
   href: docs/
 - name: API
   href: api/
+- name: Repository
+  href: https://github.com/kochounoyume/MinimalUtility
+  homepage: https://github.com/AndanteTribe/Utils
+- name: Releases
+  href: https://github.com/kochounoyume/MinimalUtility/releases
+  homepage: https://github.com/AndanteTribe/Utils/releases
