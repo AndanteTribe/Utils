@@ -2,8 +2,7 @@ name: unity-test
 on:
   pull_request_target:
     types:
-      - opened
-      - synchronize
+      - labeled
   push:
     branches:
     - main
@@ -14,11 +13,11 @@ on:
 jobs:
   test:
       runs-on: ubuntu-latest
-      if: contains(github.event.pull_request.labels.*.name, 'request-ci')
+      if: github.event.label.name == 'request-ci'
       steps:
         - uses: actions/checkout@v4
           with:
-            fetch-depth: 0
+            ref: ${{ github.event.pull_request.head.sha }}
         - uses: actions/cache@v4
           id: cache
           with:
