@@ -10,6 +10,28 @@ public static class ValueTupleExtensions
     /// <summary>
     /// <see cref="ValueTuple{T1, T2}"/>のforeach対応.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// using UnityEngine;
+    ///
+    /// public class Sample : MonoBehaviour
+    /// {
+    ///     [SerializeField] private GameObject _button;
+    ///     [SerializeField] private GameObject _button1;
+    ///
+    ///     private void Start()
+    ///     {
+    ///         //タプルでforeachが回せる
+    ///         foreach (var obj in (_button,_button1))
+    ///         {
+    ///             obj.SetActive(false);
+    ///         }
+    ///     }
+    /// }
+    /// ]]>
+    /// </code>
+    /// </example>
     /// <param name="tuple">対象の<see cref="ValueTuple{T1, T2}"/>.</param>
     /// <typeparam name="T">要素の型.</typeparam>
     /// <returns>要素を列挙する<see cref="Enumerator{T}"/>.</returns>
@@ -20,6 +42,29 @@ public static class ValueTupleExtensions
     /// <summary>
     /// <see cref="ValueTuple{T1, T2, T3}"/>のforeach対応.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// using UnityEngine;
+    ///
+    /// public class Sample : MonoBehaviour
+    /// {
+    ///     [SerializeField] private GameObject _button;
+    ///     [SerializeField] private GameObject _button1;
+    ///     [SerializeField] private GameObject _button2;
+    ///
+    ///     private void Start()
+    ///     {
+    ///         //タプルでforeachが回せる
+    ///         foreach (var obj in (_button,_button1,_button2))
+    ///         {
+    ///             obj.SetActive(false);
+    ///         }
+    ///     }
+    /// }
+    /// ]]>
+    /// </code>
+    /// </example>
     /// <param name="tuple">対象の<see cref="ValueTuple{T1, T2, T3}"/>.</param>
     /// <typeparam name="T">要素の型.</typeparam>
     /// <returns>要素を列挙する<see cref="Enumerator{T}"/>.</returns>
@@ -30,6 +75,30 @@ public static class ValueTupleExtensions
     /// <summary>
     /// <see cref="ValueTuple{T1, T2, T3, T4}"/>のforeach対応.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// using UnityEngine;
+    ///
+    /// public class Sample : MonoBehaviour
+    /// {
+    ///     [SerializeField] private GameObject _button;
+    ///     [SerializeField] private GameObject _button1;
+    ///     [SerializeField] private GameObject _button2;
+    ///     [SerializeField] private GameObject _button3;
+    ///
+    ///     private void Start()
+    ///     {
+    ///         //タプルでforeachが回せる
+    ///         foreach (var obj in (_button,_button1,_button2,_button3))
+    ///         {
+    ///             obj.SetActive(false);
+    ///         }
+    ///     }
+    /// }
+    /// ]]>
+    /// </code>
+    /// </example>
     /// <param name="tuple">対象の<see cref="ValueTuple{T1, T2, T3, T4}"/>.</param>
     /// <typeparam name="T">要素の型.</typeparam>
     /// <returns>要素を列挙する<see cref="Enumerator{T}"/>.</returns>
@@ -40,6 +109,31 @@ public static class ValueTupleExtensions
     /// <summary>
     /// <see cref="ValueTuple{T1, T2, T3, T4, T5}"/>のforeach対応.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// using UnityEngine;
+    ///
+    /// public class Sample : MonoBehaviour
+    /// {
+    ///     [SerializeField] private GameObject _button;
+    ///     [SerializeField] private GameObject _button1;
+    ///     [SerializeField] private GameObject _button2;
+    ///     [SerializeField] private GameObject _button3;
+    ///     [SerializeField] private GameObject _button4;
+    ///
+    ///     private void Start()
+    ///     {
+    ///         //タプルでforeachが回せる
+    ///         foreach (var obj in (_button,_button1,_button2,_button3,_button4))
+    ///         {
+    ///             obj.SetActive(false);
+    ///         }
+    ///     }
+    /// }
+    /// ]]>
+    /// </code>
+    /// </example>
     /// <param name="tuple">対象の<see cref="ValueTuple{T1, T2, T3, T4, T5}"/>.</param>
     /// <typeparam name="T">要素の型.</typeparam>
     /// <returns>要素を列挙する<see cref="Enumerator{T}"/>.</returns>
@@ -50,6 +144,32 @@ public static class ValueTupleExtensions
     /// <summary>
     /// <see cref="ValueTuple{T1, T2, T3, T4, T5, T6}"/>のforeach対応.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// using UnityEngine;
+    ///
+    /// public class Sample : MonoBehaviour
+    /// {
+    ///     [SerializeField] private GameObject _button;
+    ///     [SerializeField] private GameObject _button1;
+    ///     [SerializeField] private GameObject _button2;
+    ///     [SerializeField] private GameObject _button3;
+    ///     [SerializeField] private GameObject _button4;
+    ///     [SerializeField] private GameObject _button5;
+    ///
+    ///     private void Start()
+    ///     {
+    ///         //タプルでforeachが回せる
+    ///         foreach (var obj in (_button,_button1,_button2,_button3,_button4,_button5))
+    ///         {
+    ///             obj.SetActive(false);
+    ///         }
+    ///     }
+    /// }
+    /// ]]>
+    /// </code>
+    /// </example>
     /// <param name="tuple">対象の<see cref="ValueTuple{T1, T2, T3, T4, T5, T6}"/>.</param>
     /// <typeparam name="T">要素の型.</typeparam>
     /// <returns>要素を列挙する<see cref="Enumerator{T}"/>.</returns>
@@ -60,6 +180,33 @@ public static class ValueTupleExtensions
     /// <summary>
     /// <see cref="ValueTuple{T1, T2, T3, T4, T5, T6, T7}"/>のforeach対応.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// using UnityEngine;
+    ///
+    /// public class Sample : MonoBehaviour
+    /// {
+    ///     [SerializeField] private GameObject _button;
+    ///     [SerializeField] private GameObject _button1;
+    ///     [SerializeField] private GameObject _button2;
+    ///     [SerializeField] private GameObject _button3;
+    ///     [SerializeField] private GameObject _button4;
+    ///     [SerializeField] private GameObject _button5;
+    ///     [SerializeField] private GameObject _button6;
+    ///
+    ///     private void Start()
+    ///     {
+    ///         //タプルでforeachが回せる
+    ///         foreach (var obj in (_button,_button1,_button2,_button3,_button4,_button5,_button6))
+    ///         {
+    ///             obj.SetActive(false);
+    ///         }
+    ///     }
+    /// }
+    /// ]]>
+    /// </code>
+    /// </example>
     /// <param name="tuple">対象の<see cref="ValueTuple{T1, T2, T3, T4, T5, T6, T7}"/>.</param>
     /// <typeparam name="T">要素の型.</typeparam>
     /// <returns>要素を列挙する<see cref="Enumerator{T}"/>.</returns>
@@ -110,4 +257,5 @@ public static class ValueTupleExtensions
         /// <returns>列挙が可能な場合はtrue.</returns>
         public bool MoveNext() => _moveNext = _index <= _length && ++_index < _length;
     }
+
 }

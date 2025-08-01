@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using UnityEngine;
 #if UNITY_EDITOR
 using Screen = UnityEngine.Device.Screen;
