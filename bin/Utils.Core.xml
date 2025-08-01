@@ -332,15 +332,60 @@
              </remarks>
         </member>
         <member name="M:AndanteTribe.Utils.EnumExtensions.GetEnumerator``1(``0)">
-            <summary>
-            列挙体の全てのビットフラグを取得します.
-            </summary>
-            <param name="value"></param>
-            <typeparam name="T"></typeparam>
-            <returns></returns>
-            <remarks>
-            指定する列挙体はint型が基になる型として指定されている必要があります.
-            </remarks>
+             <summary>
+             列挙体の全てのビットフラグを取得します.
+             </summary>
+             <param name="value"></param>
+             <typeparam name="T"></typeparam>
+             <example>
+             <code>
+             <![CDATA[
+             [System.Flags]
+             public enum FileAccess
+             {
+                 None = 0,
+                 Read = 1 << 0,      // 0001
+                 Write = 1 << 1,     // 0010
+                 Execute = 1 << 2,   // 0100
+                 ReadWrite = Read | Write, // 0011
+                 All = Read | Write | Execute
+             }
+            
+             public class Sample
+             {
+                 public void Run()
+                 {
+                     FileAccess currentPermissions = FileAccess.Read | FileAccess.Write;
+            
+                     //foreachが実行可能になる
+                     foreach (var flag in currentPermissions)
+                     {
+                         // 実行結果
+                         // Read
+                         // Write
+                         Console.WriteLine(flag);
+                     }
+            
+                     currentPermissions = FileAccess.None | FileAccess.All ;
+            
+                     foreach (var flag in currentPermissions)
+                     {
+                         // 実行結果 Noneは出力されない
+                         // Read
+                         // Write
+                         // Execute
+                         Console.WriteLine(flag);
+                     }
+            
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <returns></returns>
+             <remarks>
+             指定する列挙体はint型が基になる型として指定されている必要があります.
+             </remarks>
         </member>
         <member name="T:AndanteTribe.Utils.EnumExtensions.Enumerator`1">
             <summary>
@@ -372,7 +417,7 @@
              <code>
              <![CDATA[
              using System.Collections.Generic;
-             using MinimalUtility;
+             using AndanteTribe.Utils;
             
              public enum Fruits : int
              {
@@ -426,15 +471,47 @@
             </summary>
         </member>
         <member name="M:AndanteTribe.Utils.MemoryExtensions.GetEnumerator``1(System.Memory{``0}@)">
-            <summary>
-            <see cref="T:System.Memory`1"/>のforeach対応.
-            </summary>
-            <example>
-            <see cref="M:AndanteTribe.Utils.MemoryExtensions.GetEnumerator``1(System.ReadOnlyMemory{``0}@)"/>と使い方や機能は同じ.
-            </example>
-            <param name="memory">対象の<see cref="T:System.Memory`1"/>.</param>
-            <typeparam name="T">要素の型.</typeparam>
-            <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.MemoryExtensions.Enumerator`1"/>.</returns>
+             <summary>
+             <see cref="T:System.Memory`1"/>のforeach対応.
+             </summary>
+             <remarks>
+             <see cref="M:AndanteTribe.Utils.MemoryExtensions.GetEnumerator``1(System.ReadOnlyMemory{``0}@)"/>と使い方や機能は同じ.
+             </remarks>
+             <example>
+             <code>
+             <![CDATA[
+             using System;
+             using System.Collections;
+             using AndanteTribe.Utils;
+             using UnityEngine;
+            
+             public class MemoryExtensionsSample : MonoBehaviour
+             {
+                 private Memory<char> _text;
+            
+                 private void Start()
+                 {
+                     const string text = "Hello, World!";
+                     _text = text.AsMemory().Slice(7, 5); // 'W', 'o', 'r', 'l', 'd'
+            
+                     StartCoroutine(UpdateText());
+                 }
+            
+                 private IEnumerator UpdateText()
+                 {
+                     foreach (var c in _text)
+                     {
+                         Debug.Log(c);
+                         yield return null; // Wait for next frame
+                     }
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="memory">対象の<see cref="T:System.Memory`1"/>.</param>
+             <typeparam name="T">要素の型.</typeparam>
+             <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.MemoryExtensions.Enumerator`1"/>.</returns>
         </member>
         <member name="M:AndanteTribe.Utils.MemoryExtensions.GetEnumerator``1(System.ReadOnlyMemory{``0}@)">
              <summary>
@@ -445,7 +522,7 @@
              <![CDATA[
              using System;
              using System.Collections;
-             using MinimalUtility;
+             using AndanteTribe.Utils;
              using UnityEngine;
             
              public class MemoryExtensionsSample : MonoBehaviour
@@ -505,52 +582,199 @@
             </summary>
         </member>
         <member name="M:AndanteTribe.Utils.ValueTupleExtensions.GetEnumerator``1(System.ValueTuple{``0,``0}@)">
-            <summary>
-            <see cref="T:System.ValueTuple`2"/>のforeach対応.
-            </summary>
-            <param name="tuple">対象の<see cref="T:System.ValueTuple`2"/>.</param>
-            <typeparam name="T">要素の型.</typeparam>
-            <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1"/>.</returns>
+             <summary>
+             <see cref="T:System.ValueTuple`2"/>のforeach対応.
+             </summary>
+             <example>
+             <code>
+             <![CDATA[
+             using UnityEngine;
+            
+             public class Sample : MonoBehaviour
+             {
+                 [SerializeField] private GameObject _button;
+                 [SerializeField] private GameObject _button1;
+            
+                 private void Start()
+                 {
+                     //タプルでforeachが回せる
+                     foreach (var obj in (_button,_button1))
+                     {
+                         obj.SetActive(false);
+                     }
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="tuple">対象の<see cref="T:System.ValueTuple`2"/>.</param>
+             <typeparam name="T">要素の型.</typeparam>
+             <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1"/>.</returns>
         </member>
         <member name="M:AndanteTribe.Utils.ValueTupleExtensions.GetEnumerator``1(System.ValueTuple{``0,``0,``0}@)">
-            <summary>
-            <see cref="T:System.ValueTuple`3"/>のforeach対応.
-            </summary>
-            <param name="tuple">対象の<see cref="T:System.ValueTuple`3"/>.</param>
-            <typeparam name="T">要素の型.</typeparam>
-            <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1"/>.</returns>
+             <summary>
+             <see cref="T:System.ValueTuple`3"/>のforeach対応.
+             </summary>
+             <example>
+             <code>
+             <![CDATA[
+             using UnityEngine;
+            
+             public class Sample : MonoBehaviour
+             {
+                 [SerializeField] private GameObject _button;
+                 [SerializeField] private GameObject _button1;
+                 [SerializeField] private GameObject _button2;
+            
+                 private void Start()
+                 {
+                     //タプルでforeachが回せる
+                     foreach (var obj in (_button,_button1,_button2))
+                     {
+                         obj.SetActive(false);
+                     }
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="tuple">対象の<see cref="T:System.ValueTuple`3"/>.</param>
+             <typeparam name="T">要素の型.</typeparam>
+             <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1"/>.</returns>
         </member>
         <member name="M:AndanteTribe.Utils.ValueTupleExtensions.GetEnumerator``1(System.ValueTuple{``0,``0,``0,``0}@)">
-            <summary>
-            <see cref="T:System.ValueTuple`4"/>のforeach対応.
-            </summary>
-            <param name="tuple">対象の<see cref="T:System.ValueTuple`4"/>.</param>
-            <typeparam name="T">要素の型.</typeparam>
-            <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1"/>.</returns>
+             <summary>
+             <see cref="T:System.ValueTuple`4"/>のforeach対応.
+             </summary>
+             <example>
+             <code>
+             <![CDATA[
+             using UnityEngine;
+            
+             public class Sample : MonoBehaviour
+             {
+                 [SerializeField] private GameObject _button;
+                 [SerializeField] private GameObject _button1;
+                 [SerializeField] private GameObject _button2;
+                 [SerializeField] private GameObject _button3;
+            
+                 private void Start()
+                 {
+                     //タプルでforeachが回せる
+                     foreach (var obj in (_button,_button1,_button2,_button3))
+                     {
+                         obj.SetActive(false);
+                     }
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="tuple">対象の<see cref="T:System.ValueTuple`4"/>.</param>
+             <typeparam name="T">要素の型.</typeparam>
+             <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1"/>.</returns>
         </member>
         <member name="M:AndanteTribe.Utils.ValueTupleExtensions.GetEnumerator``1(System.ValueTuple{``0,``0,``0,``0,``0}@)">
-            <summary>
-            <see cref="T:System.ValueTuple`5"/>のforeach対応.
-            </summary>
-            <param name="tuple">対象の<see cref="T:System.ValueTuple`5"/>.</param>
-            <typeparam name="T">要素の型.</typeparam>
-            <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1"/>.</returns>
+             <summary>
+             <see cref="T:System.ValueTuple`5"/>のforeach対応.
+             </summary>
+             <example>
+             <code>
+             <![CDATA[
+             using UnityEngine;
+            
+             public class Sample : MonoBehaviour
+             {
+                 [SerializeField] private GameObject _button;
+                 [SerializeField] private GameObject _button1;
+                 [SerializeField] private GameObject _button2;
+                 [SerializeField] private GameObject _button3;
+                 [SerializeField] private GameObject _button4;
+            
+                 private void Start()
+                 {
+                     //タプルでforeachが回せる
+                     foreach (var obj in (_button,_button1,_button2,_button3,_button4))
+                     {
+                         obj.SetActive(false);
+                     }
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="tuple">対象の<see cref="T:System.ValueTuple`5"/>.</param>
+             <typeparam name="T">要素の型.</typeparam>
+             <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1"/>.</returns>
         </member>
         <member name="M:AndanteTribe.Utils.ValueTupleExtensions.GetEnumerator``1(System.ValueTuple{``0,``0,``0,``0,``0,``0}@)">
-            <summary>
-            <see cref="T:System.ValueTuple`6"/>のforeach対応.
-            </summary>
-            <param name="tuple">対象の<see cref="T:System.ValueTuple`6"/>.</param>
-            <typeparam name="T">要素の型.</typeparam>
-            <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1"/>.</returns>
+             <summary>
+             <see cref="T:System.ValueTuple`6"/>のforeach対応.
+             </summary>
+             <example>
+             <code>
+             <![CDATA[
+             using UnityEngine;
+            
+             public class Sample : MonoBehaviour
+             {
+                 [SerializeField] private GameObject _button;
+                 [SerializeField] private GameObject _button1;
+                 [SerializeField] private GameObject _button2;
+                 [SerializeField] private GameObject _button3;
+                 [SerializeField] private GameObject _button4;
+                 [SerializeField] private GameObject _button5;
+            
+                 private void Start()
+                 {
+                     //タプルでforeachが回せる
+                     foreach (var obj in (_button,_button1,_button2,_button3,_button4,_button5))
+                     {
+                         obj.SetActive(false);
+                     }
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="tuple">対象の<see cref="T:System.ValueTuple`6"/>.</param>
+             <typeparam name="T">要素の型.</typeparam>
+             <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1"/>.</returns>
         </member>
         <member name="M:AndanteTribe.Utils.ValueTupleExtensions.GetEnumerator``1(System.ValueTuple{``0,``0,``0,``0,``0,``0,``0}@)">
-            <summary>
-            <see cref="T:System.ValueTuple`7"/>のforeach対応.
-            </summary>
-            <param name="tuple">対象の<see cref="T:System.ValueTuple`7"/>.</param>
-            <typeparam name="T">要素の型.</typeparam>
-            <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1"/>.</returns>
+             <summary>
+             <see cref="T:System.ValueTuple`7"/>のforeach対応.
+             </summary>
+             <example>
+             <code>
+             <![CDATA[
+             using UnityEngine;
+            
+             public class Sample : MonoBehaviour
+             {
+                 [SerializeField] private GameObject _button;
+                 [SerializeField] private GameObject _button1;
+                 [SerializeField] private GameObject _button2;
+                 [SerializeField] private GameObject _button3;
+                 [SerializeField] private GameObject _button4;
+                 [SerializeField] private GameObject _button5;
+                 [SerializeField] private GameObject _button6;
+            
+                 private void Start()
+                 {
+                     //タプルでforeachが回せる
+                     foreach (var obj in (_button,_button1,_button2,_button3,_button4,_button5,_button6))
+                     {
+                         obj.SetActive(false);
+                     }
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="tuple">対象の<see cref="T:System.ValueTuple`7"/>.</param>
+             <typeparam name="T">要素の型.</typeparam>
+             <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1"/>.</returns>
         </member>
         <member name="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1">
             <summary>
