@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using AndanteTribe.Utils;
@@ -197,6 +198,7 @@ namespace AndanteTribe.Utils.Tests
 
             foreach (var testFlag in flags)
             {
+                UnityEngine.Debug.Log(testFlag);
                 result.Add(testFlag);
             }
 
