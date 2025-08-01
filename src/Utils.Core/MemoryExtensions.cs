@@ -10,8 +10,40 @@ public static class MemoryExtensions
     /// <summary>
     /// <see cref="Memory{T}"/>のforeach対応.
     /// </summary>
-    /// <example>
+    /// <remarks>
     /// <see cref="GetEnumerator{T}(in ReadOnlyMemory{T})"/>と使い方や機能は同じ.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// using System;
+    /// using System.Collections;
+    /// using AndanteTribe.Utils;
+    /// using UnityEngine;
+    ///
+    /// public class MemoryExtensionsSample : MonoBehaviour
+    /// {
+    ///     private Memory<char> _text;
+    ///
+    ///     private void Start()
+    ///     {
+    ///         const string text = "Hello, World!";
+    ///         _text = text.AsMemory().Slice(7, 5); // 'W', 'o', 'r', 'l', 'd'
+    ///
+    ///         StartCoroutine(UpdateText());
+    ///     }
+    ///
+    ///     private IEnumerator UpdateText()
+    ///     {
+    ///         foreach (var c in _text)
+    ///         {
+    ///             Debug.Log(c);
+    ///             yield return null; // Wait for next frame
+    ///         }
+    ///     }
+    /// }
+    /// ]]>
+    /// </code>
     /// </example>
     /// <param name="memory">対象の<see cref="Memory{T}"/>.</param>
     /// <typeparam name="T">要素の型.</typeparam>
@@ -27,7 +59,7 @@ public static class MemoryExtensions
     /// <![CDATA[
     /// using System;
     /// using System.Collections;
-    /// using MinimalUtility;
+    /// using AndanteTribe.Utils;
     /// using UnityEngine;
     ///
     /// public class MemoryExtensionsSample : MonoBehaviour
