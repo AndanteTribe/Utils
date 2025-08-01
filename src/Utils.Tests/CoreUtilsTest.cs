@@ -198,7 +198,6 @@ namespace AndanteTribe.Utils.Tests
 
             foreach (var testFlag in flags)
             {
-                UnityEngine.Debug.Log(testFlag);
                 result.Add(testFlag);
             }
 
