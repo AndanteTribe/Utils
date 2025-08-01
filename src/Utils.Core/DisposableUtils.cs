@@ -1,5 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
-
 namespace AndanteTribe.Utils;
 
 /// <summary>
@@ -54,6 +53,39 @@ public static class DisposableUtils
     /// <summary>
     /// <see cref="CancellationTokenSource"/>がキャンセルされているかどうかを確認し、キャンセルされている場合は<see cref="ObjectDisposedException"/>をスローします。
     /// </summary>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// using System;
+    /// using System.Threading;
+    /// using System.Threading.Tasks;
+    ///
+    /// public class Sample
+    /// {
+    ///     private CancellationTokenSource _cancellationDisposable = new();
+    ///
+    ///     public async Task LoadAsync()
+    ///     {
+    ///         // //従来の書き方
+    ///         // //既にキャンセル処理が呼ばれているか確認
+    ///         // if (_cancellationDisposable.IsCancellationRequested)
+    ///         // {
+    ///         //     throw new ObjectDisposedException("AudioPlayer");
+    ///         // }
+    ///
+    ///         //このように一行でキャンセル済みか確認可能
+    ///         _cancellationDisposable.ThrowIfDisposed(this);
+    ///
+    ///         var token = _cancellationDisposable.Token;
+    ///
+    ///         // 以下、非同期処理が続く
+    ///         // await Addressables.LoadAsync(token);
+    ///     }
+    ///
+    /// }
+    /// ]]>
+    /// </code>
+    /// </example>
     /// <param name="cancellationTokenSource">対象のインスタンス.</param>
     /// <param name="instance">オプションのインスタンス名。<see cref="ObjectDisposedException"/>のメッセージに使用されます。</param>
     /// <exception cref="ObjectDisposedException">キャンセルされている場合にスローされます。</exception>
@@ -70,6 +102,31 @@ public static class DisposableUtils
     /// <summary>
     /// <see cref="CancellationTokenSource"/>と<see cref="CancellationToken"/>をリンクさせた新しい<see cref="CancellationTokenSource"/>を作成します。
     /// </summary>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// using System.Threading;
+    /// using Cysharp.Threading.Tasks;
+    /// using UnityEngine;
+    ///
+    /// public class Sample : MonoBehaviour
+    /// {
+    ///     private CancellationTokenSource _cancellationTokenSource = new();
+    ///
+    ///     public async UniTaskVoid Load()
+    ///     {
+    ///         var token = Application.exitCancellationToken;
+    ///
+    ///         // このインスタンスのCancellationTokenSource、またはアプリケーションの終了が要求されたときにキャンセルされる、リンクされたCancellationTokenを作成します。
+    ///         var linkedTokenSource = _cancellationTokenSource.CreateLinkedTokenSource(token);
+    ///
+    ///         await UniTask.Delay(TimeSpan.FromSeconds(10), cancellationToken:linkedTokenSource.Token);
+    ///
+    ///     }
+    /// }
+    /// ]]>
+    /// </code>
+    /// </example>
     /// <param name="cancellationTokenSource">リンク元の<see cref="CancellationTokenSource"/>.</param>
     /// <param name="token">リンクする<see cref="CancellationToken"/>.</param>
     /// <returns>新しい<see cref="CancellationTokenSource"/>.</returns>
@@ -80,6 +137,45 @@ public static class DisposableUtils
     /// <summary>
     /// <see cref="CancellationTokenSource"/>と2つの<see cref="CancellationToken"/>をリンクさせた新しい<see cref="CancellationTokenSource"/>を作成します。
     /// </summary>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// using System.Threading;
+    /// using Cysharp.Threading.Tasks;
+    /// using UnityEngine;
+    ///
+    /// public class Sample : MonoBehaviour
+    /// {
+    ///     [SerializeField] private Player _player;
+    ///     [SerializeField] private Enemy _enemy;
+    ///
+    ///     private CancellationTokenSource _cancellationTokenSource = new();
+    ///
+    ///     public async UniTaskVoid Load()
+    ///     {
+    ///         var token = _player.destroyCancellationToken;
+    ///         var token2 = _enemy.destroyCancellationToken;
+    ///
+    ///         // プレイヤーか敵が破棄された場合、またはこのクラスのCancellationTokenSourceがキャンセルされた場合にキャンセルされるトークンを作成する。
+    ///         var linkedTokenSource = _cancellationTokenSource.CreateLinkedTokenSource(token,token2);
+    ///
+    ///         await UniTask.Delay(TimeSpan.FromSeconds(10), cancellationToken:linkedTokenSource.Token);
+    ///
+    ///     }
+    /// }
+    ///
+    /// public class Player : MonoBehaviour
+    /// {
+    ///     //以下コード
+    /// }
+    ///
+    /// public class Enemy : MonoBehaviour
+    /// {
+    ///     //以下コード
+    /// }
+    /// ]]>
+    /// </code>
+    /// </example>
     /// <param name="cancellationTokenSource">リンク元の<see cref="CancellationTokenSource"/>.</param>
     /// <param name="tokens1">リンクする最初の<see cref="CancellationToken"/>.</param>
     /// <param name="tokens2">リンクする2つ目の<see cref="CancellationToken"/>.</param>

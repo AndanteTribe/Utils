@@ -12,7 +12,7 @@
         /// <code>
         /// <![CDATA[
         /// using System.Collections.Generic;
-        /// using MinimalUtility;
+        /// using AndanteTribe.Utils;
         ///
         /// public enum Fruits : int
         /// {
