@@ -228,7 +228,7 @@
              <example>
              <code>
              <![CDATA[
-             /// /// <summary>
+             /// <summary>
              /// ファイルアクセス権を定義するフラグ付き列挙体
              /// </summary>
              [System.Flags]

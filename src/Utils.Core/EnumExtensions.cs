@@ -16,7 +16,7 @@ public static class EnumExtensions
     /// <example>
     /// <code>
     /// <![CDATA[
-    /// /// /// <summary>
+    /// /// <summary>
     /// /// ファイルアクセス権を定義するフラグ付き列挙体
     /// /// </summary>
     /// [System.Flags]
@@ -65,6 +65,7 @@ public static class EnumExtensions
     /// <remarks>
     /// 指定する列挙体はint型が基になる型として指定されている必要があります.
     /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool HasBitFlags<T>(this T value, T flag) where T : struct, Enum
     {
         var v = Unsafe.As<T, int>(ref value);
@@ -123,6 +124,7 @@ public static class EnumExtensions
     /// <remarks>
     /// 指定する列挙体はint型が基になる型として指定されている必要があります.
     /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool ConstructFlags<T>(this T value) where T : struct, Enum
     {
         var v = Unsafe.As<T, int>(ref value);
@@ -183,6 +185,7 @@ public static class EnumExtensions
     /// <remarks>
     /// 指定する列挙体はint型が基になる型として指定されている必要があります.
     /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Enumerator<T> GetEnumerator<T>(this T value) where T : struct, Enum => new(value);
 
     /// <summary>
