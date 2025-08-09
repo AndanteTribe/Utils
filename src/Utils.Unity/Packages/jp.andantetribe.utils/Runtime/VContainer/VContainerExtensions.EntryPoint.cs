@@ -73,7 +73,7 @@ namespace AndanteTribe.Utils.Unity.VContainer
                 });
             }
 
-            return _builder.Register<IInitializable, T>(_lifetime);
+            return _builder.Register<IInitializable, T>(_lifetime).AsSelf();
         }
 
         internal List<Func<IObjectResolver, CancellationToken, ValueTask>> GetQueue() => _queue;
