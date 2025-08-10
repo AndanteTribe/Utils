@@ -32,7 +32,7 @@ namespace AndanteTribe.Utils.Unity.Tasks
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cancellationTokenSource.Token);
 
 #if UNITY_EDITOR || DEVELOP_BUILD
-            var callerInfo = $"{GetFileName(callerFilePath)} {callerMethodName} {callerLineNumber}行目";
+            var callerInfo = GetCallerInfo(callerFilePath, callerMethodName, callerLineNumber);
             Debug.Log("[AsyncSemaphore] WaitOneAsync : " + callerInfo);
             var handle = new Handle(_queue, _version++, callerInfo);
 #else
@@ -51,7 +51,7 @@ namespace AndanteTribe.Utils.Unity.Tasks
             [CallerLineNumber] int callerLineNumber = -1)
         {
 #if UNITY_EDITOR || DEVELOP_BUILD
-            var callerInfo = $"{GetFileName(callerFilePath)} {callerMethodName} {callerLineNumber}行目";
+            var callerInfo = GetCallerInfo(callerFilePath, callerMethodName, callerLineNumber);
             Debug.Log("[AsyncSemaphore] CancelAll : " + callerInfo);
 #endif
             _cancellationTokenSource.Cancel();
@@ -65,10 +65,17 @@ namespace AndanteTribe.Utils.Unity.Tasks
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ReadOnlySpan<char> GetFileName(in ReadOnlySpan<char> filePath)
+        private static string GetCallerInfo(string filePath, string methodName, int lineNumber)
         {
+            var sb = new DefaultInterpolatedStringHandler(4, 2);
             var lastSlashIndex = filePath.LastIndexOf('/');
-            return lastSlashIndex == -1 ? filePath : filePath[(lastSlashIndex + 1)..];
+            sb.AppendFormatted(lastSlashIndex == -1 ? filePath : filePath[(lastSlashIndex + 1)..]);
+            sb.AppendLiteral(" ");
+            sb.AppendLiteral(methodName);
+            sb.AppendLiteral(" ");
+            sb.AppendFormatted(lineNumber);
+            sb.AppendLiteral("行目");
+            return sb.ToStringAndClear();
         }
 
         /// <summary>
