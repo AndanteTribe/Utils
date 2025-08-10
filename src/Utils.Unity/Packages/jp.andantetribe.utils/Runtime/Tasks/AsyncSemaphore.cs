@@ -22,7 +22,7 @@ namespace AndanteTribe.Utils.Unity.Tasks
         /// 返されたハンドルは処理が終わったら必ずDisposeすること.
         /// </remarks>
         /// <returns>順番を明け渡すためのハンドル.</returns>
-        public async UniTask<IDisposable> WaitOneAsync(
+        public async UniTask<Handle> WaitOneAsync(
             CancellationToken cancellationToken = default,
             [CallerFilePath] string callerFilePath = "",
             [CallerMemberName] string callerMethodName = "",
