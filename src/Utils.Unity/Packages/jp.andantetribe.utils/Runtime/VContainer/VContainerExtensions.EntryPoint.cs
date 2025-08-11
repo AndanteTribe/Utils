@@ -58,7 +58,7 @@ namespace AndanteTribe.Utils.Unity.VContainer
         /// <param name="waitForCompletion"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public RegistrationBuilder Add<T>(bool waitForCompletion = false) where T : class, IInitializable
+        public RegistrationBuilder RegisterEnqueue<T>(bool waitForCompletion = true) where T : class, IInitializable
         {
             if (waitForCompletion)
             {
@@ -73,7 +73,7 @@ namespace AndanteTribe.Utils.Unity.VContainer
                 });
             }
 
-            return _builder.Register<IInitializable, T>(_lifetime).AsSelf();
+            return _builder.Register<IInitializable, T>(_lifetime);
         }
 
         internal List<Func<IObjectResolver, CancellationToken, ValueTask>> GetQueue() => _queue;
@@ -103,7 +103,6 @@ namespace AndanteTribe.Utils.Unity.VContainer
                 {
                     await entrypoint(_resolver, _cancellationDisposable.Token);
                 }
-                Dispose();
             }
         }
 

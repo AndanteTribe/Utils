@@ -1,4 +1,5 @@
 ﻿#if ENABLE_UNITASK
+#nullable enable
 
 using System;
 using System.Collections.Generic;
@@ -11,9 +12,19 @@ namespace AndanteTribe.Utils.Unity.Tasks
 {
     public sealed class AsyncSemaphore
     {
-        private readonly List<Handle> _queue = new List<Handle>();
-        private uint _version = 0;
-        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+#if UNITY_EDITOR || DEVELOP_BUILD
+        private readonly bool _outputLog;
+#endif
+        private readonly List<Handle> _queue = new();
+        private uint _version;
+        private CancellationTokenSource _cancellationTokenSource = new();
+
+        public AsyncSemaphore(bool outputLog = true)
+        {
+#if UNITY_EDITOR || DEVELOP_BUILD
+            _outputLog = outputLog;
+#endif
+        }
 
         /// <summary>
         /// 順番待ちをします.
@@ -32,11 +43,16 @@ namespace AndanteTribe.Utils.Unity.Tasks
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cancellationTokenSource.Token);
 
 #if UNITY_EDITOR || DEVELOP_BUILD
-            var callerInfo = GetCallerInfo(callerFilePath, callerMethodName, callerLineNumber);
-            Debug.Log("[AsyncSemaphore] WaitOneAsync : " + callerInfo);
-            var handle = new Handle(_queue, _version++, callerInfo);
+            var handle = new Handle(_queue, _version++)
+            {
+                CallerInfo = _outputLog ? GetCallerInfo(callerFilePath, callerMethodName, callerLineNumber) : ""
+            };
+            if (_outputLog)
+            {
+                Debug.Log("[AsyncSemaphore] WaitOneAsync : " + handle.CallerInfo);
+            }
 #else
-			var handle = new Handle(queue, _version++);
+			var handle = new Handle(_queue, _version++);
 #endif
             await UniTask.WaitUntil(handle, static handle => handle.IsReady, cancellationToken: cts.Token);
             return handle;
@@ -51,8 +67,11 @@ namespace AndanteTribe.Utils.Unity.Tasks
             [CallerLineNumber] int callerLineNumber = -1)
         {
 #if UNITY_EDITOR || DEVELOP_BUILD
-            var callerInfo = GetCallerInfo(callerFilePath, callerMethodName, callerLineNumber);
-            Debug.Log("[AsyncSemaphore] CancelAll : " + callerInfo);
+            if (_outputLog)
+            {
+                var callerInfo = GetCallerInfo(callerFilePath, callerMethodName, callerLineNumber);
+                Debug.Log("[AsyncSemaphore] CancelAll : " + callerInfo);
+            }
 #endif
             _cancellationTokenSource.Cancel();
             _cancellationTokenSource.Dispose();
@@ -69,7 +88,7 @@ namespace AndanteTribe.Utils.Unity.Tasks
         {
             var sb = new DefaultInterpolatedStringHandler(4, 2);
             var lastSlashIndex = filePath.LastIndexOf('/');
-            sb.AppendFormatted(lastSlashIndex == -1 ? filePath : filePath[(lastSlashIndex + 1)..]);
+            sb.AppendFormatted(lastSlashIndex == -1 ? filePath.AsSpan() : filePath.AsSpan(lastSlashIndex + 1));
             sb.AppendLiteral(" ");
             sb.AppendLiteral(methodName);
             sb.AppendLiteral(" ");
@@ -92,34 +111,24 @@ namespace AndanteTribe.Utils.Unity.Tasks
             public bool IsReady => _queue[0]._version == _version;
 
 #if UNITY_EDITOR || DEVELOP_BUILD
-            private readonly string _callerInfo;
+            public string CallerInfo { get; init; }
+#endif
 
             /// <summary>
             /// Initialize a new instance of the <see cref="Handle"/> struct.
             /// </summary>
             /// <param name="queue"></param>
             /// <param name="version"></param>
-            /// <param name="callerInfo"></param>
-            public Handle(List<Handle> queue, uint version, string callerInfo = "")
+            internal Handle(List<Handle> queue, uint version)
             {
                 _version = version;
-                _callerInfo = callerInfo;
                 _queue = queue;
+#if UNITY_EDITOR || DEVELOP_BUILD
+                CallerInfo = "";
+#endif
                 queue.Add(this);
             }
-#else
-            /// <summary>
-            /// Initialize a new instance of the <see cref="Handle"/> struct.
-            /// </summary>
-            /// <param name="queue"></param>
-            /// <param name="version"></param>
-			public Handle(List<Handle> queue, uint version)
-			{
-                _version = version;
-                _queue = queue;
-                queue.Add(this);
-			}
-#endif
+
             public bool Equals(Handle other) =>
                 _queue == other._queue && _version == other._version;
 
@@ -127,9 +136,9 @@ namespace AndanteTribe.Utils.Unity.Tasks
             {
                 _queue.Remove(this);
 #if UNITY_EDITOR || DEVELOP_BUILD
-                if (!string.IsNullOrEmpty(_callerInfo))
+                if (!string.IsNullOrEmpty(CallerInfo))
                 {
-                    Debug.Log("[AsyncSemaphore] Handle Dispose : " + _callerInfo);
+                    Debug.Log("[AsyncSemaphore] Handle Dispose : " + CallerInfo);
                 }
 #endif
             }

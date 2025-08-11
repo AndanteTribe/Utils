@@ -2,7 +2,6 @@
 #nullable enable
 
 using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -23,37 +22,15 @@ namespace AndanteTribe.Utils.Unity.VContainer
         {
             foreach (var component in _autoBindComponents.AsSpan())
             {
+#if UNITY_EDITOR || DEVELOP_BUILD
                 if (component == null || !component.gameObject.scene.IsValid())
                 {
                     Debug.LogError("autoBindComponentsにnullまたはシーン外のコンポーネントが指定されています");
                     continue;
                 }
-                builder.Register(new AnonymousBuilder(component)).AsSelf().AsImplementedInterfaces();
+#endif
+                builder.RegisterInstance(component).As(component.GetType()).AsImplementedInterfaces();
             }
-        }
-
-        private sealed class AnonymousBuilder : RegistrationBuilder
-        {
-            private readonly object _instance;
-
-            public AnonymousBuilder(object instance) : base(instance.GetType(), Lifetime.Singleton) => _instance = instance;
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public override Registration Build()
-            {
-                var spawner = new AnonymousProvider(_instance);
-                return new Registration(ImplementationType, Lifetime, InterfaceTypes, spawner);
-            }
-        }
-
-        private sealed class AnonymousProvider : IInstanceProvider
-        {
-            private readonly object _instance;
-
-            public AnonymousProvider(object instance) => _instance = instance;
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public object SpawnInstance(IObjectResolver resolver) => _instance;
         }
     }
 }
