@@ -14,40 +14,94 @@ namespace AndanteTribe.Utils.Unity.Editor
     {
         private static readonly Type s_toolbarType = typeof(UnityEditor.Editor).Assembly.GetType("UnityEditor.Toolbar");
 
+        /// <summary>
+        /// Unityエディタツールバーの右側に新しい要素を追加します。
+        /// </summary>
+        /// <param name="factory"></param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AddRight(Func<VisualElement> factory) =>
+        public static void AddRight(Func<VisualElement?> factory) =>
             EditorApplication.delayCall += () =>
             {
                 var element = factory();
-                element.style.overflow = Overflow.Visible;
-                GetToolbarRoot()?.Q("ToolbarZoneRightAlign")?.Add(element);
+                if (element != null)
+                {
+                    element.style.overflow = Overflow.Visible;
+                    GetToolbarRoot()?.Q("ToolbarZoneRightAlign")?.Add(element);
+                }
             };
 
+        /// <summary>
+        /// Unityエディタツールバーの左側に新しい要素を追加します。
+        /// </summary>
+        /// <param name="factory"></param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AddLeft(Func<VisualElement> factory) =>
+        public static void AddLeft(Func<VisualElement?> factory) =>
             EditorApplication.delayCall += () =>
             {
                 var element = factory();
-                element.style.overflow = Overflow.Visible;
-                GetToolbarRoot()?.Q("ToolbarZoneLeftAlign")?.Add(element);
+                if (element != null)
+                {
+                    element.style.overflow = Overflow.Visible;
+                    GetToolbarRoot()?.Q("ToolbarZoneLeftAlign")?.Add(element);
+                }
             };
 
+        /// <summary>
+        /// Unityエディタツールバーの中央に新しい要素を追加します。
+        /// </summary>
+        /// <example>
+        /// <![CDATA[
+        /// using AndanteTribe.Utils.Unity.Editor;
+        /// using UnityEditor;
+        /// using UnityEditor.SceneManagement;
+        /// using UnityEngine.UIElements;
+        ///
+        /// [InitializeOnLoad]
+        /// public static class ToolbarManager
+        /// {
+        ///     static ToolbarManager()
+        ///     {
+        ///         UnityEditorToolbarUtils.AddCenter(false, static () =>
+        ///         {
+        ///             if (!EditorApplication.isPlaying)
+        ///             {
+        ///                 var button = new Button { text = "Systemシーンをロード" };
+        ///                 button.RegisterCallback<ClickEvent>(static _ =>
+        ///                 {
+        ///                     EditorSceneManager.OpenScene("Assets/Scenes/System.unity");
+        ///                     EditorApplication.isPlaying = true;
+        ///                 }
+        ///                 return button;
+        ///             }
+        ///             return null;
+        ///         }
+        ///     }
+        /// }
+        /// ]]>
+        /// </example>
+        /// <param name="rightSide">ゲーム再生ボタン群からみて右側に配置するかどうか.</param>
+        /// <param name="factory"></param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AddCenter(bool rightSide, Func<VisualElement> factory) =>
+        public static void AddCenter(bool rightSide, Func<VisualElement?> factory)
+        {
             EditorApplication.delayCall += () =>
             {
                 var center = GetToolbarRoot()?.Q("ToolbarZonePlayMode");
                 var element = factory();
-                element.style.overflow = Overflow.Visible;
-                if (rightSide)
+                if (element != null)
                 {
-                    center?.Add(element);
-                }
-                else
-                {
-                    center?.Insert(0, element);
+                    element.style.overflow = Overflow.Visible;
+                    if (rightSide)
+                    {
+                        center?.Add(element);
+                    }
+                    else
+                    {
+                        center?.Insert(0, element);
+                    }
                 }
             };
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static VisualElement? GetToolbarRoot()
