@@ -63,17 +63,20 @@ namespace AndanteTribe.Utils.Unity.Editor
         ///     {
         ///         UnityEditorToolbarUtils.AddCenter(false, static () =>
         ///         {
-        ///             if (!EditorApplication.isPlaying)
+        ///             var button = new Button { text = "Systemシーンをロード" };
+        ///             button.RegisterCallback<ClickEvent>(static _ =>
         ///             {
-        ///                 var button = new Button { text = "Systemシーンをロード" };
-        ///                 button.RegisterCallback<ClickEvent>(static _ =>
+        ///                 if (EditorApplication.isPlaying)
+        ///                 {
+        ///                     EditorApplication.isPlaying = false;
+        ///                 }
+        ///                 else
         ///                 {
         ///                     EditorSceneManager.OpenScene("Assets/Scenes/System.unity");
         ///                     EditorApplication.isPlaying = true;
         ///                 }
-        ///                 return button;
-        ///             }
-        ///             return null;
+        ///             };
+        ///             return button;
         ///         }
         ///     }
         /// }
