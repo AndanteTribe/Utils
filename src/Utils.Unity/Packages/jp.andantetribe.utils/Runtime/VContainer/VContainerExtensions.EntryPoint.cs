@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine.Pool;
 using VContainer;
+using VContainer.Diagnostics;
 using VContainer.Unity;
 
 namespace AndanteTribe.Utils.Unity.VContainer
@@ -21,20 +22,18 @@ namespace AndanteTribe.Utils.Unity.VContainer
         /// エントリーポイント制御関数.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="configuration"></param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void RegisterEntryPoints(this IContainerBuilder builder, Action<EntryPointsQueueBuilder> configuration)
-        {
-            var entryPointsBuilder = new EntryPointsQueueBuilder(builder, Lifetime.Singleton);
-            configuration(entryPointsBuilder);
-            builder.RegisterEntryPoint<EntryPointContainer>().WithParameter(entryPointsBuilder.GetQueue);
-        }
+        public static EntryPointsQueueBuilder RegisterEntryPoints(this IContainerBuilder builder) =>
+            new(builder, Lifetime.Singleton);
     }
 
     /// <summary>
     /// <see cref="IInitializable"/>を実装するオブジェクトを、バインド順にエントリー発火もするBuilder
     /// </summary>
-    public readonly struct EntryPointsQueueBuilder
+    /// <remarks>
+    /// 基本的にusingスコープで囲んで使う.
+    /// </remarks>
+    public readonly struct EntryPointsQueueBuilder : IContainerBuilder, IDisposable
     {
         private readonly IContainerBuilder _builder;
         private readonly Lifetime _lifetime;
@@ -55,7 +54,7 @@ namespace AndanteTribe.Utils.Unity.VContainer
         /// <summary>
         /// <see cref="IInitializable"/>を実装するオブジェクトをバインドし、エントリーポイントとしてキューに追加します.
         /// </summary>
-        /// <param name="waitForCompletion"></param>
+        /// <param name="waitForCompletion">対象の型の初期化処理の終了を待機して、次の対象の初期化処理を実行するかどうか.</param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public RegistrationBuilder RegisterEnqueue<T>(bool waitForCompletion = true) where T : class, IInitializable
@@ -76,7 +75,68 @@ namespace AndanteTribe.Utils.Unity.VContainer
             return _builder.Register<IInitializable, T>(_lifetime);
         }
 
-        internal List<Func<IObjectResolver, CancellationToken, ValueTask>> GetQueue() => _queue;
+        void IDisposable.Dispose() =>
+            _builder.RegisterEntryPoint<EntryPointContainer>().WithParameter(_queue);
+
+        /// <inheritdoc />
+        /// <exception cref="NotSupportedException">
+        /// EntryPointsQueueBuilderをわざわざキャストして使用するなどの誤使用に発生する警告.
+        /// </exception>
+        T IContainerBuilder.Register<T>(T registrationBuilder)
+            => throw NotSupportedExceptionForEntryPointsQueueBuilder();
+
+        /// <inheritdoc />
+        /// <exception cref="NotSupportedException">
+        /// EntryPointsQueueBuilderをわざわざキャストして使用するなどの誤使用に発生する警告.
+        /// </exception>
+        void IContainerBuilder.RegisterBuildCallback(Action<IObjectResolver> container) =>
+            throw NotSupportedExceptionForEntryPointsQueueBuilder();
+
+        /// <inheritdoc />
+        /// <exception cref="NotSupportedException">
+        /// EntryPointsQueueBuilderをわざわざキャストして使用するなどの誤使用に発生する警告.
+        /// </exception>
+        bool IContainerBuilder.Exists(Type type, bool includeInterfaceTypes, bool findParentScopes) =>
+            throw NotSupportedExceptionForEntryPointsQueueBuilder();
+
+        /// <inheritdoc />
+        /// <exception cref="NotSupportedException">
+        /// EntryPointsQueueBuilderをわざわざキャストして使用するなどの誤使用に発生する警告.
+        /// </exception>
+        object IContainerBuilder.ApplicationOrigin
+        {
+            get => throw NotSupportedExceptionForEntryPointsQueueBuilder();
+            set => throw NotSupportedExceptionForEntryPointsQueueBuilder();
+        }
+
+        /// <inheritdoc />
+        /// <exception cref="NotSupportedException">
+        /// EntryPointsQueueBuilderをわざわざキャストして使用するなどの誤使用に発生する警告.
+        /// </exception>
+        DiagnosticsCollector IContainerBuilder.Diagnostics
+        {
+            get => throw NotSupportedExceptionForEntryPointsQueueBuilder();
+            set => throw NotSupportedExceptionForEntryPointsQueueBuilder();
+        }
+
+        /// <inheritdoc />
+        /// <exception cref="NotSupportedException">
+        /// EntryPointsQueueBuilderをわざわざキャストして使用するなどの誤使用に発生する警告.
+        /// </exception>
+        int IContainerBuilder.Count => throw NotSupportedExceptionForEntryPointsQueueBuilder();
+
+        /// <inheritdoc />
+        /// <exception cref="NotSupportedException">
+        /// EntryPointsQueueBuilderをわざわざキャストして使用するなどの誤使用に発生する警告.
+        /// </exception>
+        RegistrationBuilder IContainerBuilder.this[int index]
+        {
+            get => throw NotSupportedExceptionForEntryPointsQueueBuilder();
+            set => throw NotSupportedExceptionForEntryPointsQueueBuilder();
+        }
+
+        private static Exception NotSupportedExceptionForEntryPointsQueueBuilder() =>
+            new NotSupportedException("EntryPointsQueueBuilderをわざわざキャストして使わないでください。使い方を間違えています。");
     }
 
     internal sealed class EntryPointContainer : IStartable, IDisposable
@@ -107,7 +167,7 @@ namespace AndanteTribe.Utils.Unity.VContainer
         }
 
         /// <inheritdoc />
-        public void Dispose()
+        void IDisposable.Dispose()
         {
             if (!_cancellationDisposable.IsCancellationRequested)
             {
