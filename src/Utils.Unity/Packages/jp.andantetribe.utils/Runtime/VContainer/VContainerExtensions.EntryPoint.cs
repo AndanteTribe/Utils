@@ -2,7 +2,6 @@
 #nullable enable
 
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -59,7 +58,7 @@ namespace AndanteTribe.Utils.Unity.VContainer
     public readonly struct EntryPointRegistrationScope : IDisposable
     {
         private static readonly ObjectPool<EntryPointsQueueBuilder> s_pool = new (
-            createFunc: static () => new EntryPointsQueueBuilder(), actionOnRelease: ep => ep.Queue.AsSpan().Clear());
+            static () => new EntryPointsQueueBuilder(), static ep => ep.Reset());
 
         private readonly IContainerBuilder _builder;
         internal readonly EntryPointsQueueBuilder _entryPointsBuilder;
@@ -81,34 +80,25 @@ namespace AndanteTribe.Utils.Unity.VContainer
 
     internal sealed class EntryPointsQueueBuilder : IContainerBuilder
     {
+        public List<Func<IObjectResolver, CancellationToken, ValueTask>> Queue { get; private set; } = new();
         internal IContainerBuilder _builder = null!;
         internal Lifetime _lifetime;
 
-        public Func<IObjectResolver, CancellationToken, ValueTask>[] Queue =
-            Array.Empty<Func<IObjectResolver, CancellationToken, ValueTask>>();
+        public void Reset() => Queue = ListPool<Func<IObjectResolver, CancellationToken, ValueTask>>.Get();
 
-        private int _size = 0;
-
-        internal RegistrationBuilder RegisterEnqueue<T>(bool waitForCompletion = true) where T : class, IInitializable
+        public RegistrationBuilder RegisterEnqueue<T>(bool waitForCompletion = true) where T : class, IInitializable
         {
-            if (Queue.Length == _size)
-            {
-                var newQueue = ArrayPool<Func<IObjectResolver, CancellationToken, ValueTask>>.Shared.Rent(_size + 1);
-                Queue.AsSpan().CopyTo(newQueue);
-                ArrayPool<Func<IObjectResolver, CancellationToken, ValueTask>>.Shared.Return(Queue);
-                Queue = newQueue;
-            }
             if (waitForCompletion)
             {
-                Queue[_size++] = static (resolver, token) => resolver.Resolve<T>().InitializeAsync(token);
+                Queue.Add(static (resolver, token) => resolver.Resolve<T>().InitializeAsync(token));
             }
             else
             {
-                Queue[_size++] = static (resolver, token) =>
+                Queue.Add(static (resolver, token) =>
                 {
                     _ = resolver.Resolve<T>().InitializeAsync(token);
                     return default;
-                };
+                });
             }
 
             return _builder.Register<IInitializable, T>(_lifetime);
