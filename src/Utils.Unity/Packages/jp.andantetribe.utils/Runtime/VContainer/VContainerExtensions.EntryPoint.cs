@@ -2,6 +2,7 @@
 #nullable enable
 
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -48,7 +49,7 @@ namespace AndanteTribe.Utils.Unity.VContainer
         {
             if (builder is EntryPointsQueueBuilder epBuilder)
             {
-                return epBuilder.Scope.Enqueue<T>(waitForCompletion);
+                return epBuilder.RegisterEnqueue<T>(waitForCompletion);
             }
 
             throw new InvalidOperationException("RegisterEnqueueはRegisterEntryPointsを呼び出すことで生成されるスコープ内で使用してください.");
@@ -57,52 +58,60 @@ namespace AndanteTribe.Utils.Unity.VContainer
 
     public readonly struct EntryPointRegistrationScope : IDisposable
     {
-        private static readonly ObjectPool<EntryPointsQueueBuilder> s_pool = new (static () => new EntryPointsQueueBuilder());
+        private static readonly ObjectPool<EntryPointsQueueBuilder> s_pool = new (
+            createFunc: static () => new EntryPointsQueueBuilder(), actionOnRelease: ep => ep.Queue.AsSpan().Clear());
 
         private readonly IContainerBuilder _builder;
-        private readonly Lifetime _lifetime;
-        private readonly List<Func<IObjectResolver, CancellationToken, ValueTask>> _queue;
         internal readonly EntryPointsQueueBuilder _entryPointsBuilder;
 
-        internal EntryPointRegistrationScope(IContainerBuilder builder, Lifetime lifetime)
+        internal EntryPointRegistrationScope(IContainerBuilder builder, in Lifetime lifetime)
         {
             _builder = builder;
-            _lifetime = lifetime;
-            _queue = ListPool<Func<IObjectResolver, CancellationToken, ValueTask>>.Get();
             _entryPointsBuilder = s_pool.Get();
-        }
-
-        internal RegistrationBuilder Enqueue<T>(bool waitForCompletion = true) where T : class, IInitializable
-        {
-            if (waitForCompletion)
-            {
-                _queue.Add(static (resolver, token) => resolver.Resolve<T>().InitializeAsync(token));
-            }
-            else
-            {
-                _queue.Add(static (resolver, token) =>
-                {
-                    _ = resolver.Resolve<T>().InitializeAsync(token);
-                    return default;
-                });
-            }
-
-            return _builder.Register<IInitializable, T>(_lifetime);
+            _entryPointsBuilder._builder = builder;
+            _entryPointsBuilder._lifetime = lifetime;
         }
 
         void IDisposable.Dispose()
         {
-            _builder.RegisterEntryPoint<EntryPointContainer>().WithParameter(_queue);
+            _builder.RegisterEntryPoint<EntryPointContainer>().WithParameter(_entryPointsBuilder.Queue);
             s_pool.Release(_entryPointsBuilder);
         }
     }
 
     internal sealed class EntryPointsQueueBuilder : IContainerBuilder
     {
-        internal EntryPointRegistrationScope Scope { get; set; }
+        internal IContainerBuilder _builder = null!;
+        internal Lifetime _lifetime;
 
-        internal EntryPointsQueueBuilder()
+        public Func<IObjectResolver, CancellationToken, ValueTask>[] Queue =
+            Array.Empty<Func<IObjectResolver, CancellationToken, ValueTask>>();
+
+        private int _size = 0;
+
+        internal RegistrationBuilder RegisterEnqueue<T>(bool waitForCompletion = true) where T : class, IInitializable
         {
+            if (Queue.Length == _size)
+            {
+                var newQueue = ArrayPool<Func<IObjectResolver, CancellationToken, ValueTask>>.Shared.Rent(_size + 1);
+                Queue.AsSpan().CopyTo(newQueue);
+                ArrayPool<Func<IObjectResolver, CancellationToken, ValueTask>>.Shared.Return(Queue);
+                Queue = newQueue;
+            }
+            if (waitForCompletion)
+            {
+                Queue[_size++] = static (resolver, token) => resolver.Resolve<T>().InitializeAsync(token);
+            }
+            else
+            {
+                Queue[_size++] = static (resolver, token) =>
+                {
+                    _ = resolver.Resolve<T>().InitializeAsync(token);
+                    return default;
+                };
+            }
+
+            return _builder.Register<IInitializable, T>(_lifetime);
         }
 
         /// <inheritdoc />
