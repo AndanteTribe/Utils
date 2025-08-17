@@ -24,7 +24,18 @@ namespace AndanteTribe.Utils.Unity.VContainer
         /// <param name="builder"></param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static EntryPointsQueueBuilder RegisterEntryPoints(this IContainerBuilder builder) =>
-            new(builder, Lifetime.Singleton);
+            EntryPointsQueueBuilderPool.Shared.Get();
+    }
+
+    internal sealed class EntryPointsQueueBuilderPool : ObjectPool<EntryPointsQueueBuilder>
+    {
+        public static readonly EntryPointsQueueBuilderPool Shared = new();
+
+        private EntryPointsQueueBuilderPool() : base(
+            static () => new EntryPointsQueueBuilder(),
+            static builder => builder._queue = ListPool<Func<IObjectResolver, CancellationToken, ValueTask>>.Get())
+        {
+        }
     }
 
     /// <summary>
@@ -33,22 +44,14 @@ namespace AndanteTribe.Utils.Unity.VContainer
     /// <remarks>
     /// 基本的にusingスコープで囲んで使う.
     /// </remarks>
-    public readonly struct EntryPointsQueueBuilder : IContainerBuilder, IDisposable
+    public sealed class EntryPointsQueueBuilder : IContainerBuilder, IDisposable
     {
-        private readonly IContainerBuilder _builder;
-        private readonly Lifetime _lifetime;
-        private readonly List<Func<IObjectResolver, CancellationToken, ValueTask>> _queue;
+        internal IContainerBuilder _builder;
+        internal Lifetime _lifetime;
+        internal List<Func<IObjectResolver, CancellationToken, ValueTask>> _queue;
 
-        /// <summary>
-        /// Initialize a new instance of <see cref="EntryPointsQueueBuilder"/>.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="lifetime"></param>
-        internal EntryPointsQueueBuilder(IContainerBuilder builder, Lifetime lifetime)
+        internal EntryPointsQueueBuilder()
         {
-            _builder = builder;
-            _lifetime = lifetime;
-            _queue = ListPool<Func<IObjectResolver, CancellationToken, ValueTask>>.Get();
         }
 
         /// <summary>
@@ -75,8 +78,11 @@ namespace AndanteTribe.Utils.Unity.VContainer
             return _builder.Register<IInitializable, T>(_lifetime);
         }
 
-        void IDisposable.Dispose() =>
+        void IDisposable.Dispose()
+        {
             _builder.RegisterEntryPoint<EntryPointContainer>().WithParameter(_queue);
+            EntryPointsQueueBuilderPool.Shared.Release(this);
+        }
 
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">
