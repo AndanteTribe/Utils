@@ -12,7 +12,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
         <!-- NuGet Packaging -->
-        <PackageId>Utils.Core</PackageId>
+        <PackageId>AndanteTribe.Utils.Core</PackageId>
         <PackageVersion>$(Version)</PackageVersion>
         <Authors>AndanteTribe</Authors>
         <Copyright>© AndanteTribe</Copyright>

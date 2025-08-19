@@ -12,7 +12,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
         <!-- NuGet Packaging -->
-        <PackageId>Utils.BackPort</PackageId>
+        <PackageId>AndanteTribe.Utils.BackPort</PackageId>
         <PackageVersion>$(Version)</PackageVersion>
         <Authors>AndanteTribe</Authors>
         <Copyright>© AndanteTribe</Copyright>
