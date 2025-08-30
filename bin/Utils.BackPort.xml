@@ -31,6 +31,31 @@
             be used to unregister the callback.</returns>
             <exception cref="T:System.ArgumentNullException"><paramref name="callback"/> is null.</exception>
         </member>
+        <member name="T:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute">
+            <summary>
+            Indicates that compiler support for a particular feature is required for the location where this attribute is applied.
+            </summary>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName">
+            <summary>
+            The name of the compiler feature.
+            </summary>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.IsOptional">
+            <summary>
+            If true, the compiler can choose to allow access to the location where this attribute is applied if it does not understand <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/>.
+            </summary>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.RefStructs">
+            <summary>
+            The <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/> used for the ref structs C# feature.
+            </summary>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.RequiredMembers">
+            <summary>
+            The <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/> used for the required members C# feature.
+            </summary>
+        </member>
         <member name="T:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler">
             <summary>Provides a handler used by the language compiler to process interpolated strings into <see cref="T:System.String"/> instances.</summary>
         </member>
@@ -240,6 +265,9 @@
         </member>
         <member name="M:System.Runtime.CompilerServices.InterpolatedStringHandlerAttribute.#ctor">
             <summary>Initializes the <see cref="T:System.Runtime.CompilerServices.InterpolatedStringHandlerAttribute"/>.</summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.RequiredMemberAttribute">
+            <summary>Specifies that a type has required members or that a member is required.</summary>
         </member>
         <member name="T:System.Runtime.InteropServices.CollectionsMarshal">
             <summary>
