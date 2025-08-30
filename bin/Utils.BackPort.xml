@@ -298,5 +298,11 @@
             TryFormat should return false only if there is not enough space in the destination buffer. Any other failures should throw an exception.
             </remarks>
         </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.SetsRequiredMembersAttribute">
+            <summary>
+            Specifies that this constructor sets all required members for the current type, and callers
+            do not need to set any required members themselves.
+            </summary>
+        </member>
     </members>
 </doc>
