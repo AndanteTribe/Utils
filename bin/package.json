@@ -1,11 +1,11 @@
-﻿{
+{
   "name": "jp.andantetribe.utils.core",
   "displayName": "AndanteTribe Utils Core",
-  "author": { 
+  "author": {
     "name": "AndanteTribe",
     "url": "https://github.com/AndanteTribe"
   },
-  "version": "0.0.0",
+  "version": "0.1.1",
   "unity": "2022.3",
   "description": "Utility library used across projects in AndanteTribe.",
   "license": "MIT"
