@@ -573,6 +573,9 @@
             <see cref="P:System.Collections.Generic.IEnumerator`1.Current"/>に同じ.
             </summary>
         </member>
+        <member name="P:AndanteTribe.Utils.MemoryExtensions.Enumerator`1.System#Collections#IEnumerator#Current">
+            <inheritdoc/>
+        </member>
         <member name="M:AndanteTribe.Utils.MemoryExtensions.Enumerator`1.#ctor(System.ReadOnlyMemory{`0}@)">
             <summary>
             Initializes a new instance of the <see cref="T:AndanteTribe.Utils.MemoryExtensions.Enumerator`1"/> struct.
@@ -613,9 +616,21 @@
             </summary>
             <param name="item"></param>
         </member>
-        <member name="M:AndanteTribe.Utils.ValueList`1.AsSegment">
+        <member name="M:AndanteTribe.Utils.ValueList`1.GetSegmentAndClear">
             <summary>
-            <see cref="T:System.ArraySegment`1"/>として取得します.
+            内部配列を<see cref="T:System.ArraySegment`1"/>として取得し、クリアします.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.ValueList`1.AsSpan">
+            <summary>
+            <see cref="T:System.Span`1"/>として取得します.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.ValueList`1.AsMemory">
+            <summary>
+            <see cref="T:System.Memory`1"/>として取得します.
             </summary>
             <returns></returns>
         </member>
@@ -629,9 +644,6 @@
             <inheritdoc />
         </member>
         <member name="M:AndanteTribe.Utils.ValueList`1.System#Collections#IEnumerable#GetEnumerator">
-            <inheritdoc />
-        </member>
-        <member name="M:AndanteTribe.Utils.ValueList`1.System#IDisposable#Dispose">
             <inheritdoc />
         </member>
         <member name="T:AndanteTribe.Utils.ValueTupleExtensions">

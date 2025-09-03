@@ -8,7 +8,7 @@ namespace AndanteTribe.Utils;
 /// </summary>
 /// <param name="capacity">初期容量.</param>
 /// <typeparam name="T">要素の型.</typeparam>
-public struct ValueList<T>(int capacity) : IReadOnlyCollection<T>, IDisposable
+public struct ValueList<T>(int capacity) : IReadOnlyCollection<T>
 {
     private T[] _items = ArrayPool<T>.Shared.Rent(capacity);
 
@@ -28,42 +28,52 @@ public struct ValueList<T>(int capacity) : IReadOnlyCollection<T>, IDisposable
     /// <param name="item"></param>
     public void Add(T item)
     {
-        if (Count >= _items.Length)
+        if (_items.Length != 0)
         {
-            var newItems = ArrayPool<T>.Shared.Rent(_items.Length * 2);
-            _items.AsSpan().CopyTo(newItems);
-            ArrayPool<T>.Shared.Return(_items);
-            _items = newItems;
+            if (Count >= _items.Length)
+            {
+                var newItems = ArrayPool<T>.Shared.Rent(_items.Length * 2);
+                _items.AsSpan().CopyTo(newItems);
+                ArrayPool<T>.Shared.Return(_items);
+                _items = newItems;
+            }
+            _items[Count++] = item;
         }
-        _items[Count++] = item;
     }
 
     /// <summary>
-    /// <see cref="ArraySegment{T}"/>として取得します.
+    /// 内部配列を<see cref="ArraySegment{T}"/>として取得し、クリアします.
     /// </summary>
     /// <returns></returns>
-    public readonly ArraySegment<T> AsSegment() => new ArraySegment<T>(_items, 0, Count);
+    public ArraySegment<T> GetSegmentAndClear()
+    {
+        var segment = new ArraySegment<T>(_items, 0, Count);
+        _items = [];
+        Count = 0;
+        return segment;
+    }
+
+    /// <summary>
+    /// <see cref="Span{T}"/>として取得します.
+    /// </summary>
+    /// <returns></returns>
+    public readonly ReadOnlySpan<T> AsSpan() => new ReadOnlySpan<T>(_items, 0, Count);
+
+    /// <summary>
+    /// <see cref="Memory{T}"/>として取得します.
+    /// </summary>
+    /// <returns></returns>
+    public readonly ReadOnlyMemory<T> AsMemory() => new ReadOnlyMemory<T>(_items, 0, Count);
 
     /// <summary>
     /// 列挙子を取得します.
     /// </summary>
     /// <returns></returns>
-    public readonly ArraySegment<T>.Enumerator GetEnumerator() => AsSegment().GetEnumerator();
+    public readonly MemoryExtensions.Enumerator<T> GetEnumerator() => AsMemory().GetEnumerator();
 
     /// <inheritdoc />
     readonly IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
 
     /// <inheritdoc />
     readonly IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-    /// <inheritdoc />
-    void IDisposable.Dispose()
-    {
-        if (_items.Length > 0)
-        {
-            ArrayPool<T>.Shared.Return(_items);
-            _items = [];
-            Count = 0;
-        }
-    }
 }

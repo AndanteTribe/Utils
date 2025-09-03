@@ -700,21 +700,21 @@ namespace AndanteTribe.Utils.Tests
         [Test]
         public void ValueListDefaultConstructor()
         {
-            using var list = new ValueList<int>();
+            var list = new ValueList<int>();
             Assert.That(list, Is.Empty);
         }
 
         [Test]
         public void ValueListWithCapacity()
         {
-            using var list = new ValueList<int>(10);
+            var list = new ValueList<int>(10);
             Assert.That(list, Is.Empty);
         }
 
         [Test]
         public void ValueListAdd()
         {
-            using var list = new ValueList<int>();
+            var list = new ValueList<int>();
             list.Add(1);
             list.Add(2);
             list.Add(3);
@@ -725,7 +725,7 @@ namespace AndanteTribe.Utils.Tests
         [Test]
         public void ValueListEnumerate()
         {
-            using var list = new ValueList<int>();
+            var list = new ValueList<int>();
             list.Add(10);
             list.Add(20);
             list.Add(30);
@@ -745,22 +745,22 @@ namespace AndanteTribe.Utils.Tests
         [Test]
         public void ValueListAsSegment()
         {
-            using var list = new ValueList<int>();
+            var list = new ValueList<int>();
             list.Add(1);
             list.Add(2);
             list.Add(3);
 
-            var segment = list.AsSegment();
-            Assert.That(segment, Has.Count.EqualTo(3));
-            Assert.That(segment[0], Is.EqualTo(1));
-            Assert.That(segment[1], Is.EqualTo(2));
-            Assert.That(segment[2], Is.EqualTo(3));
+            var span = list.AsSpan();
+            Assert.That(span.Length, Is.EqualTo(3));
+            Assert.That(span[0], Is.EqualTo(1));
+            Assert.That(span[1], Is.EqualTo(2));
+            Assert.That(span[2], Is.EqualTo(3));
         }
 
         [Test]
         public void ValueListCapacityExpansion()
         {
-            using var list = new ValueList<int>(2); // Small initial capacity
+            var list = new ValueList<int>(2); // Small initial capacity
 
             // Add more items than initial capacity
             for (int i = 0; i < 10; i++)
@@ -771,17 +771,17 @@ namespace AndanteTribe.Utils.Tests
             Assert.That(list, Has.Count.EqualTo(10));
 
             // Verify all items are correctly stored
-            var segment = list.AsSegment();
+            var span = list.AsSpan();
             for (int i = 0; i < 10; i++)
             {
-                Assert.That(segment[i], Is.EqualTo(i));
+                Assert.That(span[i], Is.EqualTo(i));
             }
         }
 
         [Test]
         public void ValueListWithReferenceTypes()
         {
-            using var list = new ValueList<string>();
+            var list = new ValueList<string>();
             list.Add("hello");
             list.Add("world");
             list.Add(null);
@@ -802,7 +802,7 @@ namespace AndanteTribe.Utils.Tests
         [Test]
         public void ValueListEmpty()
         {
-            using var list = new ValueList<int>();
+            var list = new ValueList<int>();
 
             Assert.That(list, Is.Empty);
 
@@ -818,7 +818,7 @@ namespace AndanteTribe.Utils.Tests
         [Test]
         public void ValueListLargeCapacity()
         {
-            using var list = new ValueList<int>(1000);
+            var list = new ValueList<int>(1000);
 
             for (int i = 0; i < 500; i++)
             {
@@ -827,17 +827,17 @@ namespace AndanteTribe.Utils.Tests
 
             Assert.That(list, Has.Count.EqualTo(500));
 
-            var segment = list.AsSegment();
+            var span = list.AsSpan();
             for (int i = 0; i < 500; i++)
             {
-                Assert.That(segment[i], Is.EqualTo(i * 2));
+                Assert.That(span[i], Is.EqualTo(i * 2));
             }
         }
 
         [Test]
         public void ValueListGenericEnumerator()
         {
-            using var list = new ValueList<int>();
+            var list = new ValueList<int>();
             list.Add(5);
             list.Add(10);
 
@@ -857,7 +857,7 @@ namespace AndanteTribe.Utils.Tests
         [Test]
         public void ValueListNonGenericEnumerator()
         {
-            using var list = new ValueList<int>();
+            var list = new ValueList<int>();
             list.Add(7);
             list.Add(14);
 
@@ -877,16 +877,16 @@ namespace AndanteTribe.Utils.Tests
         [Test]
         public void ValueListCollectionInitializer()
         {
-            using var list = new ValueList<int> { 1, 2, 3, 4, 5 };
+            var list = new ValueList<int> { 1, 2, 3, 4, 5 };
 
             Assert.That(list, Has.Count.EqualTo(5));
 
-            var segment = list.AsSegment();
-            Assert.That(segment[0], Is.EqualTo(1));
-            Assert.That(segment[1], Is.EqualTo(2));
-            Assert.That(segment[2], Is.EqualTo(3));
-            Assert.That(segment[3], Is.EqualTo(4));
-            Assert.That(segment[4], Is.EqualTo(5));
+            var span = list.AsSpan();
+            Assert.That(span[0], Is.EqualTo(1));
+            Assert.That(span[1], Is.EqualTo(2));
+            Assert.That(span[2], Is.EqualTo(3));
+            Assert.That(span[3], Is.EqualTo(4));
+            Assert.That(span[4], Is.EqualTo(5));
         }
     }
 }
