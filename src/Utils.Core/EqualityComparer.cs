@@ -57,13 +57,22 @@
             return new DelegateEqualityComparer<T>(equals, getHashCode);
         }
 
-        private sealed class DelegateEqualityComparer<T>(Func<T, T, bool> equals, Func<T, int> getHashCode) : IEqualityComparer<T>
+        private sealed class DelegateEqualityComparer<T> : IEqualityComparer<T>
         {
-            public bool Equals(T? x, T? y) => equals(x!, y!);
+            private readonly Func<T, T, bool> _equals;
+            private readonly Func<T, int> _getHashCode;
+            
+            public DelegateEqualityComparer(Func<T, T, bool> equals, Func<T, int> getHashCode)
+            {
+                _equals = equals;
+                _getHashCode = getHashCode;
+            }
+            
+            public bool Equals(T? x, T? y) => _equals(x!, y!);
 
-            public int GetHashCode(T obj) => getHashCode(obj);
+            public int GetHashCode(T obj) => _getHashCode(obj);
 
-            public override int GetHashCode() => HashCode.Combine(equals.GetHashCode(), getHashCode.GetHashCode());
+            public override int GetHashCode() => HashCode.Combine(_equals.GetHashCode(), _getHashCode.GetHashCode());
         }
     }
 }
