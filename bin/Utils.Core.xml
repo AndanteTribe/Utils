@@ -589,14 +589,6 @@
             <summary>
             構造体簡易リスト.
             </summary>
-            <param name="capacity">初期容量.</param>
-            <typeparam name="T">要素の型.</typeparam>
-        </member>
-        <member name="M:AndanteTribe.Utils.ValueList`1.#ctor(System.Int32)">
-            <summary>
-            構造体簡易リスト.
-            </summary>
-            <param name="capacity">初期容量.</param>
             <typeparam name="T">要素の型.</typeparam>
         </member>
         <member name="P:AndanteTribe.Utils.ValueList`1.Count">
@@ -604,8 +596,16 @@
             要素数.
             </summary>
         </member>
+        <member name="M:AndanteTribe.Utils.ValueList`1.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AndanteTribe.Utils.ValueList`1"/> struct.
+            </summary>
+            <param name="capacity">初期容量.</param>
+        </member>
         <member name="M:AndanteTribe.Utils.ValueList`1.#ctor">
-            <inheritdoc />
+            <summary>
+            Initializes a new instance of the <see cref="T:AndanteTribe.Utils.ValueList`1"/> struct with default capacity.
+            </summary>
         </member>
         <member name="M:AndanteTribe.Utils.ValueList`1.Add(`0)">
             <summary>

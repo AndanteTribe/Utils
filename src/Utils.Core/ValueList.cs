@@ -1,23 +1,35 @@
 ﻿using System.Buffers;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace AndanteTribe.Utils;
 
 /// <summary>
 /// 構造体簡易リスト.
 /// </summary>
-/// <param name="capacity">初期容量.</param>
 /// <typeparam name="T">要素の型.</typeparam>
-public struct ValueList<T>(int capacity) : IReadOnlyCollection<T>, IDisposable
+public struct ValueList<T> : IReadOnlyCollection<T>, IDisposable
 {
-    private T[] _items = ArrayPool<T>.Shared.Rent(capacity);
+    private T[] _items;
 
     /// <summary>
     /// 要素数.
     /// </summary>
     public int Count { get; private set; }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValueList{T}"/> struct.
+    /// </summary>
+    /// <param name="capacity">初期容量.</param>
+    public ValueList(int capacity)
+    {
+        _items = ArrayPool<T>.Shared.Rent(capacity);
+        Count = 0;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValueList{T}"/> struct with default capacity.
+    /// </summary>
     public ValueList() : this(16)
     {
     }
@@ -28,6 +40,11 @@ public struct ValueList<T>(int capacity) : IReadOnlyCollection<T>, IDisposable
     /// <param name="item"></param>
     public void Add(T item)
     {
+        if (_items == null)
+        {
+            _items = ArrayPool<T>.Shared.Rent(16);
+        }
+        
         if (Count >= _items.Length)
         {
             var newItems = ArrayPool<T>.Shared.Rent(_items.Length * 2);
@@ -42,7 +59,7 @@ public struct ValueList<T>(int capacity) : IReadOnlyCollection<T>, IDisposable
     /// <see cref="ArraySegment{T}"/>として取得します.
     /// </summary>
     /// <returns></returns>
-    public readonly ArraySegment<T> AsSegment() => new ArraySegment<T>(_items, 0, Count);
+    public readonly ArraySegment<T> AsSegment() => _items != null ? new ArraySegment<T>(_items, 0, Count) : new ArraySegment<T>();
 
     /// <summary>
     /// 列挙子を取得します.
@@ -59,10 +76,10 @@ public struct ValueList<T>(int capacity) : IReadOnlyCollection<T>, IDisposable
     /// <inheritdoc />
     void IDisposable.Dispose()
     {
-        if (_items.Length > 0)
+        if (_items != null && _items.Length > 0)
         {
             ArrayPool<T>.Shared.Return(_items);
-            _items = [];
+            _items = null!;
             Count = 0;
         }
     }
