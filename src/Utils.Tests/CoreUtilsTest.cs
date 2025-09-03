@@ -1,9 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using AndanteTribe.Utils;
 using NUnit.Framework;
 
 namespace AndanteTribe.Utils.Tests
@@ -201,7 +200,7 @@ namespace AndanteTribe.Utils.Tests
                 result.Add(testFlag);
             }
 
-            Assert.That(result.Count, Is.EqualTo(expected));
+            Assert.That(result, Has.Count.EqualTo(expected));
         }
 
         [Test]
@@ -244,7 +243,7 @@ namespace AndanteTribe.Utils.Tests
             }
 
             // Should iterate in order of lowest bits first
-            Assert.That(result.Count, Is.EqualTo(3));
+            Assert.That(result, Has.Count.EqualTo(3));
             Assert.That(result[0], Is.EqualTo(TestFlags.Flag1)); // bit 0
             Assert.That(result[1], Is.EqualTo(TestFlags.Flag3)); // bit 2
             Assert.That(result[2], Is.EqualTo(TestFlags.Flag4)); // bit 3
@@ -262,7 +261,7 @@ namespace AndanteTribe.Utils.Tests
             Assert.That(comparer.Equals("test", null), Is.False);
             Assert.That(comparer.Equals(null, "test"), Is.False);
 
-            // Test case insensitive comparison
+            // Test case-insensitive comparison
             Assert.That(comparer.Equals("Test", "TEST"), Is.True);
             Assert.That(comparer.Equals("Test", "test"), Is.True);
             Assert.That(comparer.Equals("Test", "Other"), Is.False);
@@ -317,7 +316,7 @@ namespace AndanteTribe.Utils.Tests
                 result.Add(item);
             }
 
-            Assert.That(result.Count, Is.EqualTo(array.Length));
+            Assert.That(result, Has.Count.EqualTo(array.Length));
         }
 
         [Test]
@@ -333,7 +332,7 @@ namespace AndanteTribe.Utils.Tests
                 result.Add(item);
             }
 
-            Assert.That(result.Count, Is.EqualTo(array.Length));
+            Assert.That(result, Has.Count.EqualTo(array.Length));
         }
 
         [Test]
@@ -344,7 +343,7 @@ namespace AndanteTribe.Utils.Tests
             {
                 list.Add(i);
             }
-            Assert.That(list.Count, Is.EqualTo(2));
+            Assert.That(list, Has.Count.EqualTo(2));
             Assert.That(list[0], Is.EqualTo(23));
             Assert.That(list[1], Is.EqualTo(31));
         }
@@ -358,7 +357,7 @@ namespace AndanteTribe.Utils.Tests
                 list.Add(i);
             }
 
-            Assert.That(list.Count, Is.EqualTo(3));
+            Assert.That(list, Has.Count.EqualTo(3));
             Assert.That(list[0], Is.EqualTo(23));
             Assert.That(list[1], Is.EqualTo(31));
             Assert.That(list[2], Is.EqualTo(42));
@@ -373,7 +372,7 @@ namespace AndanteTribe.Utils.Tests
                 list.Add(i);
             }
 
-            Assert.That(list.Count, Is.EqualTo(4));
+            Assert.That(list, Has.Count.EqualTo(4));
             Assert.That(list[0], Is.EqualTo(23));
             Assert.That(list[1], Is.EqualTo(31));
             Assert.That(list[2], Is.EqualTo(42));
@@ -389,7 +388,7 @@ namespace AndanteTribe.Utils.Tests
                 list.Add(i);
             }
 
-            Assert.That(list.Count, Is.EqualTo(5));
+            Assert.That(list, Has.Count.EqualTo(5));
             Assert.That(list[0], Is.EqualTo(23));
             Assert.That(list[1], Is.EqualTo(31));
             Assert.That(list[2], Is.EqualTo(42));
@@ -406,7 +405,7 @@ namespace AndanteTribe.Utils.Tests
                 list.Add(i);
             }
 
-            Assert.That(list.Count, Is.EqualTo(6));
+            Assert.That(list, Has.Count.EqualTo(6));
             Assert.That(list[0], Is.EqualTo(23));
             Assert.That(list[1], Is.EqualTo(31));
             Assert.That(list[2], Is.EqualTo(42));
@@ -424,7 +423,7 @@ namespace AndanteTribe.Utils.Tests
                 list.Add(i);
             }
 
-            Assert.That(list.Count, Is.EqualTo(7));
+            Assert.That(list, Has.Count.EqualTo(7));
             Assert.That(list[0], Is.EqualTo(23));
             Assert.That(list[1], Is.EqualTo(31));
             Assert.That(list[2], Is.EqualTo(42));
@@ -549,7 +548,7 @@ namespace AndanteTribe.Utils.Tests
                 result.Add(item);
             }
 
-            Assert.That(result.Count, Is.EqualTo(3));
+            Assert.That(result, Has.Count.EqualTo(3));
             Assert.That(result[0], Is.EqualTo(2));
             Assert.That(result[1], Is.EqualTo(3));
             Assert.That(result[2], Is.EqualTo(4));
@@ -567,7 +566,7 @@ namespace AndanteTribe.Utils.Tests
                 result.Add(item);
             }
 
-            Assert.That(result.Count, Is.EqualTo(2));
+            Assert.That(result, Has.Count.EqualTo(2));
             Assert.That(result[0], Is.EqualTo(3));
             Assert.That(result[1], Is.EqualTo(4));
         }
@@ -610,7 +609,7 @@ namespace AndanteTribe.Utils.Tests
                 result.Add(item);
             }
 
-            Assert.That(result.Count, Is.EqualTo(2));
+            Assert.That(result, Has.Count.EqualTo(2));
             Assert.That(result[0], Is.EqualTo("hello"));
             Assert.That(result[1], Is.EqualTo("world"));
         }
@@ -626,7 +625,7 @@ namespace AndanteTribe.Utils.Tests
                 result.Add(item);
             }
 
-            Assert.That(result.Count, Is.EqualTo(3));
+            Assert.That(result, Has.Count.EqualTo(3));
             Assert.That(result[0], Is.EqualTo("test"));
             Assert.That(result[1], Is.Null);
             Assert.That(result[2], Is.EqualTo("value"));
@@ -658,7 +657,7 @@ namespace AndanteTribe.Utils.Tests
                 result.Add(item);
             }
 
-            Assert.That(result.Count, Is.EqualTo(7));
+            Assert.That(result, Has.Count.EqualTo(7));
             for (int i = 0; i < 7; i++)
             {
                 Assert.That(result[i], Is.EqualTo(i + 1));
@@ -677,7 +676,7 @@ namespace AndanteTribe.Utils.Tests
                 result.Add(item);
             }
 
-            Assert.That(result.Count, Is.EqualTo(3));
+            Assert.That(result, Has.Count.EqualTo(3));
             Assert.That(result, Is.EqualTo(stringArray));
         }
 
@@ -693,8 +692,201 @@ namespace AndanteTribe.Utils.Tests
                 result.Add(item);
             }
 
-            Assert.That(result.Count, Is.EqualTo(3));
+            Assert.That(result, Has.Count.EqualTo(3));
             Assert.That(result, Is.EqualTo(stringArray));
+        }
+
+        // ValueList tests
+        [Test]
+        public void ValueListDefaultConstructor()
+        {
+            var list = new ValueList<int>();
+            Assert.That(list, Is.Empty);
+        }
+
+        [Test]
+        public void ValueListWithCapacity()
+        {
+            var list = new ValueList<int>(10);
+            Assert.That(list, Is.Empty);
+        }
+
+        [Test]
+        public void ValueListAdd()
+        {
+            var list = new ValueList<int>();
+            list.Add(1);
+            list.Add(2);
+            list.Add(3);
+
+            Assert.That(list, Has.Count.EqualTo(3));
+        }
+
+        [Test]
+        public void ValueListEnumerate()
+        {
+            var list = new ValueList<int>();
+            list.Add(10);
+            list.Add(20);
+            list.Add(30);
+
+            var result = new List<int>();
+            foreach (var item in list)
+            {
+                result.Add(item);
+            }
+
+            Assert.That(result, Has.Count.EqualTo(3));
+            Assert.That(result[0], Is.EqualTo(10));
+            Assert.That(result[1], Is.EqualTo(20));
+            Assert.That(result[2], Is.EqualTo(30));
+        }
+
+        [Test]
+        public void ValueListAsSegment()
+        {
+            var list = new ValueList<int>();
+            list.Add(1);
+            list.Add(2);
+            list.Add(3);
+
+            var span = list.AsSpan();
+            Assert.That(span.Length, Is.EqualTo(3));
+            Assert.That(span[0], Is.EqualTo(1));
+            Assert.That(span[1], Is.EqualTo(2));
+            Assert.That(span[2], Is.EqualTo(3));
+        }
+
+        [Test]
+        public void ValueListCapacityExpansion()
+        {
+            var list = new ValueList<int>(2); // Small initial capacity
+
+            // Add more items than initial capacity
+            for (int i = 0; i < 10; i++)
+            {
+                list.Add(i);
+            }
+
+            Assert.That(list, Has.Count.EqualTo(10));
+
+            // Verify all items are correctly stored
+            var span = list.AsSpan();
+            for (int i = 0; i < 10; i++)
+            {
+                Assert.That(span[i], Is.EqualTo(i));
+            }
+        }
+
+        [Test]
+        public void ValueListWithReferenceTypes()
+        {
+            var list = new ValueList<string>();
+            list.Add("hello");
+            list.Add("world");
+            list.Add(null);
+
+            Assert.That(list, Has.Count.EqualTo(3));
+
+            var result = new List<string>();
+            foreach (var item in list)
+            {
+                result.Add(item);
+            }
+
+            Assert.That(result[0], Is.EqualTo("hello"));
+            Assert.That(result[1], Is.EqualTo("world"));
+            Assert.That(result[2], Is.Null);
+        }
+
+        [Test]
+        public void ValueListEmpty()
+        {
+            var list = new ValueList<int>();
+
+            Assert.That(list, Is.Empty);
+
+            var result = new List<int>();
+            foreach (var item in list)
+            {
+                result.Add(item);
+            }
+
+            Assert.That(result, Is.Empty);
+        }
+
+        [Test]
+        public void ValueListLargeCapacity()
+        {
+            var list = new ValueList<int>(1000);
+
+            for (int i = 0; i < 500; i++)
+            {
+                list.Add(i * 2);
+            }
+
+            Assert.That(list, Has.Count.EqualTo(500));
+
+            var span = list.AsSpan();
+            for (int i = 0; i < 500; i++)
+            {
+                Assert.That(span[i], Is.EqualTo(i * 2));
+            }
+        }
+
+        [Test]
+        public void ValueListGenericEnumerator()
+        {
+            var list = new ValueList<int>();
+            list.Add(5);
+            list.Add(10);
+
+            var enumerableList = (IEnumerable<int>)list;
+            var result = new List<int>();
+
+            foreach (var item in enumerableList)
+            {
+                result.Add(item);
+            }
+
+            Assert.That(result, Has.Count.EqualTo(2));
+            Assert.That(result[0], Is.EqualTo(5));
+            Assert.That(result[1], Is.EqualTo(10));
+        }
+
+        [Test]
+        public void ValueListNonGenericEnumerator()
+        {
+            var list = new ValueList<int>();
+            list.Add(7);
+            list.Add(14);
+
+            var enumerable = (IEnumerable)list;
+            var result = new List<object>();
+
+            foreach (var item in enumerable)
+            {
+                result.Add(item);
+            }
+
+            Assert.That(result, Has.Count.EqualTo(2));
+            Assert.That(result[0], Is.EqualTo(7));
+            Assert.That(result[1], Is.EqualTo(14));
+        }
+
+        [Test]
+        public void ValueListCollectionInitializer()
+        {
+            var list = new ValueList<int> { 1, 2, 3, 4, 5 };
+
+            Assert.That(list, Has.Count.EqualTo(5));
+
+            var span = list.AsSpan();
+            Assert.That(span[0], Is.EqualTo(1));
+            Assert.That(span[1], Is.EqualTo(2));
+            Assert.That(span[2], Is.EqualTo(3));
+            Assert.That(span[3], Is.EqualTo(4));
+            Assert.That(span[4], Is.EqualTo(5));
         }
     }
 }
