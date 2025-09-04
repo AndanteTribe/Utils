@@ -12,7 +12,7 @@ namespace AndanteTribe.Utils;
 /// <typeparam name="T">要素の型.</typeparam>
 public struct ValueList<T>(int capacity) : IReadOnlyCollection<T>
 {
-    private T[] _items = ArrayPool<T>.Shared.Rent(capacity);
+    private T[] _items =  ArrayPool<T>.Shared.Rent(Math.Max(1, capacity));
 
     /// <summary>
     /// 要素数.
@@ -30,17 +30,14 @@ public struct ValueList<T>(int capacity) : IReadOnlyCollection<T>
     /// <param name="item"></param>
     public void Add(T item)
     {
-        if (_items.Length != 0)
+        if (Count >= _items.Length)
         {
-            if (Count >= _items.Length)
-            {
-                var newItems = ArrayPool<T>.Shared.Rent(_items.Length * 2);
-                _items.AsSpan().CopyTo(newItems);
-                ArrayPool<T>.Shared.Return(_items);
-                _items = newItems;
-            }
-            _items[Count++] = item;
+            var newItems = ArrayPool<T>.Shared.Rent(_items.Length * 2);
+            _items.AsSpan().CopyTo(newItems);
+            ArrayPool<T>.Shared.Return(_items);
+            _items = newItems;
         }
+        _items[Count++] = item;
     }
 
     /// <summary>
