@@ -800,9 +800,9 @@ namespace AndanteTribe.Utils.Tests
             Assert.That(segment.Count, Is.EqualTo(3));
             Assert.That(segment.Array, Is.Not.Null);
             Assert.That(segment.Offset, Is.EqualTo(0));
-            Assert.That(segment[0], Is.EqualTo(10));
-            Assert.That(segment[1], Is.EqualTo(20));
-            Assert.That(segment[2], Is.EqualTo(30));
+            Assert.That(segment.Array[0], Is.EqualTo(10));
+            Assert.That(segment.Array[1], Is.EqualTo(20));
+            Assert.That(segment.Array[2], Is.EqualTo(30));
         }
 
         [Test]
