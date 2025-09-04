@@ -1,5 +1,7 @@
 ﻿using System.Buffers;
 using System.Collections;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace AndanteTribe.Utils;
 
@@ -42,16 +44,36 @@ public struct ValueList<T>(int capacity) : IReadOnlyCollection<T>
     }
 
     /// <summary>
-    /// 内部配列を<see cref="ArraySegment{T}"/>として取得し、クリアします.
+    /// 配列プールに返却する.
+    /// </summary>
+    /// <param name="segment"></param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Clear(in ArraySegment<T> segment)
+    {
+        if (segment.Array is { Length: > 0 })
+        {
+            ArrayPool<T>.Shared.Return(segment.Array);
+        }
+    }
+
+    /// <summary>
+    /// 配列プールに返却する.
+    /// </summary>
+    /// <param name="memory"></param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Clear(in ReadOnlyMemory<T> memory)
+    {
+        if (memory.Length > 0 && MemoryMarshal.TryGetArray(memory, out var segment))
+        {
+            ArrayPool<T>.Shared.Return(segment.Array!);
+        }
+    }
+
+    /// <summary>
+    /// <see cref="ArraySegment{T}"/>として取得します.
     /// </summary>
     /// <returns></returns>
-    public ArraySegment<T> GetSegmentAndClear()
-    {
-        var segment = new ArraySegment<T>(_items, 0, Count);
-        _items = [];
-        Count = 0;
-        return segment;
-    }
+    public readonly ArraySegment<T> AsSegment() => new(_items, 0, Count);
 
     /// <summary>
     /// <see cref="Span{T}"/>として取得します.
