@@ -1,5 +1,7 @@
 ﻿using System.Buffers;
 using System.Collections;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace AndanteTribe.Utils;
 
@@ -10,7 +12,7 @@ namespace AndanteTribe.Utils;
 /// <typeparam name="T">要素の型.</typeparam>
 public struct ValueList<T>(int capacity) : IReadOnlyCollection<T>
 {
-    private T[] _items = ArrayPool<T>.Shared.Rent(capacity);
+    private T[] _items =  ArrayPool<T>.Shared.Rent(Math.Max(1, capacity));
 
     /// <summary>
     /// 要素数.
@@ -28,30 +30,47 @@ public struct ValueList<T>(int capacity) : IReadOnlyCollection<T>
     /// <param name="item"></param>
     public void Add(T item)
     {
-        if (_items.Length != 0)
+        if (Count >= _items.Length)
         {
-            if (Count >= _items.Length)
-            {
-                var newItems = ArrayPool<T>.Shared.Rent(_items.Length * 2);
-                _items.AsSpan().CopyTo(newItems);
-                ArrayPool<T>.Shared.Return(_items);
-                _items = newItems;
-            }
-            _items[Count++] = item;
+            var newItems = ArrayPool<T>.Shared.Rent(_items.Length * 2);
+            _items.AsSpan().CopyTo(newItems);
+            ArrayPool<T>.Shared.Return(_items);
+            _items = newItems;
+        }
+        _items[Count++] = item;
+    }
+
+    /// <summary>
+    /// 配列プールに返却する.
+    /// </summary>
+    /// <param name="segment"></param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Clear(in ArraySegment<T> segment)
+    {
+        if (segment.Array is { Length: > 0 })
+        {
+            ArrayPool<T>.Shared.Return(segment.Array);
         }
     }
 
     /// <summary>
-    /// 内部配列を<see cref="ArraySegment{T}"/>として取得し、クリアします.
+    /// 配列プールに返却する.
+    /// </summary>
+    /// <param name="memory"></param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Clear(in ReadOnlyMemory<T> memory)
+    {
+        if (memory.Length > 0 && MemoryMarshal.TryGetArray(memory, out var segment))
+        {
+            ArrayPool<T>.Shared.Return(segment.Array!);
+        }
+    }
+
+    /// <summary>
+    /// <see cref="ArraySegment{T}"/>として取得します.
     /// </summary>
     /// <returns></returns>
-    public ArraySegment<T> GetSegmentAndClear()
-    {
-        var segment = new ArraySegment<T>(_items, 0, Count);
-        _items = [];
-        Count = 0;
-        return segment;
-    }
+    public readonly ArraySegment<T> AsSegment() => new(_items, 0, Count);
 
     /// <summary>
     /// <see cref="Span{T}"/>として取得します.

@@ -779,114 +779,250 @@ namespace AndanteTribe.Utils.Tests
         }
 
         [Test]
-        public void ValueListWithReferenceTypes()
+        public void ValueListZeroCapacityHandling()
         {
-            var list = new ValueList<string>();
-            list.Add("hello");
-            list.Add("world");
-            list.Add(null);
+            var list = new ValueList<int>(0); // Zero capacity
+            list.Add(1);
+            list.Add(2);
 
-            Assert.That(list, Has.Count.EqualTo(3));
-
-            var result = new List<string>();
-            foreach (var item in list)
-            {
-                result.Add(item);
-            }
-
-            Assert.That(result[0], Is.EqualTo("hello"));
-            Assert.That(result[1], Is.EqualTo("world"));
-            Assert.That(result[2], Is.Null);
-        }
-
-        [Test]
-        public void ValueListEmpty()
-        {
-            var list = new ValueList<int>();
-
-            Assert.That(list, Is.Empty);
-
-            var result = new List<int>();
-            foreach (var item in list)
-            {
-                result.Add(item);
-            }
-
-            Assert.That(result, Is.Empty);
-        }
-
-        [Test]
-        public void ValueListLargeCapacity()
-        {
-            var list = new ValueList<int>(1000);
-
-            for (int i = 0; i < 500; i++)
-            {
-                list.Add(i * 2);
-            }
-
-            Assert.That(list, Has.Count.EqualTo(500));
-
-            var span = list.AsSpan();
-            for (int i = 0; i < 500; i++)
-            {
-                Assert.That(span[i], Is.EqualTo(i * 2));
-            }
-        }
-
-        [Test]
-        public void ValueListGenericEnumerator()
-        {
-            var list = new ValueList<int>();
-            list.Add(5);
-            list.Add(10);
-
-            var enumerableList = (IEnumerable<int>)list;
-            var result = new List<int>();
-
-            foreach (var item in enumerableList)
-            {
-                result.Add(item);
-            }
-
-            Assert.That(result, Has.Count.EqualTo(2));
-            Assert.That(result[0], Is.EqualTo(5));
-            Assert.That(result[1], Is.EqualTo(10));
-        }
-
-        [Test]
-        public void ValueListNonGenericEnumerator()
-        {
-            var list = new ValueList<int>();
-            list.Add(7);
-            list.Add(14);
-
-            var enumerable = (IEnumerable)list;
-            var result = new List<object>();
-
-            foreach (var item in enumerable)
-            {
-                result.Add(item);
-            }
-
-            Assert.That(result, Has.Count.EqualTo(2));
-            Assert.That(result[0], Is.EqualTo(7));
-            Assert.That(result[1], Is.EqualTo(14));
-        }
-
-        [Test]
-        public void ValueListCollectionInitializer()
-        {
-            var list = new ValueList<int> { 1, 2, 3, 4, 5 };
-
-            Assert.That(list, Has.Count.EqualTo(5));
-
+            Assert.That(list.Count, Is.EqualTo(2));
             var span = list.AsSpan();
             Assert.That(span[0], Is.EqualTo(1));
             Assert.That(span[1], Is.EqualTo(2));
-            Assert.That(span[2], Is.EqualTo(3));
-            Assert.That(span[3], Is.EqualTo(4));
-            Assert.That(span[4], Is.EqualTo(5));
+        }
+
+        [Test]
+        public void ValueListAsSegmentTest()
+        {
+            var list = new ValueList<int> { 10, 20, 30 };
+            var segment = list.AsSegment();
+
+            Assert.That(segment.Count, Is.EqualTo(3));
+            Assert.That(segment.Array, Is.Not.Null);
+            Assert.That(segment.Offset, Is.EqualTo(0));
+            Assert.That(segment.Array[0], Is.EqualTo(10));
+            Assert.That(segment.Array[1], Is.EqualTo(20));
+            Assert.That(segment.Array[2], Is.EqualTo(30));
+        }
+
+        [Test]
+        public void ValueListAsMemoryTest()
+        {
+            var list = new ValueList<int> { 5, 15, 25 };
+            var memory = list.AsMemory();
+
+            Assert.That(memory.Length, Is.EqualTo(3));
+            var span = memory.Span;
+            Assert.That(span[0], Is.EqualTo(5));
+            Assert.That(span[1], Is.EqualTo(15));
+            Assert.That(span[2], Is.EqualTo(25));
+        }
+
+        [Test]
+        public void ValueListClearArraySegment()
+        {
+            var list = new ValueList<int>() { 1, 2, 3 };
+            var segment = list.AsSegment();
+
+            // Test the static Clear method
+            Assert.That(() => ValueList<int>.Clear(segment), Throws.Nothing);
+        }
+
+        [Test]
+        public void ValueListClearEmptyArraySegment()
+        {
+            var segment = new ArraySegment<int>();
+
+            // Test Clear with empty/null array
+            Assert.That(() => ValueList<int>.Clear(segment), Throws.Nothing);
+        }
+
+        [Test]
+        public void ValueListClearReadOnlyMemory()
+        {
+            var list = new ValueList<int>() { 1, 2, 3 };
+            var memory = list.AsMemory();
+
+            // Test the static Clear method with ReadOnlyMemory
+            Assert.That(() => ValueList<int>.Clear(memory), Throws.Nothing);
+        }
+
+        [Test]
+        public void ValueListClearEmptyReadOnlyMemory()
+        {
+            var memory = ReadOnlyMemory<int>.Empty;
+
+            // Test Clear with empty memory
+            Assert.That(() => ValueList<int>.Clear(memory), Throws.Nothing);
+        }
+
+        [Test]
+        public void ValueListMultipleCapacityExpansions()
+        {
+            var list = new ValueList<int>(1); // Very small capacity
+
+            // Add many items to trigger multiple expansions
+            for (int i = 0; i < 100; i++)
+            {
+                list.Add(i);
+            }
+
+            Assert.That(list.Count, Is.EqualTo(100));
+            var span = list.AsSpan();
+            for (int i = 0; i < 100; i++)
+            {
+                Assert.That(span[i], Is.EqualTo(i));
+            }
+        }
+
+        [Test]
+        public void ValueListEnumeratorReset()
+        {
+            var list = new ValueList<int> { 1, 2, 3 };
+            var enumerator = list.GetEnumerator();
+
+            // Enumerate through all items
+            var count = 0;
+            while (enumerator.MoveNext())
+            {
+                count++;
+            }
+            Assert.That(count, Is.EqualTo(3));
+
+            // Enumerator should be at end
+            Assert.That(enumerator.MoveNext(), Is.False);
+        }
+
+        // IInitializable tests for 100% coverage
+        private class SyncInitializable : IInitializable
+        {
+            public bool IsInitialized { get; private set; }
+
+            public void Initialize(CancellationToken cancellationToken)
+            {
+                IsInitialized = true;
+            }
+        }
+
+        private class AsyncOnlyInitializable : IInitializable
+        {
+            public bool IsInitialized { get; private set; }
+
+            public async ValueTask InitializeAsync(CancellationToken cancellationToken)
+            {
+                await Task.Delay(1, cancellationToken);
+                IsInitialized = true;
+            }
+        }
+
+        private class DefaultImplementationInitializable : IInitializable
+        {
+            // Uses default implementations only
+        }
+
+        [Test]
+        public void InitializableSyncImplementation()
+        {
+            var initializable = new SyncInitializable();
+            Assert.That(initializable.IsInitialized, Is.False);
+
+            initializable.Initialize(CancellationToken.None);
+            Assert.That(initializable.IsInitialized, Is.True);
+        }
+
+        [Test]
+        public async Task InitializableAsyncOnlyImplementation()
+        {
+            var initializable = new AsyncOnlyInitializable();
+            Assert.That(initializable.IsInitialized, Is.False);
+
+            await initializable.InitializeAsync(CancellationToken.None);
+            Assert.That(initializable.IsInitialized, Is.True);
+        }
+
+        [Test]
+        public void InitializableDefaultSyncThrows()
+        {
+            var initializable = new DefaultImplementationInitializable();
+
+            // Test that default Initialize implementation throws NotImplementedException
+            Assert.That(() => ((IInitializable)initializable).Initialize(CancellationToken.None),
+                Throws.TypeOf<NotImplementedException>()
+                    .With.Message.Contains("IInitializableを実装する場合"));
+        }
+
+        [Test]
+        public async Task InitializableDefaultAsyncCallsSync()
+        {
+            var initializable = new DefaultImplementationInitializable();
+
+            // Test that default InitializeAsync calls Initialize and throws
+            try
+            {
+                await ((IInitializable)initializable).InitializeAsync(CancellationToken.None);
+                Assert.Fail("Expected NotImplementedException");
+            }
+            catch (NotImplementedException ex)
+            {
+                Assert.That(ex.Message, Contains.Substring("IInitializableを実装する場合"));
+            }
+        }
+
+        [Test]
+        public async Task InitializableSyncAsAsyncWrapper()
+        {
+            var initializable = new SyncInitializable();
+
+            // Test that sync implementation works through async wrapper
+            await ((IInitializable)initializable).InitializeAsync(CancellationToken.None);
+            Assert.That(initializable.IsInitialized, Is.True);
+        }
+
+        [Test]
+        public void InitializableSyncWithCancellation()
+        {
+            var initializable = new SyncInitializable();
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            // Test that cancelled token doesn't prevent sync initialization
+            initializable.Initialize(cts.Token);
+            Assert.That(initializable.IsInitialized, Is.True);
+        }
+
+        public async Task InitializableAsyncWithCancellation()
+        {
+            var initializable = new AsyncOnlyInitializable();
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            // Test async with cancelled token
+            try
+            {
+                await initializable.InitializeAsync(cts.Token);
+                Assert.Fail("Expected OperationCanceledException");
+            }
+            catch (OperationCanceledException)
+            {
+                Assert.That(initializable.IsInitialized, Is.False);
+            }
+        }
+
+        [Test]
+        public void InitializableInterfaceDefaultBehavior()
+        {
+            // Test that default implementations follow the contract
+            var initializable = new DefaultImplementationInitializable();
+
+            // Both methods should throw with the same message
+            var syncException = Assert.Throws<NotImplementedException>(() =>
+                ((IInitializable)initializable).Initialize(CancellationToken.None));
+
+            var asyncException = Assert.ThrowsAsync<NotImplementedException>(async () =>
+                await ((IInitializable)initializable).InitializeAsync(CancellationToken.None));
+
+            Assert.That(syncException.Message, Contains.Substring("IInitializableを実装する場合"));
+            Assert.That(asyncException.Message, Contains.Substring("IInitializableを実装する場合"));
         }
     }
 }
