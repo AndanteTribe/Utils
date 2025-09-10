@@ -168,26 +168,26 @@ namespace AndanteTribe.Utils.Unity.VContainer
     internal sealed class EntryPointContainer : IStartable, IDisposable
     {
         private readonly IObjectResolver _resolver;
-        private readonly CancellationTokenSource _cancellationDisposable = new();
+        private readonly CancellationToken _cancellationToken;
         private readonly List<Func<IObjectResolver, CancellationToken, ValueTask>> _entryPoints;
 
-        public EntryPointContainer(IObjectResolver resolver, List<Func<IObjectResolver, CancellationToken, ValueTask>> entryPoints)
+        public EntryPointContainer(IObjectResolver resolver, LifetimeScope lifetimeScope, List<Func<IObjectResolver, CancellationToken, ValueTask>> entryPoints)
         {
             _resolver = resolver;
+            _cancellationToken = lifetimeScope.destroyCancellationToken;
             _entryPoints = entryPoints;
         }
 
         /// <inheritdoc />
         void IStartable.Start()
         {
-            _cancellationDisposable.ThrowIfDisposed(this);
             _ = StartAsync();
 
             async ValueTask StartAsync()
             {
                 foreach (var entrypoint in _entryPoints)
                 {
-                    await entrypoint(_resolver, _cancellationDisposable.Token);
+                    await entrypoint(_resolver, _cancellationToken);
                 }
             }
         }
@@ -195,11 +195,9 @@ namespace AndanteTribe.Utils.Unity.VContainer
         /// <inheritdoc />
         void IDisposable.Dispose()
         {
-            if (!_cancellationDisposable.IsCancellationRequested)
+            if (!_cancellationToken.IsCancellationRequested)
             {
                 ListPool<Func<IObjectResolver, CancellationToken, ValueTask>>.Release(_entryPoints);
-                _cancellationDisposable.Cancel();
-                _cancellationDisposable.Dispose();
             }
         }
     }
