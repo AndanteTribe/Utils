@@ -35,6 +35,9 @@ namespace AndanteTribe.Utils.Unity.VContainer
         /// <summary>
         /// <see cref="IInitializable"/>を実装したエントリーポイントオブジェクトをキューに登録します.
         /// </summary>
+        /// <remarks>
+        /// 登録した<see cref="T"/>型は自動的に<see cref="T"/>型としてもバインドされます.
+        /// </remarks>
         /// <param name="builder"></param>
         /// <param name="waitForCompletion">対象の型の初期化が完了するまで待機するかどうか.</param>
         /// <typeparam name="T"></typeparam>
@@ -49,6 +52,31 @@ namespace AndanteTribe.Utils.Unity.VContainer
             if (builder is EntryPointsQueueBuilder epBuilder)
             {
                 return epBuilder.RegisterEnqueue<T>(waitForCompletion);
+            }
+
+            throw new InvalidOperationException("RegisterEnqueueはRegisterEntryPointsを呼び出すことで生成されるスコープ内で使用してください.");
+        }
+
+        /// <summary>
+        /// <see cref="IInitializable"/>を実装したエントリーポイントオブジェクトをキューに登録します.
+        /// </summary>
+        /// <remarks>
+        /// 登録した<see cref="TImplement"/>型でバインドされず、<see cref="TInterface"/>型としてバインドされます.
+        /// </remarks>
+        /// <param name="builder"></param>
+        /// <param name="waitForCompletion">対象の型の初期化が完了するまで待機するかどうか.</param>
+        /// <typeparam name="TInterface"></typeparam>
+        /// <typeparam name="TImplement"></typeparam>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException">
+        /// RegisterEnqueueをRegisterEntryPointsを呼び出すことで生成されるスコープ内で使用しなかった場合に発生する警告.
+        /// </exception>
+        public static RegistrationBuilder RegisterEnqueue<TInterface, TImplement>(this IContainerBuilder builder, bool waitForCompletion = true)
+            where TImplement : class, TInterface, IInitializable
+        {
+            if (builder is EntryPointsQueueBuilder epBuilder)
+            {
+                return epBuilder.RegisterEnqueue<TInterface, TImplement>(waitForCompletion);
             }
 
             throw new InvalidOperationException("RegisterEnqueueはRegisterEntryPointsを呼び出すことで生成されるスコープ内で使用してください.");
@@ -101,7 +129,39 @@ namespace AndanteTribe.Utils.Unity.VContainer
                 });
             }
 
-            return _builder.Register<IInitializable, T>(_lifetime);
+            return _builder.Register<IInitializable, T>(_lifetime).AsSelf();
+        }
+
+        public RegistrationBuilder RegisterEnqueue<TInterface, TImplement>(bool waitForCompletion = true)
+            where TImplement : class, TInterface, IInitializable
+        {
+            if (waitForCompletion)
+            {
+                Queue.Add(static (resolver, token) =>
+                {
+                    if (resolver.Resolve<TInterface>() is IInitializable initializable)
+                    {
+                        return initializable.InitializeAsync(token);
+                    }
+
+                    throw new InvalidOperationException($"{typeof(TImplement).FullName} is not IInitializable.");
+                });
+            }
+            else
+            {
+                Queue.Add(static (resolver, token) =>
+                {
+                    if (resolver.Resolve<TInterface>() is IInitializable initializable)
+                    {
+                        _ = initializable.InitializeAsync(token);
+                        return default;
+                    }
+
+                    throw new InvalidOperationException($"{typeof(TImplement).FullName} is not IInitializable.");
+                });
+            }
+
+            return _builder.Register<IInitializable, TImplement>(_lifetime).As<TInterface>();
         }
 
         /// <inheritdoc />
