@@ -72,7 +72,9 @@ namespace AndanteTribe.Utils.Unity.Editor
                         // managedReferenceValueがnullの時は型が取得できないので、無理矢理文字列から型判定
                         if (genericType == null)
                         {
-                            var typeName = property.managedReferenceFieldTypename.AsSpan().TrimStart("[[");
+                            var fieldName = property.managedReferenceFieldTypename.AsSpan();
+                            var i = fieldName.IndexOf("[[");
+                            var typeName = fieldName.Slice(i + 2);
                             typeName = typeName[..typeName.IndexOf(',')];
                             genericType = Type.GetType(typeName.ToString());
                             if (genericType == null)
