@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.1;net5.0;net6.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1;net5.0;net6.0;net7.0</TargetFrameworks>
         <LangVersion>13</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <OutputType>Library</OutputType>
         <RootNamespace>AndanteTribe.Utils.BackPort</RootNamespace>
-        <Version>0.1.0</Version>
+        <Version>0.1.4</Version>
         <AssemblyName>Utils.BackPort</AssemblyName>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
 

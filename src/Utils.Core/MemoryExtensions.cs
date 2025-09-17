@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections;
+using System.Runtime.CompilerServices;
 
 namespace AndanteTribe.Utils;
 
@@ -96,15 +97,16 @@ public static class MemoryExtensions
     /// <see cref="ReadOnlyMemory{T}"/>のforeach対応.
     /// </summary>
     /// <typeparam name="T">要素の型.</typeparam>
-    public struct Enumerator<T>
+    public struct Enumerator<T> : IEnumerator<T>
     {
         private readonly ReadOnlyMemory<T> _memory;
         private int _index;
 
-        /// <summary>
-        /// <see cref="System.Collections.Generic.IEnumerator{T}.Current"/>に同じ.
-        /// </summary>
-        public T Current => _memory.Span[_index];
+        /// <inheritdoc/>
+        public readonly T Current => _memory.Span[_index];
+
+        /// <inheritdoc/>
+        readonly object? IEnumerator.Current => Current;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Enumerator{T}"/> struct.
@@ -116,10 +118,15 @@ public static class MemoryExtensions
             _index = -1;
         }
 
-        /// <summary>
-        /// <see cref="System.Collections.Generic.IEnumerator{T}.MoveNext"/>に同じ.
-        /// </summary>
-        /// <returns>列挙が可能な場合はtrue.</returns>
+        /// <inheritdoc/>
         public bool MoveNext() => _index < _memory.Length && ++_index < _memory.Length;
+
+        /// <inheritdoc/>
+        void IEnumerator.Reset() => _index = -1;
+
+        /// <inheritdoc/>
+        readonly void IDisposable.Dispose()
+        {
+        }
     }
 }

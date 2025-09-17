@@ -106,6 +106,58 @@ namespace AndanteTribe.Utils.Unity.Editor
             };
         }
 
+        /// <summary>
+        /// 汎用性がありそうな倍速実装だけデフォルトで生やしておく.
+        /// </summary>
+        public static void AddTimeScaleSlider()
+        {
+            AddLeft(static () =>
+            {
+                var slider = new SliderInt(1, 5)
+                {
+                    style =
+                    {
+                        flexDirection = FlexDirection.Row,
+                        alignItems = Align.FlexStart,
+                        width = 150,
+                    }
+                };
+                slider.Insert(0, new Image()
+                {
+                    image = (Texture2D)EditorGUIUtility.IconContent("d_UnityEditor.AnimationWindow").image,
+                    style =
+                    {
+                        width = 16,
+                        height = 16,
+                        marginRight = 5
+                    }
+                });
+                var label = new Label()
+                {
+                    text = string.Create(3, slider.value, static (span, i) =>
+                    {
+                        stackalloc char[] { 'x', ' ' }.CopyTo(span);
+                        i.TryFormat(span[2..], out _);
+                    }),
+                    style =
+                    {
+                        marginLeft = 5,
+                    }
+                };
+                slider.RegisterCallback<ChangeEvent<int>, Label>(static (v, label) =>
+                {
+                    Time.timeScale = v.newValue;
+                    label.text = string.Create(3, v.newValue, static (span, i) =>
+                    {
+                        stackalloc char[] { 'x', ' ' }.CopyTo(span);
+                        i.TryFormat(span[2..], out _);
+                    });
+                }, label);
+                slider.Add(label);
+                return slider;
+            });
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static VisualElement? GetToolbarRoot()
         {

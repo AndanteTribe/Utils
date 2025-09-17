@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -14,8 +15,11 @@ namespace AndanteTribe.Utils.Unity.Editor
         private static readonly Lazy<Texture2D> s_settingIcon = new(static () =>
             (Texture2D)EditorGUIUtility.Load("SettingsIcon"));
 
-        private static readonly Lazy<TypeCache.TypeCollection> s_objectReferenceTypes = new(static () =>
-            TypeCache.GetTypesDerivedFrom(typeof(IObjectReference<>)));
+        private static readonly Lazy<Type[]> s_objectReferenceTypes = new(static () =>
+        {
+            return TypeCache.GetTypesDerivedFrom(typeof(IObjectReference<>))
+                .Where(t => t.IsDefined(typeof(SerializableAttribute), false)).ToArray();
+        });
 
         private static readonly Lazy<TypeCache.TypeCollection> s_unityObjectTypes = new(static () =>
             TypeCache.GetTypesDerivedFrom(typeof(UnityEngine.Object)));
@@ -68,7 +72,9 @@ namespace AndanteTribe.Utils.Unity.Editor
                         // managedReferenceValueがnullの時は型が取得できないので、無理矢理文字列から型判定
                         if (genericType == null)
                         {
-                            var typeName = property.managedReferenceFieldTypename.AsSpan(58);
+                            var fieldName = property.managedReferenceFieldTypename.AsSpan();
+                            var i = fieldName.IndexOf("[[");
+                            var typeName = fieldName.Slice(i + 2);
                             typeName = typeName[..typeName.IndexOf(',')];
                             genericType = Type.GetType(typeName.ToString());
                             if (genericType == null)

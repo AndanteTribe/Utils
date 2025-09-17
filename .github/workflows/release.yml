@@ -1,0 +1,95 @@
+name: release (github-hosted ubuntu-latest)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        required: true
+        default: "0.1.0"
+        
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: create branch
+      run: |
+          BRANCH="feature/v${{ github.event.inputs.version }}"
+          echo "Creating branch: $BRANCH"
+
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git fetch origin
+          git checkout -b "$BRANCH" origin/main
+          git push origin "$BRANCH"
+    - name: update version (unity)
+      run: |
+          VERSION="${{ github.event.inputs.version }}"
+          echo "Updating package.json files to version $VERSION"
+
+          FILES=(
+            ./bin/package.json
+            ./src/Utils.Unity/Packages/jp.andantetribe.utils/package.json
+          )
+
+          for FILE in "${FILES[@]}"; do
+            echo "Updating $FILE"
+            jq --arg ver "$VERSION" '.version = $ver' "$FILE" > tmp.$$.json && mv tmp.$$.json "$FILE"
+          done
+    - name: update version (csproj)
+      run: |
+          VERSION="${{ github.event.inputs.version }}"
+          echo "Updating .csproj files to version $VERSION"
+
+          FILES=(
+            ./src/Utils.Core/Utils.Core.csproj
+            ./src/Utils.BackPort/Utils.BackPort.csproj
+          )
+
+          for FILE in "${FILES[@]}"; do
+            echo "Updating $FILE"
+            sed -i -E "s|<Version>.*</Version>|<Version>${VERSION}</Version>|" "$FILE"
+          done
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+    - run: |
+        dotnet restore ./src/Utils.Core/Utils.Core.slnx
+        dotnet build ./src/Utils.Core/Utils.Core.slnx --configuration Release --no-restore
+    - name: commit and push
+      run: |
+          VERSION="${{ github.event.inputs.version }}"
+          
+          git add \
+            ./bin/package.json \
+            ./bin/Utils.Core.dll \
+            ./bin/Utils.Core.xml \
+            ./bin/Utils.BackPort.dll \
+            ./bin/Utils.BackPort.xml \
+            ./src/Utils.Unity/Packages/jp.andantetribe.utils/package.json \
+            ./src/Utils.Core/Utils.Core.csproj \
+            ./src/Utils.BackPort/Utils.BackPort.csproj
+          git commit -m "chore: bump version to ${VERSION}"
+          git push origin HEAD
+    - name: create pull request
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        VERSION: ${{ github.event.inputs.version }}
+      run: |
+        VERSION="${{ github.event.inputs.version }}"
+        BRANCH="feature/v$VERSION"
+    
+        gh pr create \
+          --base main \
+          --head "$BRANCH" \
+          --title "chore: bump version to $VERSION" \
+          --fill \
+          --assignee "${{ github.actor }}"
