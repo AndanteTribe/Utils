@@ -148,15 +148,19 @@ namespace AndanteTribe.Utils.Unity.Tasks
         public readonly struct Handle : IDisposable
         {
             private readonly GameObjectPool<T> _gameObjectPool;
-            private readonly T _instance;
+
+            /// <summary>
+            /// プールから取得したインスタンス.
+            /// </summary>
+            public readonly T Instance;
 
             internal Handle(GameObjectPool<T> gameObjectPool, T instance)
             {
                 _gameObjectPool = gameObjectPool;
-                _instance = instance;
+                Instance = instance;
             }
 
-            void IDisposable.Dispose() => _gameObjectPool.Return(_instance);
+            void IDisposable.Dispose() => _gameObjectPool.Return(Instance);
         }
     }
 }
