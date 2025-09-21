@@ -589,6 +589,43 @@
         <member name="M:AndanteTribe.Utils.MemoryExtensions.Enumerator`1.System#IDisposable#Dispose">
             <inheritdoc/>
         </member>
+        <member name="T:AndanteTribe.Utils.Obscured`1">
+            <summary>
+            メモリ改ざん対策構造体.
+            </summary>
+            <remarks>
+            基本的にスコープ内でキャストして使う.
+            本体はコレクション周りの利用で面倒がないように<see cref="M:AndanteTribe.Utils.Obscured`1.Equals(AndanteTribe.Utils.Obscured{`0})"/>や<see cref="M:AndanteTribe.Utils.Obscured`1.CompareTo(AndanteTribe.Utils.Obscured{`0})"/>などは公開しているが、それ以上は何もできない.
+            </remarks>
+        </member>
+        <member name="M:AndanteTribe.Utils.Obscured`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AndanteTribe.Utils.Obscured`1"/> struct.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.Obscured`1.op_Implicit(AndanteTribe.Utils.Obscured{`0})~`0">
+            <summary>
+            <see cref="T:AndanteTribe.Utils.Obscured`1"/>から<see cref="!:T"/>への暗黙的変換.
+            </summary>
+            <param name="obscured"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Obscured`1.op_Implicit(`0)~AndanteTribe.Utils.Obscured{`0}">
+            <summary>
+            <see cref="!:T"/>から<see cref="T:AndanteTribe.Utils.Obscured`1"/>への暗黙的変換.
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Obscured`1.Equals(AndanteTribe.Utils.Obscured{`0})">
+            <inheritdoc />
+        </member>
+        <member name="M:AndanteTribe.Utils.Obscured`1.CompareTo(AndanteTribe.Utils.Obscured{`0})">
+            <inheritdoc />
+        </member>
+        <member name="M:AndanteTribe.Utils.Obscured`1.GetHashCode">
+            <inheritdoc />
+        </member>
         <member name="T:AndanteTribe.Utils.ValueList`1">
             <summary>
             構造体簡易リスト.
