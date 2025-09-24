@@ -595,8 +595,12 @@
             </summary>
             <remarks>
             基本的にスコープ内でキャストして使う.
-            本体はコレクション周りの利用で面倒がないように<see cref="M:AndanteTribe.Utils.Obscured`1.Equals(AndanteTribe.Utils.Obscured{`0})"/>や<see cref="M:AndanteTribe.Utils.Obscured`1.CompareTo(AndanteTribe.Utils.Obscured{`0})"/>などは公開しているが、それ以上は何もできない.
             </remarks>
+        </member>
+        <member name="P:AndanteTribe.Utils.Obscured`1.Value">
+            <summary>
+            復号化された値.
+            </summary>
         </member>
         <member name="M:AndanteTribe.Utils.Obscured`1.#ctor">
             <summary>
@@ -617,10 +621,10 @@
             <param name="value"></param>
             <returns></returns>
         </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.Equals(AndanteTribe.Utils.Obscured{`0})">
+        <member name="M:AndanteTribe.Utils.Obscured`1.System#IEquatable{AndanteTribe#Utils#Obscured{T}}#Equals(AndanteTribe.Utils.Obscured{`0})">
             <inheritdoc />
         </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.CompareTo(AndanteTribe.Utils.Obscured{`0})">
+        <member name="M:AndanteTribe.Utils.Obscured`1.System#IComparable{AndanteTribe#Utils#Obscured{T}}#CompareTo(AndanteTribe.Utils.Obscured{`0})">
             <inheritdoc />
         </member>
         <member name="M:AndanteTribe.Utils.Obscured`1.GetHashCode">
