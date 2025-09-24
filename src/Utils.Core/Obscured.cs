@@ -17,12 +17,16 @@ internal static class RandomCache
 /// </summary>
 /// <remarks>
 /// 基本的にスコープ内でキャストして使う.
-/// 本体はコレクション周りの利用で面倒がないように<see cref="Equals"/>や<see cref="CompareTo"/>などは公開しているが、それ以上は何もできない.
 /// </remarks>
 public readonly struct Obscured<T> : IEquatable<Obscured<T>>, IComparable<Obscured<T>> where T : unmanaged
 {
     internal readonly T _hiddenValue;
     internal readonly T _key;
+
+    /// <summary>
+    /// 復号化された値.
+    /// </summary>
+    public T Value => Xor(_hiddenValue, _key);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Obscured{T}"/> struct.
@@ -80,11 +84,11 @@ public readonly struct Obscured<T> : IEquatable<Obscured<T>>, IComparable<Obscur
     public static implicit operator Obscured<T>(T value) => new(value);
 
     /// <inheritdoc />
-    public bool Equals(Obscured<T> other) =>
+    bool IEquatable<Obscured<T>>.Equals(Obscured<T> other) =>
         EqualityComparer<T>.Default.Equals(Xor(_hiddenValue, _key), Xor(other._hiddenValue, other._key));
 
     /// <inheritdoc />
-    public int CompareTo(Obscured<T> other) =>
+    int IComparable<Obscured<T>>.CompareTo(Obscured<T> other) =>
         Comparer<T>.Default.Compare(Xor(_hiddenValue, _key), Xor(other._hiddenValue, other._key));
 
     /// <inheritdoc />

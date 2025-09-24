@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -1111,13 +1110,13 @@ namespace AndanteTribe.Utils.Tests
             Obscured<int> obscured3 = 200;
 
             // Same values should be equal
-            Assert.That(obscured1.Equals(obscured2), Is.True);
+            Assert.That(EqualityComparer<Obscured<int>>.Default.Equals(obscured1, obscured2), Is.True);
 
             // Different values should not be equal
-            Assert.That(obscured1.Equals(obscured3), Is.False);
+            Assert.That(EqualityComparer<Obscured<int>>.Default.Equals(obscured1, obscured3), Is.False);
 
             // Same instance should be equal to itself
-            Assert.That(obscured1.Equals(obscured1), Is.True);
+            Assert.That(EqualityComparer<Obscured<int>>.Default.Equals(obscured1, obscured1), Is.True);
         }
 
         [Test]
@@ -1128,9 +1127,9 @@ namespace AndanteTribe.Utils.Tests
             Obscured<int> obscured3 = 100;
 
             // Test comparison operations
-            Assert.That(obscured1.CompareTo(obscured2), Is.Not.EqualTo(0));
-            Assert.That(obscured1.CompareTo(obscured3), Is.EqualTo(0)); // Different keys
-            Assert.That(obscured1.CompareTo(obscured1), Is.EqualTo(0)); // Same instance
+            Assert.That(Comparer<Obscured<int>>.Default.Compare(obscured1, obscured2), Is.Not.EqualTo(0));
+            Assert.That(Comparer<Obscured<int>>.Default.Compare(obscured1, obscured3), Is.EqualTo(0)); // Different keys
+            Assert.That(Comparer<Obscured<int>>.Default.Compare(obscured1, obscured1), Is.EqualTo(0)); // Same instance
         }
 
         [Test]
@@ -1237,10 +1236,10 @@ namespace AndanteTribe.Utils.Tests
             Obscured<int> obscured3 = 0;
 
             // Test various comparison scenarios
-            Assert.That(obscured1.CompareTo(obscured2), Is.Not.EqualTo(0));
-            Assert.That(obscured2.CompareTo(obscured1), Is.Not.EqualTo(0));
-            Assert.That(obscured3.CompareTo(obscured1), Is.Not.EqualTo(0));
-            Assert.That(obscured3.CompareTo(obscured2), Is.Not.EqualTo(0));
+            Assert.That(Comparer<Obscured<int>>.Default.Compare(obscured1, obscured2), Is.Not.EqualTo(0));
+            Assert.That(Comparer<Obscured<int>>.Default.Compare(obscured2, obscured1), Is.Not.EqualTo(0));
+            Assert.That(Comparer<Obscured<int>>.Default.Compare(obscured3, obscured1), Is.Not.EqualTo(0));
+            Assert.That(Comparer<Obscured<int>>.Default.Compare(obscured3, obscured2), Is.Not.EqualTo(0));
         }
 
         [Test]
