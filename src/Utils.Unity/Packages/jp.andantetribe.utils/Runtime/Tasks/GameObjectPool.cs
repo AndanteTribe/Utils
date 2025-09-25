@@ -91,7 +91,7 @@ namespace AndanteTribe.Utils.Unity.Tasks
         /// </summary>
         /// <param name="cancellationToken">キャンセルトークン.</param>
         /// <returns>取得したインスタンスと解放用の<see cref="System.IDisposable"/>.</returns>
-        public async UniTask<Handle> RentAsyncHandle(CancellationToken cancellationToken = default)
+        public async UniTask<Handle> RentHandleAsync(CancellationToken cancellationToken = default)
         {
             var instance = await RentAsync(cancellationToken);
             return new Handle(this, instance);
