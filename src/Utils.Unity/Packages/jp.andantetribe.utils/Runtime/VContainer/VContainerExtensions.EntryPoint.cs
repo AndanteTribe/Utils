@@ -81,6 +81,51 @@ namespace AndanteTribe.Utils.Unity.VContainer
 
             throw new InvalidOperationException("RegisterEnqueueはRegisterEntryPointsを呼び出すことで生成されるスコープ内で使用してください.");
         }
+
+        /// <summary>
+        /// <see cref="IInitializable"/>を実装したエントリーポイントオブジェクトのインスタンスをキューに登録します.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="instance"></param>
+        /// <param name="waitForCompletion">対象の型の初期化が完了するまで待機するかどうか.</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException">
+        /// RegisterEnqueueをRegisterEntryPointsを呼び出すことで生成されるスコープ内で使用しなかった場合に発生する警告.
+        /// </exception>
+        public static RegistrationBuilder RegisterInstanceEnqueue<T>(this IContainerBuilder builder, T instance, bool waitForCompletion = true)
+            where T : class, IInitializable
+        {
+            if (builder is EntryPointsQueueBuilder epBuilder)
+            {
+                return epBuilder.RegisterInstanceEnqueue(instance, waitForCompletion);
+            }
+
+            throw new InvalidOperationException("RegisterInstanceEnqueueはRegisterEntryPointsを呼び出すことで生成されるスコープ内で使用してください.");
+        }
+
+        /// <summary>
+        /// <see cref="IInitializable"/>を実装したエントリーポイントオブジェクトのインスタンスをキューに登録します.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="instance"></param>
+        /// <param name="waitForCompletion">対象の型の初期化が完了するまで待機するかどうか.</param>
+        /// <typeparam name="TInterface"></typeparam>
+        /// <typeparam name="TImplement"></typeparam>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException">
+        /// RegisterEnqueueをRegisterEntryPointsを呼び出すことで生成されるスコープ内で使用しなかった場合に発生する警告.
+        /// </exception>
+        public static RegistrationBuilder RegisterInstanceEnqueue<TInterface, TImplement>(this IContainerBuilder builder, TImplement instance, bool waitForCompletion = true)
+            where TImplement : class, TInterface, IInitializable
+        {
+            if (builder is EntryPointsQueueBuilder epBuilder)
+            {
+                return epBuilder.RegisterInstanceEnqueue<TInterface, TImplement>(instance, waitForCompletion);
+            }
+
+            throw new InvalidOperationException("RegisterInstanceEnqueueはRegisterEntryPointsを呼び出すことで生成されるスコープ内で使用してください.");
+        }
     }
 
     public readonly struct EntryPointRegistrationScope : IDisposable
@@ -162,6 +207,56 @@ namespace AndanteTribe.Utils.Unity.VContainer
             }
 
             return _builder.Register<IInitializable, TImplement>(_lifetime).As<TInterface>();
+        }
+
+        public RegistrationBuilder RegisterInstanceEnqueue<T>(T instance, bool waitForCompletion = true) where T : class, IInitializable
+        {
+            if (waitForCompletion)
+            {
+                Queue.Add(static (resolver, token) => resolver.Resolve<T>().InitializeAsync(token));
+            }
+            else
+            {
+                Queue.Add(static (resolver, token) =>
+                {
+                    _ = resolver.Resolve<T>().InitializeAsync(token);
+                    return default;
+                });
+            }
+
+            return _builder.RegisterInstance<IInitializable, T>(instance).AsSelf();
+        }
+
+        public RegistrationBuilder RegisterInstanceEnqueue<TInterface, TImplement>(TImplement instance, bool waitForCompletion = true)
+            where TImplement : class, TInterface, IInitializable
+        {
+            if (waitForCompletion)
+            {
+                Queue.Add(static (resolver, token) =>
+                {
+                    if (resolver.Resolve<TInterface>() is IInitializable initializable)
+                    {
+                        return initializable.InitializeAsync(token);
+                    }
+
+                    throw new InvalidOperationException($"{typeof(TImplement).FullName} is not IInitializable.");
+                });
+            }
+            else
+            {
+                Queue.Add(static (resolver, token) =>
+                {
+                    if (resolver.Resolve<TInterface>() is IInitializable initializable)
+                    {
+                        _ = initializable.InitializeAsync(token);
+                        return default;
+                    }
+
+                    throw new InvalidOperationException($"{typeof(TImplement).FullName} is not IInitializable.");
+                });
+            }
+
+            return _builder.RegisterInstance<IInitializable, TImplement>(instance).As<TInterface>();
         }
 
         /// <inheritdoc />
