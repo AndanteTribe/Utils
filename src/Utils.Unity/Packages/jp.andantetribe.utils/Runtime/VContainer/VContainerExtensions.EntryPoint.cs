@@ -143,7 +143,7 @@ namespace AndanteTribe.Utils.Unity.VContainer
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RegistrationBuilder RegisterComponentEnqueue<T>(this IContainerBuilder builder, T component, bool waitForCompletion = true)
-            where T : UnityEngine.Component, IInitializable
+            where T : UnityEngine.MonoBehaviour, IInitializable
         {
             if (builder is EntryPointsQueueBuilder epBuilder)
             {
@@ -211,7 +211,7 @@ namespace AndanteTribe.Utils.Unity.VContainer
             return _builder.RegisterInstance<IInitializable, TImplement>(instance).As<TInterface>();
         }
 
-        public RegistrationBuilder RegisterComponentEnqueue<T>(T component, bool waitForCompletion = true) where T : UnityEngine.Component, IInitializable
+        public RegistrationBuilder RegisterComponentEnqueue<T>(T component, bool waitForCompletion = true) where T : UnityEngine.MonoBehaviour, IInitializable
         {
             RegisterEnqueueInternal<T>(waitForCompletion);
             return _builder.RegisterComponent(component).As<IInitializable>();
