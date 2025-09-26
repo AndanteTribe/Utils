@@ -6,7 +6,7 @@
     <members>
         <member name="T:AndanteTribe.Utils.CollectionsExtensions">
             <summary>
-            <see cref="N:System.Collections.Generic"/>または<see cref="N:System.Linq"/>周りの追加拡張メソッド群.
+            <see cref="N:System.Collections.Generic"/>または<see cref="N:System.Linq"/>または<see cref="T:System.Buffers.ArrayPool`1"/>周りの追加拡張メソッド群.
             </summary>
         </member>
         <member name="M:AndanteTribe.Utils.CollectionsExtensions.AsSpan``1(System.Collections.Generic.List{``0})">
@@ -41,6 +41,28 @@
              <param name="list"></param>
              <typeparam name="T"></typeparam>
              <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.CollectionsExtensions.Rent``1(System.Buffers.ArrayPool{``0},System.Int32,``0[]@)">
+            <summary>
+            <see cref="T:System.Buffers.ArrayPool`1"/>から借りた配列を返却するためのハンドルを取得します.
+            </summary>
+            <remarks>
+            基本的に<see langword="using"/>ステートメントと組み合わせて使用します.
+            </remarks>
+            <param name="pool"></param>
+            <param name="minimumLength"></param>
+            <param name="array"></param>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="T:AndanteTribe.Utils.CollectionsExtensions.Handle`1">
+            <summary>
+            <see cref="T:System.Buffers.ArrayPool`1"/>から借りた配列を返却するためのハンドル.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:AndanteTribe.Utils.CollectionsExtensions.Handle`1.System#IDisposable#Dispose">
+            <inheritdoc/>
         </member>
         <member name="T:AndanteTribe.Utils.DisposableUtils">
             <summary>

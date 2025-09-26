@@ -1,9 +1,10 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Buffers;
+using System.Runtime.CompilerServices;
 
 namespace AndanteTribe.Utils;
 
 /// <summary>
-/// <see cref="System.Collections.Generic"/>または<see cref="System.Linq"/>周りの追加拡張メソッド群.
+/// <see cref="System.Collections.Generic"/>または<see cref="System.Linq"/>または<see cref="System.Buffers.ArrayPool{T}"/>周りの追加拡張メソッド群.
 /// </summary>
 public static class CollectionsExtensions
 {
@@ -42,4 +43,37 @@ public static class CollectionsExtensions
     public static Span<T> AsSpan<T>(this List<T> list) =>
         System.Runtime.InteropServices.CollectionsMarshal.AsSpan(list);
 
+    /// <summary>
+    /// <see cref="ArrayPool{T}"/>から借りた配列を返却するためのハンドルを取得します.
+    /// </summary>
+    /// <remarks>
+    /// 基本的に<see langword="using"/>ステートメントと組み合わせて使用します.
+    /// </remarks>
+    /// <param name="pool"></param>
+    /// <param name="minimumLength"></param>
+    /// <param name="array"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Handle<T> Rent<T>(this ArrayPool<T> pool, int minimumLength, out T[] array) =>
+        new(pool, array = pool.Rent(minimumLength));
+
+    /// <summary>
+    /// <see cref="ArrayPool{T}"/>から借りた配列を返却するためのハンドル.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public readonly struct Handle<T> : IDisposable
+    {
+        private readonly ArrayPool<T> _pool;
+        private readonly T[] _array;
+
+        internal Handle(ArrayPool<T> pool, T[] array)
+        {
+            _pool = pool;
+            _array = array;
+        }
+
+        /// <inheritdoc/>
+        void IDisposable.Dispose() => _pool.Return(_array);
+    }
 }

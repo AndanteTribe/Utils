@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -1248,6 +1249,159 @@ namespace AndanteTribe.Utils.Tests
             var obscured = new Obscured<int>();
             int value = obscured;
             Assert.That(value, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void ArrayPoolRentBasicUsage()
+        {
+            var pool = ArrayPool<int>.Shared;
+
+            using var handle = pool.Rent(10, out int[] array);
+
+            Assert.That(array, Is.Not.Null);
+            Assert.That(array.Length, Is.GreaterThanOrEqualTo(10));
+        }
+
+        [Test]
+        public void ArrayPoolRentWithUsingStatement()
+        {
+            var pool = ArrayPool<int>.Shared;
+            int[] rentedArray = null;
+
+            using (var handle = pool.Rent(5, out int[] array))
+            {
+                rentedArray = array;
+                Assert.That(array, Is.Not.Null);
+                Assert.That(array.Length, Is.GreaterThanOrEqualTo(5));
+
+                // 配列を使用
+                array[0] = 42;
+                Assert.That(array[0], Is.EqualTo(42));
+            }
+
+            // usingブロックを抜けた後、配列は返却されている
+            Assert.That(rentedArray, Is.Not.Null); // 参照は有効だが、内容は変更される可能性がある
+        }
+
+        [Test]
+        public void ArrayPoolRentDifferentTypes()
+        {
+            // int型のテスト
+            var intPool = ArrayPool<int>.Shared;
+            using (var intHandle = intPool.Rent(8, out int[] intArray))
+            {
+                Assert.That(intArray, Is.Not.Null);
+                Assert.That(intArray.Length, Is.GreaterThanOrEqualTo(8));
+                intArray[0] = 100;
+                Assert.That(intArray[0], Is.EqualTo(100));
+            }
+
+            // string型のテスト
+            var stringPool = ArrayPool<string>.Shared;
+            using (var stringHandle = stringPool.Rent(3, out string[] stringArray))
+            {
+                Assert.That(stringArray, Is.Not.Null);
+                Assert.That(stringArray.Length, Is.GreaterThanOrEqualTo(3));
+                stringArray[0] = "test";
+                Assert.That(stringArray[0], Is.EqualTo("test"));
+            }
+        }
+
+        [Test]
+        public void ArrayPoolRentZeroLength()
+        {
+            var pool = ArrayPool<int>.Shared;
+
+            using var handle = pool.Rent(0, out int[] array);
+
+            Assert.That(array, Is.Not.Null);
+            Assert.That(array.Length, Is.GreaterThanOrEqualTo(0));
+        }
+
+        [Test]
+        public void ArrayPoolRentLargeSize()
+        {
+            var pool = ArrayPool<byte>.Shared;
+            const int requestedSize = 1024;
+
+            using var handle = pool.Rent(requestedSize, out byte[] array);
+
+            Assert.That(array, Is.Not.Null);
+            Assert.That(array.Length, Is.GreaterThanOrEqualTo(requestedSize));
+
+            // 配列の使用可能性を確認
+            array[0] = 255;
+            array[requestedSize - 1] = 128;
+            Assert.That(array[0], Is.EqualTo(255));
+            Assert.That(array[requestedSize - 1], Is.EqualTo(128));
+        }
+
+        [Test]
+        public void ArrayPoolRentMultipleArrays()
+        {
+            var pool = ArrayPool<int>.Shared;
+
+            using var handle1 = pool.Rent(16, out int[] array1);
+            using var handle2 = pool.Rent(32, out int[] array2);
+            using var handle3 = pool.Rent(64, out int[] array3);
+
+            // 全て異なる配列インスタンスである
+            Assert.That(array1, Is.Not.SameAs(array2));
+            Assert.That(array2, Is.Not.SameAs(array3));
+            Assert.That(array1, Is.Not.SameAs(array3));
+
+            // サイズ要件を満たしている
+            Assert.That(array1.Length, Is.GreaterThanOrEqualTo(5));
+            Assert.That(array2.Length, Is.GreaterThanOrEqualTo(10));
+            Assert.That(array3.Length, Is.GreaterThanOrEqualTo(15));
+
+            // 各配列が独立して使用可能
+            array1[0] = 1;
+            array2[0] = 2;
+            array3[0] = 3;
+
+            Assert.That(array1[0], Is.EqualTo(1));
+            Assert.That(array2[0], Is.EqualTo(2));
+            Assert.That(array3[0], Is.EqualTo(3));
+        }
+
+        [Test]
+        public void ArrayPoolRentHandleDispose()
+        {
+            var pool = ArrayPool<int>.Shared;
+            int[] array;
+
+            // handleを明示的にDisposeする
+            var handle = pool.Rent(10, out array);
+            Assert.That(array, Is.Not.Null);
+
+            ((IDisposable)handle).Dispose();
+
+            // Disposeが例外を投げないことを確認
+            Assert.That(() => ((IDisposable)handle).Dispose(), Throws.Nothing);
+        }
+
+        [Test]
+        public void ArrayPoolRentCustomPool()
+        {
+            // カスタムプールを作成
+            var customPool = ArrayPool<double>.Create();
+
+            using var handle = customPool.Rent(20, out double[] array);
+
+            Assert.That(array, Is.Not.Null);
+            Assert.That(array.Length, Is.GreaterThanOrEqualTo(20));
+
+            // 配列を使用
+            for (int i = 0; i < 20; i++)
+            {
+                array[i] = i * 0.5;
+            }
+
+            for (int i = 0; i < 20; i++)
+            {
+                Assert.That(array[i], Is.EqualTo(i * 0.5));
+            }
         }
     }
 }
