@@ -2,6 +2,7 @@
 
 using System.Globalization;
 using System.Threading;
+using AndanteTribe.Utils.BackPort.Internal;
 using UnityEngine;
 
 [assembly: UnityEngine.Scripting.AlwaysLinkAssembly]
@@ -13,7 +14,13 @@ namespace AndanteTribe.Utils.Unity
 #endif
     internal static class Initializer
     {
-        static Initializer() => SetDefaultCulture();
+        static Initializer()
+        {
+#if !NET6_0_OR_GREATER
+            CustomSpanFormatter.OtherFormatterHelper = new UnityCustomSpanFormatter();
+#endif
+            SetDefaultCulture();
+        }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         private static void SetDefaultCulture()

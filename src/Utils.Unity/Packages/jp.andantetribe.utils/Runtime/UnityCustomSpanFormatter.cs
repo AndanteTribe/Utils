@@ -7,13 +7,8 @@ using System.Runtime.CompilerServices;
 using AndanteTribe.Utils.BackPort.Internal;
 using UnityEngine;
 
-[assembly: UnityEngine.Scripting.AlwaysLinkAssembly]
-
 namespace AndanteTribe.Utils.Unity
 {
-#if UNITY_EDITOR
-    [UnityEditor.InitializeOnLoad]
-#endif
     internal sealed class UnityCustomSpanFormatter : IServiceProvider
     {
         private readonly RuntimeTypeHandle _boundsTypeHandle = typeof(Bounds).TypeHandle;
@@ -33,12 +28,8 @@ namespace AndanteTribe.Utils.Unity
         private readonly RuntimeTypeHandle _vector3IntTypeHandle = typeof(Vector3Int).TypeHandle;
         private readonly RuntimeTypeHandle _vector4TypeHandle = typeof(Vector4).TypeHandle;
 
-        static UnityCustomSpanFormatter() => SetOtherFormatterHelper();
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
-        private static void SetOtherFormatterHelper() => CustomSpanFormatter.OtherFormatterHelper = new UnityCustomSpanFormatter();
-
-        public object? GetService(Type serviceType)
+        /// <inheritdoc />
+        object? IServiceProvider.GetService(Type serviceType)
         {
             var t = serviceType.TypeHandle;
 
