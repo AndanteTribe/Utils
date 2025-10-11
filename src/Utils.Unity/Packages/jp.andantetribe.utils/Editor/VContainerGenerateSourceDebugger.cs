@@ -39,7 +39,9 @@ namespace AndanteTribe.Utils.Unity.Editor
 
             var next = false;
 
-            foreach (var type in TypeCache.GetTypesDerivedFrom<IInjector>().OrderBy(static t => t.FullName, StringComparer.Ordinal))
+            foreach (var type in TypeCache.GetTypesDerivedFrom<IInjector>()
+                         .Where(static t => t.FullName != "VContainer.Internal.ReflectionInjector")
+                         .OrderBy(static t => t.FullName, StringComparer.Ordinal))
             {
                 var label = new Label(type.FullName)
                 {
