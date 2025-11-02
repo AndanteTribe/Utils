@@ -43,6 +43,15 @@ public struct ValueList<T>(int capacity) : IReadOnlyCollection<T>
     /// <summary>
     /// 配列プールに返却する.
     /// </summary>
+    /// <returns></returns>
+    public readonly void Clear()
+    {
+        ArrayPool<T>.Shared.Return(_items);
+    }
+
+    /// <summary>
+    /// 配列プールに返却する.
+    /// </summary>
     /// <param name="segment"></param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Clear(in ArraySegment<T> segment)

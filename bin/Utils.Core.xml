@@ -475,6 +475,19 @@
              <exception cref="T:System.ArgumentNullException"><see cref="!:equals"/>がnullです.</exception>
              <exception cref="T:System.NotSupportedException"><see cref="!:getHashCode"/>がnullです.</exception>
         </member>
+        <member name="T:AndanteTribe.Utils.FormatHelper">
+            <summary>
+            文字列フォーマットのヘルパー.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.FormatHelper.AnalyzeFormat(System.ReadOnlySpan{System.Char}@)">
+            <summary>
+            フォーマット文字列を解析します.
+            </summary>
+            <param name="format"></param>
+            <returns></returns>
+            <exception cref="T:System.FormatException"></exception>
+        </member>
         <member name="T:AndanteTribe.Utils.IInitializable">
             <summary>
             初期化処理を提供するインターフェース.
@@ -679,6 +692,12 @@
             要素を追加します.
             </summary>
             <param name="item"></param>
+        </member>
+        <member name="M:AndanteTribe.Utils.ValueList`1.Clear">
+            <summary>
+            配列プールに返却する.
+            </summary>
+            <returns></returns>
         </member>
         <member name="M:AndanteTribe.Utils.ValueList`1.Clear(System.ArraySegment{`0}@)">
             <summary>
