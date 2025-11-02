@@ -857,6 +857,16 @@ namespace AndanteTribe.Utils.Tests
         }
 
         [Test]
+        public void ValueListToArrayAndClear()
+        {
+            var list = new ValueList<int> { 1, 2, 3, 4, 5 };
+            var array = list.ToArrayAndClear();
+
+            // Verify returned array
+            Assert.That(array, Is.EqualTo(new[] { 1, 2, 3, 4, 5 }));
+        }
+
+        [Test]
         public void ValueListMultipleCapacityExpansions()
         {
             var list = new ValueList<int>(1); // Very small capacity
@@ -1402,6 +1412,101 @@ namespace AndanteTribe.Utils.Tests
             {
                 Assert.That(array[i], Is.EqualTo(i * 0.5));
             }
+        }
+
+        [Test]
+        public void FormatHelper_SimpleLiteral()
+        {
+            var (literals, embeds) = FormatHelper.AnalyzeFormat("hello".AsSpan());
+            Assert.That(literals, Is.EqualTo(new[] { "hello" }));
+            Assert.That(embeds, Is.Empty);
+        }
+
+        [Test]
+        public void FormatHelper_SinglePlaceholderWithoutFormat()
+        {
+            var (literals, embeds) = FormatHelper.AnalyzeFormat("a{0}b".AsSpan());
+            Assert.That(literals, Is.EqualTo(new[] { "a", "b" }));
+            Assert.That(embeds, Has.Length.EqualTo(1));
+            Assert.That(embeds[0].index, Is.EqualTo(0));
+            Assert.That(embeds[0].format, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
+        public void FormatHelper_MultiplePlaceholdersWithFormats()
+        {
+            var (literals, embeds) = FormatHelper.AnalyzeFormat("Start{0}Middle{1:000}End".AsSpan());
+            Assert.That(literals, Is.EqualTo(new[] { "Start", "Middle", "End" }));
+            Assert.That(embeds, Has.Length.EqualTo(2));
+            Assert.That(embeds[0].index, Is.EqualTo(0));
+            Assert.That(embeds[0].format, Is.EqualTo(string.Empty));
+            Assert.That(embeds[1].index, Is.EqualTo(1));
+            Assert.That(embeds[1].format, Is.EqualTo("000"));
+        }
+
+        [Test]
+        public void FormatHelper_ConsecutivePlaceholders()
+        {
+            // 実装は連続するプレースホルダの間に空のリテラルを挿入しない挙動になるためそれに合わせて検証
+            var (literals, embeds) = FormatHelper.AnalyzeFormat("{0}{1}".AsSpan());
+            Assert.That(embeds, Has.Length.EqualTo(2));
+            Assert.That(literals, Has.Length.EqualTo(1));
+            Assert.That(literals[0], Is.EqualTo(string.Empty)); // 末尾の空リテラルが追加される実装
+            Assert.That(embeds[0].index, Is.EqualTo(0));
+            Assert.That(embeds[1].index, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void FormatHelper_FormatContainingColon()
+        {
+            var (literals, embeds) = FormatHelper.AnalyzeFormat("x{2:0:0}y".AsSpan());
+            Assert.That(embeds, Has.Length.EqualTo(1));
+            Assert.That(embeds[0].index, Is.EqualTo(2));
+            Assert.That(embeds[0].format, Is.EqualTo("0:0")); // 最初の ':' 以降をフォーマット文字列として取得
+            Assert.That(literals, Is.EqualTo(new[] { "x", "y" }));
+        }
+
+        [Test]
+        public void FormatHelper_UnclosedBrace_ThrowsFormatException()
+        {
+            Assert.That(() => FormatHelper.AnalyzeFormat("{0".AsSpan()),
+                Throws.TypeOf<FormatException>().With.Message.Contains("閉じ中括弧"));
+        }
+
+        [Test]
+        public void FormatHelper_UnclosedDoubleBrace_ThrowsFormatException()
+        {
+            Assert.That(() => FormatHelper.AnalyzeFormat("{{".AsSpan()),
+                Throws.TypeOf<FormatException>().With.Message.Contains("閉じ中括弧"));
+        }
+
+        [Test]
+        public void FormatHelper_StandaloneClosingBrace_ThrowsFormatException()
+        {
+            Assert.That(() => FormatHelper.AnalyzeFormat("a}b".AsSpan()),
+                Throws.TypeOf<FormatException>().With.Message.Contains("開き中括弧"));
+        }
+
+        [Test]
+        public void FormatHelper_InnerBraceInFormat_ThrowsDueToEarlyClosing()
+        {
+            Assert.That(() => FormatHelper.AnalyzeFormat("x{0:{1}}y".AsSpan()),
+                Throws.TypeOf<FormatException>().With.Message.Contains("開き中括弧"));
+        }
+
+        [Test]
+        public void FormatHelper_LeadingZerosIndex_Parsed()
+        {
+            var (literals, embeds) = FormatHelper.AnalyzeFormat("{001:00}".AsSpan());
+            Assert.That(embeds, Has.Length.EqualTo(1));
+            Assert.That(embeds[0].index, Is.EqualTo(1));
+            Assert.That(embeds[0].format, Is.EqualTo("00"));
+        }
+
+        [Test]
+        public void FormatHelper_EmptyIndex_ThrowsFormatException()
+        {
+            Assert.That(() => FormatHelper.AnalyzeFormat("{}".AsSpan()), Throws.TypeOf<FormatException>());
         }
     }
 }
