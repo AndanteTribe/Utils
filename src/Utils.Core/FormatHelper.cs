@@ -59,7 +59,7 @@ public static class FormatHelper
                 {
                     if (!IsAsciiDigit(c))
                     {
-                        throw new FormatException($"インデックス '{i.ToString()}' が整数ではありません。");
+                        throw new FormatException($"インデックス '{i}' が整数ではありません。");
                     }
                 }
 
