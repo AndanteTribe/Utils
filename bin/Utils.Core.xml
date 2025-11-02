@@ -693,9 +693,9 @@
             </summary>
             <param name="item"></param>
         </member>
-        <member name="M:AndanteTribe.Utils.ValueList`1.ToArrayAndClear">
+        <member name="M:AndanteTribe.Utils.ValueList`1.Clear">
             <summary>
-            配列として取得し、配列プールに返却する.
+            配列プールに返却する.
             </summary>
             <returns></returns>
         </member>

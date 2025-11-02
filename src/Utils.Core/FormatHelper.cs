@@ -67,12 +67,12 @@ public static class FormatHelper
                 pos += endBrace + 1;
             }
 
-            return (literals.ToArrayAndClear(), indices.ToArrayAndClear());
+            return (literals.AsSpan().ToArray(), indices.AsSpan().ToArray());
         }
         finally
         {
-            literals.ToArrayAndClear();
-            indices.ToArrayAndClear();
+            literals.Clear();
+            indices.Clear();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

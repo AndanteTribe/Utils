@@ -857,16 +857,6 @@ namespace AndanteTribe.Utils.Tests
         }
 
         [Test]
-        public void ValueListToArrayAndClear()
-        {
-            var list = new ValueList<int> { 1, 2, 3, 4, 5 };
-            var array = list.ToArrayAndClear();
-
-            // Verify returned array
-            Assert.That(array, Is.EqualTo(new[] { 1, 2, 3, 4, 5 }));
-        }
-
-        [Test]
         public void ValueListMultipleCapacityExpansions()
         {
             var list = new ValueList<int>(1); // Very small capacity

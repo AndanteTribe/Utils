@@ -41,14 +41,12 @@ public struct ValueList<T>(int capacity) : IReadOnlyCollection<T>
     }
 
     /// <summary>
-    /// 配列として取得し、配列プールに返却する.
+    /// 配列プールに返却する.
     /// </summary>
     /// <returns></returns>
-    public readonly T[] ToArrayAndClear()
+    public readonly void Clear()
     {
-        var result = AsSpan().ToArray();
         ArrayPool<T>.Shared.Return(_items);
-        return result;
     }
 
     /// <summary>
