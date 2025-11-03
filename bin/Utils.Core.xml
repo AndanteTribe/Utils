@@ -480,6 +480,14 @@
             文字列フォーマットのヘルパー.
             </summary>
         </member>
+        <member name="M:AndanteTribe.Utils.FormatHelper.AnalyzeFormat(System.String@)">
+            <summary>
+            フォーマット文字列を解析します.
+            </summary>
+            <param name="format"></param>
+            <returns></returns>
+            <exception cref="T:System.FormatException"></exception>
+        </member>
         <member name="M:AndanteTribe.Utils.FormatHelper.AnalyzeFormat(System.ReadOnlySpan{System.Char}@)">
             <summary>
             フォーマット文字列を解析します.

@@ -50,10 +50,7 @@ public static class FormatHelper
                     throw new FormatException("開き中括弧がありません。");
                 }
 
-                if (pos != 0 || countUntilNextBrace > 0)
-                {
-                    literals.Add(remainder.Slice(0, countUntilNextBrace).ToString());
-                }
+                literals.Add(remainder.Slice(0, countUntilNextBrace).ToString());
 
                 pos += countUntilNextBrace;
                 pos++;
