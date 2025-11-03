@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace AndanteTribe.Utils;
 
@@ -13,6 +14,19 @@ public static class FormatHelper
     /// <param name="format"></param>
     /// <returns></returns>
     /// <exception cref="FormatException"></exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static (string[] literal, (int index, string format)[] embed) AnalyzeFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] in string format)
+    {
+        return AnalyzeFormat(format.AsSpan());
+    }
+
+    /// <summary>
+    /// フォーマット文字列を解析します.
+    /// </summary>
+    /// <param name="format"></param>
+    /// <returns></returns>
+    /// <exception cref="FormatException"></exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static (string[] literal, (int index, string format)[] embed) AnalyzeFormat(in ReadOnlySpan<char> format)
     {
         var literals = new ValueList<string>();
@@ -36,10 +50,7 @@ public static class FormatHelper
                     throw new FormatException("開き中括弧がありません。");
                 }
 
-                if (pos != 0 || countUntilNextBrace > 0)
-                {
-                    literals.Add(remainder.Slice(0, countUntilNextBrace).ToString());
-                }
+                literals.Add(remainder.Slice(0, countUntilNextBrace).ToString());
 
                 pos += countUntilNextBrace;
                 pos++;

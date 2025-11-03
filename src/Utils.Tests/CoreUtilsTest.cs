@@ -1437,11 +1437,11 @@ namespace AndanteTribe.Utils.Tests
         [Test]
         public void FormatHelper_ConsecutivePlaceholders()
         {
-            // 実装は連続するプレースホルダの間に空のリテラルを挿入しない挙動になるためそれに合わせて検証
             var (literals, embeds) = FormatHelper.AnalyzeFormat("{0}{1}".AsSpan());
             Assert.That(embeds, Has.Length.EqualTo(2));
-            Assert.That(literals, Has.Length.EqualTo(1));
-            Assert.That(literals[0], Is.EqualTo(string.Empty)); // 末尾の空リテラルが追加される実装
+            Assert.That(literals, Has.Length.EqualTo(2));
+            Assert.That(literals[0], Is.EqualTo(""));
+            Assert.That(literals[1], Is.EqualTo(""));
             Assert.That(embeds[0].index, Is.EqualTo(0));
             Assert.That(embeds[1].index, Is.EqualTo(1));
         }
