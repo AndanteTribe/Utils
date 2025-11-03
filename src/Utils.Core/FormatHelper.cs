@@ -78,7 +78,7 @@ public static class FormatHelper
                 pos += endBrace + 1;
             }
 
-            return (literals.AsSpan().ToArray(), indices.AsSpan().ToArray());
+            return (literals.Count == 0 ? [] : literals.AsSpan().ToArray(), indices.Count == 0 ? [] : indices.AsSpan().ToArray());
         }
         finally
         {
