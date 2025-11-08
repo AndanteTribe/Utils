@@ -74,8 +74,9 @@ namespace AndanteTribe.Utils.Unity.Tasks
             cancellationToken.ThrowIfCancellationRequested();
             if (_pool.Count > 0)
             {
-                var instance = _pool[0];
-                _pool.RemoveAt(0);
+                var last = _pool.Count - 1;
+                var instance = _pool[last];
+                _pool.RemoveAt(last);
                 instance.gameObject.SetActive(true);
                 return instance;
             }
