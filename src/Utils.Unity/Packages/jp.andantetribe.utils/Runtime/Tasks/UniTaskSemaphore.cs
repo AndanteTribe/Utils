@@ -48,7 +48,7 @@ namespace AndanteTribe.Utils.Unity.Tasks
 
             if (maxCount == 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(maxCount), maxCount, "The initialCount argument must be non-negative and less than or equal to the maximumCount.");
+                throw new ArgumentOutOfRangeException(nameof(maxCount), maxCount, "The maximumCount argument must be a positive number. If a maximum is not required, use the constructor without a maxCount parameter.");
             }
 
             CurrentCount = initialCount;
