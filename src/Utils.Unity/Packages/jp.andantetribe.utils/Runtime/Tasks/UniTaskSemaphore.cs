@@ -55,11 +55,34 @@ namespace AndanteTribe.Utils.Unity.Tasks
             _maxCount = maxCount;
         }
 
+        /// <summary>
+        /// 非同期でセマフォを待機します.
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public UniTask WaitAsync(in CancellationToken cancellationToken = default)
         {
             return WaitAsync(Timeout.Infinite, cancellationToken).AsUniTask();
         }
 
+        /// <summary>
+        /// 非同期でセマフォを待機し、解放用ハンドルを取得します.
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async UniTask<Handle> WaitScopeAsync(CancellationToken cancellationToken = default)
+        {
+            await WaitAsync(Timeout.Infinite, cancellationToken);
+            return new Handle(this);
+        }
+
+        /// <summary>
+        /// 非同期でセマフォを待機します.
+        /// </summary>
+        /// <param name="timeout"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>正常にセマフォを取得できた場合はtrue、タイムアウトした場合はfalse.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public UniTask<bool> WaitAsync(in TimeSpan timeout, in CancellationToken cancellationToken = default)
         {
             var totalMilliseconds = (long)timeout.TotalMilliseconds;
@@ -71,6 +94,14 @@ namespace AndanteTribe.Utils.Unity.Tasks
             return WaitAsync((int)timeout.TotalMilliseconds, cancellationToken);
         }
 
+        /// <summary>
+        /// 非同期でセマフォを待機します.
+        /// </summary>
+        /// <param name="millisecondsTimeout"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>正常にセマフォを取得できた場合はtrue、タイムアウトした場合はfalse.</returns>
+        /// <exception cref="ObjectDisposedException"></exception>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public UniTask<bool> WaitAsync(in int millisecondsTimeout, in CancellationToken cancellationToken = default)
         {
             if (_isDisposed)
@@ -102,8 +133,8 @@ namespace AndanteTribe.Utils.Unity.Tasks
             Assert.IsTrue(CurrentCount == 0, "CurrentCount should never be negative");
             var asyncWaiter = CreateAndAddAsyncWaiter();
             return millisecondsTimeout == Timeout.Infinite && !cancellationToken.CanBeCanceled
-                ? asyncWaiter.Task
-                : WaitUntilCountOrTimeoutAsync(asyncWaiter, TimeSpan.FromMilliseconds(millisecondsTimeout), cancellationToken);
+                ? asyncWaiter.WaitAsync(Timeout.Infinite)
+                : WaitUntilCountOrTimeoutAsync(asyncWaiter, millisecondsTimeout, cancellationToken);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -158,7 +189,8 @@ namespace AndanteTribe.Utils.Unity.Tasks
             return wasInList;
         }
 
-        private async UniTask<bool> WaitUntilCountOrTimeoutAsync(UniTaskNode<bool> asyncWaiter, TimeSpan millisecondsTimeout, CancellationToken cancellationToken)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private async UniTask<bool> WaitUntilCountOrTimeoutAsync(UniTaskNode<bool> asyncWaiter, int millisecondsTimeout, CancellationToken cancellationToken)
         {
             Assert.IsFalse(asyncWaiter == null, "Waiter should have been constructed");
 
@@ -169,7 +201,7 @@ namespace AndanteTribe.Utils.Unity.Tasks
                 await asyncWaiter!.WaitAsync(millisecondsTimeout);
                 return true;
             }
-            catch
+            catch (Exception)
             {
                 if (RemoveAsyncWaiter(asyncWaiter!))
                 {
@@ -177,10 +209,18 @@ namespace AndanteTribe.Utils.Unity.Tasks
                     return false;
                 }
 
-                return await asyncWaiter!.Task;
+                throw;
             }
         }
 
+        /// <summary>
+        /// セマフォを解放します.
+        /// </summary>
+        /// <param name="releaseCount">解放するセマフォの数.</param>
+        /// <returns></returns>
+        /// <exception cref="ObjectDisposedException"></exception>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="SemaphoreFullException"></exception>
         public uint Release(uint releaseCount = 1)
         {
             if (_isDisposed)
@@ -226,6 +266,10 @@ namespace AndanteTribe.Utils.Unity.Tasks
             Dispose(true);
         }
 
+        /// <summary>
+        /// Dispose pattern implementation.
+        /// </summary>
+        /// <param name="disposing"></param>
         public void Dispose(bool disposing)
         {
             if (disposing)
@@ -234,6 +278,18 @@ namespace AndanteTribe.Utils.Unity.Tasks
                 _asyncHead = null;
                 _asyncTail = null;
             }
+        }
+
+        /// <summary>
+        /// セマフォの解放用ハンドル.
+        /// </summary>
+        public readonly struct Handle : IDisposable
+        {
+            private readonly UniTaskSemaphore _semaphore;
+
+            internal Handle(UniTaskSemaphore semaphore) => _semaphore = semaphore;
+
+            void IDisposable.Dispose() => _semaphore.Release();
         }
     }
 }

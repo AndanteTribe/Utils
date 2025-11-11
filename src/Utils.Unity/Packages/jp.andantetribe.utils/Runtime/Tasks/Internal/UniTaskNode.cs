@@ -20,7 +20,10 @@ namespace AndanteTribe.Utils.Unity.Tasks.Internal
         ref UniTaskNode<T> ITaskPoolNode<UniTaskNode<T>>.NextNode => ref _poolNextNode!;
 
         private readonly TimeoutController _timeoutController = new TimeoutController();
-        private CancellationTokenRegistration _registration;
+        private CancellationToken _timeoutToken;
+        private CancellationTokenRegistration _timeoutRegistration;
+        private CancellationToken _externalCancellationToken;
+        private CancellationTokenRegistration _externalCancellationRegistration;
 
         private UniTaskCompletionSourceCore<T> _core;
         private short _version;
@@ -49,23 +52,29 @@ namespace AndanteTribe.Utils.Unity.Tasks.Internal
             return result;
         }
 
-        public UniTask<T> Task
-        {
-            [DebuggerHidden]
-            get
-            {
-                return new UniTask<T>(this, _core.Version);
-            }
-        }
-
         [DebuggerHidden]
-        public UniTask<T> WaitAsync(in TimeSpan timeout)
+        public UniTask<T> WaitAsync(in int millisecondsTimeout, in CancellationToken cancellationToken = default)
         {
-            _registration = _timeoutController.Timeout(timeout).UnsafeRegister(static state =>
+            if (cancellationToken.CanBeCanceled)
             {
-                var self = (UniTaskNode<T>)state!;
-                self.TrySetCanceled();
-            }, this);
+                _externalCancellationToken = cancellationToken;
+                _externalCancellationRegistration = cancellationToken.UnsafeRegister(static state =>
+                {
+                    var self = (UniTaskNode<T>)state!;
+                    self.TrySetCanceled(self._externalCancellationToken);
+                }, this);
+            }
+
+            if (millisecondsTimeout != Timeout.Infinite)
+            {
+                _timeoutToken = _timeoutController.Timeout(millisecondsTimeout);
+                _timeoutRegistration = _timeoutToken.UnsafeRegister(static state =>
+                {
+                    var self = (UniTaskNode<T>)state!;
+                    self.TrySetCanceled(self._timeoutToken);
+                }, this);
+            }
+
             return new UniTask<T>(this, _core.Version);
         }
 
@@ -129,11 +138,14 @@ namespace AndanteTribe.Utils.Unity.Tasks.Internal
         {
             TaskTracker.RemoveTracking(this);
             _core.Reset();
-            _registration.Dispose();
+            _timeoutToken = CancellationToken.None;
+            _timeoutRegistration.Dispose();
             if (!_timeoutController.IsTimeout())
             {
                 _timeoutController.Reset();
             }
+            _externalCancellationToken = CancellationToken.None;
+            _externalCancellationRegistration.Dispose();
             Prev = null;
             Next = null;
             return s_pool.TryPush(this);
