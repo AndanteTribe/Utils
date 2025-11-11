@@ -65,7 +65,8 @@ namespace AndanteTribe.Utils.Unity.Tasks
         public async ValueTask InitializeAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var module = EventSystem.current.currentInputModule ?? EventSystem.current.GetComponent<BaseInputModule>();
+            var module = EventSystem.current.currentInputModule == null
+                ? EventSystem.current.GetComponent<BaseInputModule>() : EventSystem.current.currentInputModule;
 
             cancellationToken.UnsafeRegister(static state =>
             {
@@ -77,7 +78,7 @@ namespace AndanteTribe.Utils.Unity.Tasks
                 if (self._image != null && self._image.material != null)
                 {
                     UnityEngine.Object.Destroy(self._image.material);
-                    self._image.material = null;
+                    self._image.material = null!;
                 }
             }, this);
 

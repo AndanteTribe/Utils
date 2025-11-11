@@ -18,7 +18,13 @@ namespace AndanteTribe.Utils.Unity.Editor
         protected abstract string InspectorTypeName { get; }
 
         /// <inheritdoc/>
-        public override void OnInspectorGUI() => _editor?.OnInspectorGUI();
+        public override void OnInspectorGUI()
+        {
+            if (_editor != null)
+            {
+                _editor.OnInspectorGUI();
+            }
+        }
 
         private void OnEnable()
             => CreateCachedEditor(target, typeof(EditorApplication).Assembly.GetType(InspectorTypeName), ref _editor);

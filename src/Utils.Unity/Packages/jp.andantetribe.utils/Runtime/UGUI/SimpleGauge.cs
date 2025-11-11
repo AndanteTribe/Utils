@@ -10,6 +10,7 @@ namespace AndanteTribe.Utils.Unity.UGUI
     /// <summary>
     /// <see cref="RectMask2D"/>を継承利用したシンプルで綺麗なゲージ表示.
     /// </summary>
+    [RequireComponent(typeof(MaskableGraphic))]
     public class SimpleGauge : RectMask2D
     {
         [SerializeField]
