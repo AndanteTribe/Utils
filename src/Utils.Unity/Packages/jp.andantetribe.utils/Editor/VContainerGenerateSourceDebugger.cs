@@ -20,7 +20,7 @@ namespace AndanteTribe.Utils.Unity.Editor
             window.Show();
         }
 
-        private void CreateGUI()
+        protected void CreateGUI()
         {
             // ScrollView を作る
             var scrollView = new ScrollView
