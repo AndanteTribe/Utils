@@ -84,13 +84,28 @@ public readonly struct Obscured<T> : IEquatable<Obscured<T>>, IComparable<Obscur
     public static implicit operator Obscured<T>(T value) => new(value);
 
     /// <inheritdoc />
-    bool IEquatable<Obscured<T>>.Equals(Obscured<T> other) =>
+    public bool Equals(Obscured<T> other) =>
         EqualityComparer<T>.Default.Equals(Xor(_hiddenValue, _key), Xor(other._hiddenValue, other._key));
 
     /// <inheritdoc />
-    int IComparable<Obscured<T>>.CompareTo(Obscured<T> other) =>
+    public int CompareTo(Obscured<T> other) =>
         Comparer<T>.Default.Compare(Xor(_hiddenValue, _key), Xor(other._hiddenValue, other._key));
 
     /// <inheritdoc />
     public override int GetHashCode() => EqualityComparer<T>.Default.GetHashCode(Xor(_hiddenValue, _key));
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj) => obj is Obscured<T> other && Equals(other);
+
+    /// <summary>
+    /// Returns a value indicating whether two <see cref="Obscured{T}"/> values are equal.
+    /// </summary>
+    public static bool operator ==(Obscured<T> left, Obscured<T> right) =>
+        EqualityComparer<T>.Default.Equals(Xor(left._hiddenValue, left._key), Xor(right._hiddenValue, right._key));
+
+    /// <summary>
+    /// Returns a value indicating whether two <see cref="Obscured{T}"/> values are not equal.
+    /// </summary>
+    public static bool operator !=(Obscured<T> left, Obscured<T> right) =>
+        !EqualityComparer<T>.Default.Equals(Xor(left._hiddenValue, left._key), Xor(right._hiddenValue, right._key));
 }
