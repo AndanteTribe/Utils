@@ -7,7 +7,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <OutputType>Library</OutputType>
         <RootNamespace>AndanteTribe.Utils</RootNamespace>
-        <Version>0.2.1</Version>
+        <Version>0.2.2</Version>
         <AssemblyName>Utils.Core</AssemblyName>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
