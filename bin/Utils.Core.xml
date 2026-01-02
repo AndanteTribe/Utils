@@ -632,6 +632,83 @@
         <member name="M:AndanteTribe.Utils.MemoryExtensions.Enumerator`1.System#IDisposable#Dispose">
             <inheritdoc/>
         </member>
+        <member name="T:AndanteTribe.Utils.StateTuple">
+            <summary>
+            スレッドセーフなプールを持つ参照タプル. <see cref="T:System.ValueTuple"/>でボクシングするような場面での使用を想定.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.StateTuple.Create``1(``0)">
+            <summary>
+            参照タプルを作成します.
+            </summary>
+            <param name="item1"></param>
+            <typeparam name="T1"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.StateTuple.Create``2(``0,``1)">
+            <summary>
+            参照タプルを作成します.
+            </summary>
+            <param name="item1"></param>
+            <param name="item2"></param>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.StateTuple.Create``3(``0,``1,``2)">
+            <summary>
+            参照タプルを作成します.
+            </summary>
+            <param name="item1"></param>
+            <param name="item2"></param>
+            <param name="item3"></param>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+            <typeparam name="T3"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="T:AndanteTribe.Utils.StateTuple`1">
+            <summary>
+            スレッドセーフなプールを持つ参照タプル. <see cref="T:System.ValueTuple"/>でボクシングするような場面での使用を想定.
+            </summary>
+            <typeparam name="T1"></typeparam>
+        </member>
+        <member name="M:AndanteTribe.Utils.StateTuple`1.Deconstruct(`0@)">
+            <summary>
+            Deconstructs the tuple into its components.
+            </summary>
+            <param name="item1"></param>
+        </member>
+        <member name="T:AndanteTribe.Utils.StateTuple`2">
+            <summary>
+            スレッドセーフなプールを持つ参照タプル. <see cref="T:System.ValueTuple"/>でボクシングするような場面での使用を想定.
+            </summary>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+        </member>
+        <member name="M:AndanteTribe.Utils.StateTuple`2.Deconstruct(`0@,`1@)">
+            <summary>
+            Deconstructs the tuple into its components.
+            </summary>
+            <param name="item1"></param>
+            <param name="item2"></param>
+        </member>
+        <member name="T:AndanteTribe.Utils.StateTuple`3">
+            <summary>
+            スレッドセーフなプールを持つ参照タプル. <see cref="T:System.ValueTuple"/>でボクシングするような場面での使用を想定.
+            </summary>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+            <typeparam name="T3"></typeparam>
+        </member>
+        <member name="M:AndanteTribe.Utils.StateTuple`3.Deconstruct(`0@,`1@,`2@)">
+            <summary>
+            Deconstructs the tuple into its components.
+            </summary>
+            <param name="item1"></param>
+            <param name="item2"></param>
+            <param name="item3"></param>
+        </member>
         <member name="T:AndanteTribe.Utils.ValueList`1">
             <summary>
             構造体簡易リスト.
