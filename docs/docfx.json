@@ -10,6 +10,18 @@
           ]
         },
         {
+          "src": "../src/Utils.GameServices",
+          "files": [
+            "*.cs"
+          ]
+        },
+        {
+          "src": "../src/Utils.Csv",
+          "files": [
+            "*.cs"
+          ]
+        },
+        {
           "src": "../src/Utils.Unity/Packages/jp.andantetribe.utils",
           "files": [
             "**/*.cs"
