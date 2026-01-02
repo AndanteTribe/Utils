@@ -1,16 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace AndanteTribe.Utils;
-
-internal static class RandomCache
-{
-#if NET6_0_OR_GREATER
-    public static Random Shared { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => Random.Shared; }
-#else
-    public static Random Shared { get; } = new();
-#endif
-}
+namespace AndanteTribe.Utils.GameServices;
 
 /// <summary>
 /// メモリ改ざん対策構造体.
@@ -53,7 +44,7 @@ public readonly struct Obscured<T> : IEquatable<Obscured<T>>, IComparable<Obscur
     internal static T GenerateKey()
     {
         var buffer = (Span<byte>)stackalloc byte[Unsafe.SizeOf<T>()];
-        RandomCache.Shared.NextBytes(buffer);
+        Random.Shared.NextBytes(buffer);
         return MemoryMarshal.Read<T>(buffer);
     }
 

@@ -11,6 +11,7 @@
     "precompiledReferences": [
         "Utils.Core.dll",
         "Utils.BackPort.dll",
+        "Utils.GameServices.dll",
         "nunit.framework.dll"
     ],
     "autoReferenced": false,

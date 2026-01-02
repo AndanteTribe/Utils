@@ -7,7 +7,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.Pool;
+using UnityEngine.Assertions;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using Object = UnityEngine.Object;
 
@@ -18,13 +18,12 @@ namespace AndanteTribe.Utils.Unity.Addressable
     /// </summary>
     public class AssetsRegistry : IDisposable
     {
-        private readonly List<AsyncOperationHandle> _handles = ListPool<AsyncOperationHandle>.Get();
-        private readonly CancellationTokenSource _cancellationDisposable;
+        private static readonly IEqualityComparer<AsyncOperationHandle> s_equalityComparer = EqualityComparer.Create<AsyncOperationHandle>(
+            static (x, y) => x.Equals(y), static x => x.GetHashCode());
+
+        private readonly HashSet<AsyncOperationHandle> _handles = new(s_equalityComparer);
 
         public int Count => _handles.Count;
-
-        public AssetsRegistry(CancellationTokenSource? cancellationDisposable = null) =>
-            _cancellationDisposable = cancellationDisposable ?? new CancellationTokenSource();
 
         /// <summary>
         /// アセットのロード.
@@ -35,18 +34,10 @@ namespace AndanteTribe.Utils.Unity.Addressable
         /// <returns></returns>
         public async UniTask<TObject> LoadAsync<TObject>(string address, CancellationToken cancellationToken) where TObject : Object
         {
-            _cancellationDisposable.ThrowIfDisposed(this);
             cancellationToken.ThrowIfCancellationRequested();
-            using var cts = _cancellationDisposable.CreateLinkedTokenSource(_cancellationDisposable.Token);
-            return await LoadAsyncInternal<TObject>(address, cts.Token);
-        }
-
-        internal async UniTask<TObject> LoadAsyncInternal<TObject>(string address, CancellationToken cancellationToken) where TObject : Object
-        {
             var handle = Addressables.LoadAssetAsync<TObject>(address);
-            var result = await handle.ToUniTask(cancellationToken: cancellationToken, autoReleaseWhenCanceled: true);
             _handles.Add(handle);
-            return result;
+            return await handle.ToUniTask(cancellationToken: cancellationToken, autoReleaseWhenCanceled: true);
         }
 
         /// <summary>
@@ -58,13 +49,11 @@ namespace AndanteTribe.Utils.Unity.Addressable
         /// <returns></returns>
         public async UniTask<TObject> LoadAsync<TObject>(AssetReferenceT<TObject> reference, CancellationToken cancellationToken) where TObject : Object
         {
-            _cancellationDisposable.ThrowIfDisposed(this);
             cancellationToken.ThrowIfCancellationRequested();
-            using var cts = _cancellationDisposable.CreateLinkedTokenSource(_cancellationDisposable.Token);
+            Assert.IsTrue(reference.IsValid());
             var handle = Addressables.LoadAssetAsync<TObject>(reference);
-            var result = await handle.ToUniTask(cancellationToken: cts.Token, autoReleaseWhenCanceled: true);
             _handles.Add(handle);
-            return result;
+            return await handle.ToUniTask(cancellationToken: cancellationToken, autoReleaseWhenCanceled: true);
         }
 
         /// <summary>
@@ -81,24 +70,24 @@ namespace AndanteTribe.Utils.Unity.Addressable
         public async UniTask<TComponent> InstantiateAsync<TComponent>(
             string address, Transform parent, CancellationToken cancellationToken) where TComponent : Component
         {
-            _cancellationDisposable.ThrowIfDisposed(this);
             cancellationToken.ThrowIfCancellationRequested();
-            using var cts = _cancellationDisposable.CreateLinkedTokenSource(_cancellationDisposable.Token);
             var handle = Addressables.LoadAssetAsync<GameObject>(address);
-            var obj = await handle.ToUniTask(cancellationToken: cts.Token, autoReleaseWhenCanceled: true);
+            _handles.Add(handle);
+            var obj = await handle.ToUniTask(cancellationToken: cancellationToken, autoReleaseWhenCanceled: true);
             if (!obj.TryGetComponent<TComponent>(out var component))
             {
+                _handles.Remove(handle);
                 handle.Release();
                 throw new InvalidOperationException($"指定の型 {typeof(TComponent)} は {handle.DebugName} から取得できませんでした。");
             }
             try
             {
-                var result = await Object.InstantiateAsync(component, parent).WithCancellation(cts.Token);
-                _handles.Add(handle);
+                var result = await Object.InstantiateAsync(component, parent).WithCancellation(cancellationToken);
                 return result[0];
             }
-            catch (OperationCanceledException e) when(e.CancellationToken == cts.Token)
+            catch (OperationCanceledException e) when(e.CancellationToken == cancellationToken)
             {
+                _handles.Remove(handle);
                 handle.Release();
                 throw;
             }
@@ -116,24 +105,25 @@ namespace AndanteTribe.Utils.Unity.Addressable
         public async UniTask<TComponent> InstantiateAsync<TComponent>(
             AssetReferenceT<GameObject> reference, Transform parent, CancellationToken cancellationToken) where TComponent : Component
         {
-            _cancellationDisposable.ThrowIfDisposed(this);
             cancellationToken.ThrowIfCancellationRequested();
-            using var cts = _cancellationDisposable.CreateLinkedTokenSource(_cancellationDisposable.Token);
+            Assert.IsTrue(reference.IsValid());
             var handle = Addressables.LoadAssetAsync<GameObject>(reference);
-            var obj = await handle.ToUniTask(cancellationToken: cts.Token, autoReleaseWhenCanceled: true);
+            _handles.Add(handle);
+            var obj = await handle.ToUniTask(cancellationToken: cancellationToken, autoReleaseWhenCanceled: true);
             if (!obj.TryGetComponent<TComponent>(out var component))
             {
+                _handles.Remove(handle);
                 handle.Release();
                 throw new InvalidOperationException($"指定の型 {typeof(TComponent)} は {handle.DebugName} から取得できませんでした。");
             }
             try
             {
-                var result = await Object.InstantiateAsync(component, parent).WithCancellation(cts.Token);
-                _handles.Add(handle);
+                var result = await Object.InstantiateAsync(component, parent).WithCancellation(cancellationToken);
                 return result[0];
             }
-            catch (OperationCanceledException e) when(e.CancellationToken == cts.Token)
+            catch (OperationCanceledException e) when(e.CancellationToken == cancellationToken)
             {
+                _handles.Remove(handle);
                 handle.Release();
                 throw;
             }
@@ -144,8 +134,7 @@ namespace AndanteTribe.Utils.Unity.Addressable
         /// </summary>
         public void Clear()
         {
-            _cancellationDisposable.ThrowIfDisposed(this);
-            foreach (var handle in _handles.AsSpan())
+            foreach (var handle in _handles)
             {
                 if (handle.IsValid())
                 {
@@ -156,13 +145,7 @@ namespace AndanteTribe.Utils.Unity.Addressable
         }
 
         /// <inheritdoc/>
-        public void Dispose()
-        {
-            Clear();
-            ListPool<AsyncOperationHandle>.Release(_handles);
-            _cancellationDisposable.Cancel();
-            _cancellationDisposable.Dispose();
-        }
+        public void Dispose() => Clear();
     }
 }
 

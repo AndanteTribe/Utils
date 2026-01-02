@@ -5,7 +5,7 @@ using System;
 using TMPro;
 using UnityEngine;
 
-namespace AndanteTribe.Utils.Unity.UGUI
+namespace AndanteTribe.Utils.Unity.UI
 {
     public abstract class TextView
     {

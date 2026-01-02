@@ -1,18 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.1;net5.0;net6.0</TargetFrameworks>
+        <TargetFramework>netstandard2.1</TargetFramework>
         <LangVersion>14</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <OutputType>Library</OutputType>
-        <RootNamespace>AndanteTribe.Utils.BackPort</RootNamespace>
+        <RootNamespace>AndanteTribe.Utils.Csv</RootNamespace>
         <Version>0.2.2</Version>
-        <AssemblyName>Utils.BackPort</AssemblyName>
+        <AssemblyName>Utils.Csv</AssemblyName>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-
+        
         <!-- NuGet Packaging -->
-        <PackageId>AndanteTribe.Utils.BackPort</PackageId>
+        <PackageId>AndanteTribe.Utils.Csv</PackageId>
         <PackageVersion>$(Version)</PackageVersion>
         <Authors>AndanteTribe</Authors>
         <Copyright>© AndanteTribe</Copyright>
@@ -27,16 +27,4 @@
         <None Remove=".gitignore" />
     </ItemGroup>
 
-    <ItemGroup>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-            <_Parameter1>Utils.Tests</_Parameter1>
-        </AssemblyAttribute>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-            <_Parameter1>Utils.Unity</_Parameter1>
-        </AssemblyAttribute>
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
-      <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
-    </ItemGroup>
 </Project>

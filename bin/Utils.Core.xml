@@ -296,9 +296,7 @@
              </code>
              </example>
              <returns></returns>
-             <remarks>
-             指定する列挙体はint型が基になる型として指定されている必要があります.
-             </remarks>
+             <exception cref="T:System.NotSupportedException">対象の列挙体の基礎型がサポートされていない場合にスローされます.</exception>
         </member>
         <member name="M:AndanteTribe.Utils.EnumExtensions.ConstructFlags``1(``0)">
              <summary>
@@ -349,9 +347,65 @@
              </code>
              </example>
              <returns></returns>
-             <remarks>
-             指定する列挙体はint型が基になる型として指定されている必要があります.
-             </remarks>
+             <exception cref="T:System.NotSupportedException">対象の列挙体の基礎型がサポートされていない場合にスローされます.</exception>
+        </member>
+        <member name="M:AndanteTribe.Utils.EnumExtensions.AggregateFlags``1(System.Span{``0})">
+             <summary>
+             指定のビットフラグを集約します.
+             </summary>
+             <param name="flags"></param>
+             <typeparam name="T"></typeparam>
+             <returns></returns>
+             <exception cref="T:System.NotSupportedException">対象の列挙体の基礎型がサポートされていない場合にスローされます.</exception>
+             <example>
+             <code>
+             <![CDATA[
+             [System.Flags]
+             public enum FileAccess
+             {
+                 None = 0,
+                 Read = 1 << 0,      // 0001
+                 Write = 1 << 1,     // 0010
+                 Execute = 1 << 2,   // 0100
+                 ReadWrite = Read | Write,
+                 All = Read | Write | Execute
+             }
+            
+             public class Sample
+             {
+                 public void Run()
+                 {
+                     // 配列から ReadOnlySpan を作って集約する例
+                     var flags = new[] { FileAccess.Read, FileAccess.Write };
+                     var aggregated = flags.AsSpan().AggregateFlags();
+                     // 出力: ReadWrite
+                     Console.WriteLine(aggregated);
+            
+                     // 単一要素
+                     var single = new[] { FileAccess.Execute };
+                     var aggregatedSingle = single.AsSpan().AggregateFlags();
+                     // 出力: Execute
+                     Console.WriteLine(aggregatedSingle);
+            
+                     // 空配列 -> デフォルト(= None)
+                     var empty = Array.Empty<FileAccess>();
+                     var aggregatedEmpty = empty.AsSpan().AggregateFlags();
+                     // 出力: None
+                     Console.WriteLine(aggregatedEmpty);
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+        </member>
+        <member name="M:AndanteTribe.Utils.EnumExtensions.AggregateFlags``1(System.ReadOnlySpan{``0})">
+            <summary>
+            指定のビットフラグを集約します.
+            </summary>
+            <param name="flags"></param>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+            <exception cref="T:System.NotSupportedException">対象の列挙体の基礎型がサポートされていない場合にスローされます.</exception>
         </member>
         <member name="M:AndanteTribe.Utils.EnumExtensions.GetEnumerator``1(``0)">
              <summary>
@@ -405,9 +459,6 @@
              </code>
              </example>
              <returns></returns>
-             <remarks>
-             指定する列挙体はint型が基になる型として指定されている必要があります.
-             </remarks>
         </member>
         <member name="T:AndanteTribe.Utils.EnumExtensions.Enumerator`1">
             <summary>
@@ -632,59 +683,82 @@
         <member name="M:AndanteTribe.Utils.MemoryExtensions.Enumerator`1.System#IDisposable#Dispose">
             <inheritdoc/>
         </member>
-        <member name="T:AndanteTribe.Utils.Obscured`1">
+        <member name="T:AndanteTribe.Utils.StateTuple">
             <summary>
-            メモリ改ざん対策構造体.
-            </summary>
-            <remarks>
-            基本的にスコープ内でキャストして使う.
-            </remarks>
-        </member>
-        <member name="P:AndanteTribe.Utils.Obscured`1.Value">
-            <summary>
-            復号化された値.
+            スレッドセーフなプールを持つ参照タプル. <see cref="T:System.ValueTuple"/>でボクシングするような場面での使用を想定.
             </summary>
         </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.#ctor">
+        <member name="M:AndanteTribe.Utils.StateTuple.Create``1(``0)">
             <summary>
-            Initializes a new instance of the <see cref="T:AndanteTribe.Utils.Obscured`1"/> struct.
+            参照タプルを作成します.
             </summary>
-        </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.op_Implicit(AndanteTribe.Utils.Obscured{`0})~`0">
-            <summary>
-            <see cref="T:AndanteTribe.Utils.Obscured`1"/>から<see cref="!:T"/>への暗黙的変換.
-            </summary>
-            <param name="obscured"></param>
+            <param name="item1"></param>
+            <typeparam name="T1"></typeparam>
             <returns></returns>
         </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.op_Implicit(`0)~AndanteTribe.Utils.Obscured{`0}">
+        <member name="M:AndanteTribe.Utils.StateTuple.Create``2(``0,``1)">
             <summary>
-            <see cref="!:T"/>から<see cref="T:AndanteTribe.Utils.Obscured`1"/>への暗黙的変換.
+            参照タプルを作成します.
             </summary>
-            <param name="value"></param>
+            <param name="item1"></param>
+            <param name="item2"></param>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
             <returns></returns>
         </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.Equals(AndanteTribe.Utils.Obscured{`0})">
-            <inheritdoc />
-        </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.CompareTo(AndanteTribe.Utils.Obscured{`0})">
-            <inheritdoc />
-        </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.GetHashCode">
-            <inheritdoc />
-        </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.Equals(System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.op_Equality(AndanteTribe.Utils.Obscured{`0},AndanteTribe.Utils.Obscured{`0})">
+        <member name="M:AndanteTribe.Utils.StateTuple.Create``3(``0,``1,``2)">
             <summary>
-            Returns a value indicating whether two <see cref="T:AndanteTribe.Utils.Obscured`1"/> values are equal.
+            参照タプルを作成します.
             </summary>
+            <param name="item1"></param>
+            <param name="item2"></param>
+            <param name="item3"></param>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+            <typeparam name="T3"></typeparam>
+            <returns></returns>
         </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.op_Inequality(AndanteTribe.Utils.Obscured{`0},AndanteTribe.Utils.Obscured{`0})">
+        <member name="T:AndanteTribe.Utils.StateTuple`1">
             <summary>
-            Returns a value indicating whether two <see cref="T:AndanteTribe.Utils.Obscured`1"/> values are not equal.
+            スレッドセーフなプールを持つ参照タプル. <see cref="T:System.ValueTuple"/>でボクシングするような場面での使用を想定.
             </summary>
+            <typeparam name="T1"></typeparam>
+        </member>
+        <member name="M:AndanteTribe.Utils.StateTuple`1.Deconstruct(`0@)">
+            <summary>
+            Deconstructs the tuple into its components.
+            </summary>
+            <param name="item1"></param>
+        </member>
+        <member name="T:AndanteTribe.Utils.StateTuple`2">
+            <summary>
+            スレッドセーフなプールを持つ参照タプル. <see cref="T:System.ValueTuple"/>でボクシングするような場面での使用を想定.
+            </summary>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+        </member>
+        <member name="M:AndanteTribe.Utils.StateTuple`2.Deconstruct(`0@,`1@)">
+            <summary>
+            Deconstructs the tuple into its components.
+            </summary>
+            <param name="item1"></param>
+            <param name="item2"></param>
+        </member>
+        <member name="T:AndanteTribe.Utils.StateTuple`3">
+            <summary>
+            スレッドセーフなプールを持つ参照タプル. <see cref="T:System.ValueTuple"/>でボクシングするような場面での使用を想定.
+            </summary>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+            <typeparam name="T3"></typeparam>
+        </member>
+        <member name="M:AndanteTribe.Utils.StateTuple`3.Deconstruct(`0@,`1@,`2@)">
+            <summary>
+            Deconstructs the tuple into its components.
+            </summary>
+            <param name="item1"></param>
+            <param name="item2"></param>
+            <param name="item3"></param>
         </member>
         <member name="T:AndanteTribe.Utils.ValueList`1">
             <summary>

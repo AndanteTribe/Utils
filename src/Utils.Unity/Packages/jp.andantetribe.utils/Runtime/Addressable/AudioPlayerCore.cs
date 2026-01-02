@@ -2,6 +2,7 @@
 #nullable enable
 
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -12,23 +13,22 @@ namespace AndanteTribe.Utils.Unity.Addressable
     /// <summary>
     /// 汎用オーディオ再生クラス.
     /// </summary>
-    public partial class AudioPlayer : IDisposable
+    public partial class AudioPlayerCore : IDisposable
     {
         private readonly AudioSource[] _bgmChannels;
 
-        protected readonly AudioSource SeChannel;
-        protected readonly AssetsRegistry BgmRegistry;
-        protected readonly CancellationTokenSource CancellationDisposable = new();
-        protected ReadOnlySpan<AudioSource> BgmChannels => _bgmChannels;
+        private readonly AudioSource _seChannel;
+        private readonly AssetsRegistry _bgmRegistry = new AssetsRegistry();
+        private ReadOnlySpan<AudioSource> BgmChannels => _bgmChannels;
 
         private int _currentBgmChannelIndex = -1;
 
         /// <summary>
-        /// Initialize a new instance of <see cref="AudioPlayer"/>.
+        /// Initialize a new instance of <see cref="AudioPlayerCore"/>.
         /// </summary>
         /// <param name="root"></param>
         /// <param name="bgmChannelCount"></param>
-        public AudioPlayer(GameObject root, int bgmChannelCount = 3)
+        public AudioPlayerCore(GameObject root, int bgmChannelCount = 3)
         {
             _bgmChannels = new AudioSource[bgmChannelCount];
             var bgmChannels = _bgmChannels.AsSpan();
@@ -39,9 +39,7 @@ namespace AndanteTribe.Utils.Unity.Addressable
                 channel.loop = true;
                 bgmChannels[i] = channel;
             }
-            SeChannel = root.AddComponent<AudioSource>();
-            BgmRegistry = new AssetsRegistry(CancellationDisposable);
-
+            _seChannel = root.AddComponent<AudioSource>();
             Initialize();
         }
 
@@ -53,10 +51,7 @@ namespace AndanteTribe.Utils.Unity.Addressable
         /// <param name="cancellationToken"></param>
         public async UniTask PlayBGMAsync(string address, bool loop = true, CancellationToken cancellationToken = default)
         {
-            CancellationDisposable.ThrowIfDisposed(this);
-            cancellationToken.ThrowIfCancellationRequested();
-            using var cts = CancellationDisposable.CreateLinkedTokenSource(cancellationToken);
-            var clip = await BgmRegistry.LoadAsyncInternal<AudioClip>(address, cts.Token);
+            var clip = await _bgmRegistry.LoadAsync<AudioClip>(address, cancellationToken);
             var channel = GetAvailableBgmChannel();
 
             channel.Stop();
@@ -71,7 +66,6 @@ namespace AndanteTribe.Utils.Unity.Addressable
         /// </summary>
         public void StopAllBGM()
         {
-            CancellationDisposable.ThrowIfDisposed(this);
             foreach (var channel in BgmChannels)
             {
                 if (channel.isPlaying)
@@ -80,7 +74,7 @@ namespace AndanteTribe.Utils.Unity.Addressable
                     channel.clip = null;
                 }
             }
-            BgmRegistry.Clear();
+            _bgmRegistry.Clear();
             _currentBgmChannelIndex = -1;
         }
 
@@ -91,22 +85,19 @@ namespace AndanteTribe.Utils.Unity.Addressable
         /// <param name="cancellationToken"></param>
         public async UniTask PlaySEAsync(string address, CancellationToken cancellationToken = default)
         {
-            CancellationDisposable.ThrowIfDisposed(this);
-            cancellationToken.ThrowIfCancellationRequested();
-            using var cts = CancellationDisposable.CreateLinkedTokenSource(cancellationToken);
             var handle = Addressables.LoadAssetAsync<AudioClip>(address);
             try
             {
-                var result = await handle.ToUniTask(cancellationToken: cts.Token, autoReleaseWhenCanceled: true);
+                var result = await handle.ToUniTask(cancellationToken: cancellationToken, autoReleaseWhenCanceled: true);
                 if (result == null)
                 {
                     Debug.LogError($"Failed to load SE: {address}");
                     return;
                 }
 
-                SeChannel.PlayOneShot(result);
+                _seChannel.PlayOneShot(result);
 
-                await UniTask.Delay(TimeSpan.FromSeconds(result.length), cancellationToken: cts.Token);
+                await UniTask.Delay(TimeSpan.FromSeconds(result.length), cancellationToken: cancellationToken);
             }
             finally
             {
@@ -121,14 +112,16 @@ namespace AndanteTribe.Utils.Unity.Addressable
         public void Dispose()
         {
             StopAllBGM();
-            SeChannel.Stop();
-            SeChannel.clip = null;
-            BgmRegistry.Dispose();
+            _seChannel.Stop();
+            _seChannel.clip = null;
+            _bgmRegistry.Dispose();
         }
 
-        protected AudioSource GetAvailableBgmChannel() => _bgmChannels[(_currentBgmChannelIndex + 1) % _bgmChannels.Length];
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private AudioSource GetAvailableBgmChannel() => _bgmChannels[(_currentBgmChannelIndex + 1) % _bgmChannels.Length];
 
         partial void Initialize();
+        partial void Deinitialize();
         partial void SetBgmVolume(AudioSource channel, float rate = 1.0f);
     }
 }

@@ -1,6 +1,6 @@
 ﻿#if !NET6_0_OR_GREATER
 
-namespace System.Runtime.CompilerServices;
+namespace System.Threading;
 
 /// <summary>
 /// Provides extension methods for <see cref="CancellationToken"/> to allow

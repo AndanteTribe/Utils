@@ -1,13 +1,14 @@
 ﻿#if ENABLE_UGUI
 #nullable enable
 
+using AndanteTribe.Utils.Unity.UI;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 namespace AndanteTribe.Utils.Unity.Editor
 {
-    [CustomEditor(typeof(UGUI.SimpleGauge))]
+    [CustomEditor(typeof(SimpleGauge))]
     public class SimpleGaugeEditor : UnityEditor.Editor
     {
         /// <inheritdoc/>

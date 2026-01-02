@@ -9,16 +9,13 @@ using UnityEngine;
 
 namespace AndanteTribe.Utils.Unity.Addressable
 {
-    public partial class AudioPlayer
+    public partial class AudioPlayerCore
     {
         public virtual TimeSpan FadeDuration { get; init; } = TimeSpan.FromSeconds(3.0f);
 
         public async UniTask CrossFadeBGMAsync(string address, bool loop = true, CancellationToken cancellationToken = default)
         {
-            CancellationDisposable.ThrowIfDisposed(this);
-            cancellationToken.ThrowIfCancellationRequested();
-            using var cts = CancellationDisposable.CreateLinkedTokenSource(cancellationToken);
-            var clip = await BgmRegistry.LoadAsyncInternal<AudioClip>(address, cts.Token);
+            var clip = await _bgmRegistry.LoadAsync<AudioClip>(address, cancellationToken);
 
             // 再生曲がなければフェードインで再生開始
             if (_currentBgmChannelIndex != -1)
@@ -33,7 +30,7 @@ namespace AndanteTribe.Utils.Unity.Addressable
                 // 0.0~PI/2
                 await LMotion.Create(0.0f, 1.0f, (float)FadeDuration.TotalSeconds)
                     .Bind((self: this, channel), static (rate, args) => args.self.SetBgmVolume(args.channel, Mathf.PI * 0.5f * rate))
-                    .ToUniTask(cts.Token);
+                    .ToUniTask(cancellationToken);
 
                 return;
             }
@@ -58,7 +55,7 @@ namespace AndanteTribe.Utils.Unity.Addressable
                     self.SetBgmVolume(cur, Mathf.Cos(f));
                     self.SetBgmVolume(next, Mathf.Sin(f));
                 })
-                .ToUniTask(cts.Token);
+                .ToUniTask(cancellationToken);
 
             currentChannel.Stop();
             currentChannel.clip = null;
