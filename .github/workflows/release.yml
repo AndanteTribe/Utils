@@ -6,7 +6,7 @@ on:
       version:
         type: string
         required: true
-        default: "0.1.0"
+        default: "1.0.0"
         
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -52,6 +52,7 @@ jobs:
           FILES=(
             ./src/Utils.Core/Utils.Core.csproj
             ./src/Utils.BackPort/Utils.BackPort.csproj
+            ./src/Utils.GameServices/Utils.GameServices.csproj
           )
 
           for FILE in "${FILES[@]}"; do
@@ -60,7 +61,7 @@ jobs:
           done
     - uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 9.0.x
+        dotnet-version: 10.0.x
     - run: |
         dotnet restore ./src/Utils.Core/Utils.Core.slnx
         dotnet build ./src/Utils.Core/Utils.Core.slnx --configuration Release --no-restore
@@ -74,9 +75,12 @@ jobs:
             ./bin/Utils.Core.xml \
             ./bin/Utils.BackPort.dll \
             ./bin/Utils.BackPort.xml \
+            ./bin/Utils.GameServices.dll \
+            ./bin/Utils.GameServices.xml \
             ./src/Utils.Unity/Packages/jp.andantetribe.utils/package.json \
             ./src/Utils.Core/Utils.Core.csproj \
-            ./src/Utils.BackPort/Utils.BackPort.csproj
+            ./src/Utils.BackPort/Utils.BackPort.csproj \
+            ./src/Utils.GameServices/Utils.GameServices.csproj
           git commit -m "chore: bump version to ${VERSION}"
           git push origin HEAD
     - name: create pull request
