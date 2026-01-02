@@ -1,4 +1,5 @@
 ﻿<Solution>
+  <Project Path="../Utils.Csv/Utils.Csv.csproj" />
   <Project Path="../Utils.GameServices/Utils.GameServices.csproj" />
   <Project Path="../Utils.BackPort/Utils.BackPort.csproj" />
   <Project Path="../Utils.Tests/Utils.Tests.csproj" />

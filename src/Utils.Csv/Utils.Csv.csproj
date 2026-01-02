@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <LangVersion>14</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <OutputType>Library</OutputType>
+        <RootNamespace>AndanteTribe.Utils.Csv</RootNamespace>
+        <Version>0.2.2</Version>
+        <AssemblyName>Utils.Csv</AssemblyName>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        
+        <!-- NuGet Packaging -->
+        <PackageId>AndanteTribe.Utils.Csv</PackageId>
+        <PackageVersion>$(Version)</PackageVersion>
+        <Authors>AndanteTribe</Authors>
+        <Copyright>© AndanteTribe</Copyright>
+        <Description>Utility library used across projects in AndanteTribe.</Description>
+        <PackageProjectUrl>https://github.com/AndanteTribe/Utils</PackageProjectUrl>
+        <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Remove=".gitignore" />
+    </ItemGroup>
+
+</Project>
