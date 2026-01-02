@@ -5,7 +5,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace AndanteTribe.Utils.Unity.UGUI
+namespace AndanteTribe.Utils.Unity.UI
 {
     /// <summary>
     /// <see cref="RectMask2D"/>を継承利用したシンプルで綺麗なゲージ表示.

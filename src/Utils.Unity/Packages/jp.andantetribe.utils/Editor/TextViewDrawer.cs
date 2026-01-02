@@ -2,7 +2,7 @@
 #nullable enable
 
 using System;
-using AndanteTribe.Utils.Unity.UGUI;
+using AndanteTribe.Utils.Unity.UI;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;

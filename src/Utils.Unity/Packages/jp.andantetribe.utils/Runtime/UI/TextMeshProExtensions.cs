@@ -5,7 +5,7 @@ using System;
 using System.Buffers;
 using System.Runtime.CompilerServices;
 
-namespace AndanteTribe.Utils.Unity.UGUI
+namespace AndanteTribe.Utils.Unity.UI
 {
     public static class TextMeshProExtensions
     {
