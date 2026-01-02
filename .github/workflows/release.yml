@@ -53,6 +53,7 @@ jobs:
             ./src/Utils.Core/Utils.Core.csproj
             ./src/Utils.BackPort/Utils.BackPort.csproj
             ./src/Utils.GameServices/Utils.GameServices.csproj
+            ./src/Utils.Csv/Utils.Csv.csproj
           )
 
           for FILE in "${FILES[@]}"; do
@@ -77,10 +78,12 @@ jobs:
             ./bin/Utils.BackPort.xml \
             ./bin/Utils.GameServices.dll \
             ./bin/Utils.GameServices.xml \
+            ./bin/Utils.Csv.dll \
+            ./bin/Utils.Csv.xml \
             ./src/Utils.Unity/Packages/jp.andantetribe.utils/package.json \
             ./src/Utils.Core/Utils.Core.csproj \
             ./src/Utils.BackPort/Utils.BackPort.csproj \
-            ./src/Utils.GameServices/Utils.GameServices.csproj
+            ./src/Utils.Csv/Utils.Csv.csproj
           git commit -m "chore: bump version to ${VERSION}"
           git push origin HEAD
     - name: create pull request
