@@ -177,8 +177,8 @@ namespace AndanteTribe.Utils.Unity
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetFullStretch(this RectTransform rectTransform, in float left = 0, in float right = 0, in float top = 0, in float bottom = 0)
         {
-            rectTransform.anchorMin = Vector2.zero;
-            rectTransform.anchorMax = Vector2.one;
+            rectTransform.anchorMin = new Vector2(0f, 0f);
+            rectTransform.anchorMax = new Vector2(1f, 1f);
             rectTransform.offsetMin = new Vector2(left, bottom);
             rectTransform.offsetMax = new Vector2(-right, -top);
         }
