@@ -9,13 +9,12 @@ using UnityEngine;
 
 namespace AndanteTribe.Utils.Unity.Addressable
 {
-    public partial class AudioPlayer
+    public partial class AudioPlayerCore
     {
         public virtual TimeSpan FadeDuration { get; init; } = TimeSpan.FromSeconds(3.0f);
 
         public async UniTask CrossFadeBGMAsync(string address, bool loop = true, CancellationToken cancellationToken = default)
         {
-            cancellationToken.ThrowIfCancellationRequested();
             var clip = await _bgmRegistry.LoadAsync<AudioClip>(address, cancellationToken);
 
             // 再生曲がなければフェードインで再生開始

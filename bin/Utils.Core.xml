@@ -296,9 +296,7 @@
              </code>
              </example>
              <returns></returns>
-             <remarks>
-             指定する列挙体はint型が基になる型として指定されている必要があります.
-             </remarks>
+             <exception cref="T:System.NotSupportedException">対象の列挙体の基礎型がサポートされていない場合にスローされます.</exception>
         </member>
         <member name="M:AndanteTribe.Utils.EnumExtensions.ConstructFlags``1(``0)">
              <summary>
@@ -349,9 +347,65 @@
              </code>
              </example>
              <returns></returns>
-             <remarks>
-             指定する列挙体はint型が基になる型として指定されている必要があります.
-             </remarks>
+             <exception cref="T:System.NotSupportedException">対象の列挙体の基礎型がサポートされていない場合にスローされます.</exception>
+        </member>
+        <member name="M:AndanteTribe.Utils.EnumExtensions.AggregateFlags``1(System.Span{``0})">
+             <summary>
+             指定のビットフラグを集約します.
+             </summary>
+             <param name="flags"></param>
+             <typeparam name="T"></typeparam>
+             <returns></returns>
+             <exception cref="T:System.NotSupportedException">対象の列挙体の基礎型がサポートされていない場合にスローされます.</exception>
+             <example>
+             <code>
+             <![CDATA[
+             [System.Flags]
+             public enum FileAccess
+             {
+                 None = 0,
+                 Read = 1 << 0,      // 0001
+                 Write = 1 << 1,     // 0010
+                 Execute = 1 << 2,   // 0100
+                 ReadWrite = Read | Write,
+                 All = Read | Write | Execute
+             }
+            
+             public class Sample
+             {
+                 public void Run()
+                 {
+                     // 配列から ReadOnlySpan を作って集約する例
+                     var flags = new[] { FileAccess.Read, FileAccess.Write };
+                     var aggregated = flags.AsSpan().AggregateFlags();
+                     // 出力: ReadWrite
+                     Console.WriteLine(aggregated);
+            
+                     // 単一要素
+                     var single = new[] { FileAccess.Execute };
+                     var aggregatedSingle = single.AsSpan().AggregateFlags();
+                     // 出力: Execute
+                     Console.WriteLine(aggregatedSingle);
+            
+                     // 空配列 -> デフォルト(= None)
+                     var empty = Array.Empty<FileAccess>();
+                     var aggregatedEmpty = empty.AsSpan().AggregateFlags();
+                     // 出力: None
+                     Console.WriteLine(aggregatedEmpty);
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+        </member>
+        <member name="M:AndanteTribe.Utils.EnumExtensions.AggregateFlags``1(System.ReadOnlySpan{``0})">
+            <summary>
+            指定のビットフラグを集約します.
+            </summary>
+            <param name="flags"></param>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+            <exception cref="T:System.NotSupportedException">対象の列挙体の基礎型がサポートされていない場合にスローされます.</exception>
         </member>
         <member name="M:AndanteTribe.Utils.EnumExtensions.GetEnumerator``1(``0)">
              <summary>
@@ -405,9 +459,6 @@
              </code>
              </example>
              <returns></returns>
-             <remarks>
-             指定する列挙体はint型が基になる型として指定されている必要があります.
-             </remarks>
         </member>
         <member name="T:AndanteTribe.Utils.EnumExtensions.Enumerator`1">
             <summary>

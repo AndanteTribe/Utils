@@ -9,7 +9,7 @@
         "com.unity.collections": "1.5.1",
         "com.unity.mathematics": "1.0.1"
       },
-      "hash": "b651c5866fe0e3fba065ce2e56dfdfcd59d3d109"
+      "hash": "1d170af70c7db3df372dc4796c843f81e780530c"
     },
     "com.cysharp.r3": {
       "version": "https://github.com/Cysharp/R3.git?path=src/R3.Unity/Assets/R3.Unity",
@@ -200,7 +200,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "ee940efab8d92008716c568cdcfb1a388e2d4802"
+      "hash": "0093a457d1abe17bbb97d9c0b7dea921c5e670e4"
     },
     "nuget-packages": {
       "version": "file:nuget-packages",

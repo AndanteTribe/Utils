@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace AndanteTribe.Utils.Unity.Addressable
 {
-    public partial class AudioPlayer
+    public partial class AudioPlayerCore
     {
         /// <summary>
         /// マスターボリューム.

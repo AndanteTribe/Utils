@@ -45,7 +45,6 @@ namespace AndanteTribe.Utils.Unity.Tasks
         /// <param name="cancellationToken"></param>
         public async UniTask PreallocateAsync(int count, CancellationToken cancellationToken = default)
         {
-            cancellationToken.ThrowIfCancellationRequested();
             var original = await _reference.LoadAsync(cancellationToken);
             var instances = await Object.InstantiateAsync(original, count, _root).WithCancellation(cancellationToken);
             foreach (var instance in instances)

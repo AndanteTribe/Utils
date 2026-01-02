@@ -13,7 +13,7 @@ namespace AndanteTribe.Utils.Unity.Addressable
     /// <summary>
     /// 汎用オーディオ再生クラス.
     /// </summary>
-    public partial class AudioPlayer : IDisposable
+    public partial class AudioPlayerCore : IDisposable
     {
         private readonly AudioSource[] _bgmChannels;
 
@@ -24,11 +24,11 @@ namespace AndanteTribe.Utils.Unity.Addressable
         private int _currentBgmChannelIndex = -1;
 
         /// <summary>
-        /// Initialize a new instance of <see cref="AudioPlayer"/>.
+        /// Initialize a new instance of <see cref="AudioPlayerCore"/>.
         /// </summary>
         /// <param name="root"></param>
         /// <param name="bgmChannelCount"></param>
-        public AudioPlayer(GameObject root, int bgmChannelCount = 3)
+        public AudioPlayerCore(GameObject root, int bgmChannelCount = 3)
         {
             _bgmChannels = new AudioSource[bgmChannelCount];
             var bgmChannels = _bgmChannels.AsSpan();
@@ -51,7 +51,6 @@ namespace AndanteTribe.Utils.Unity.Addressable
         /// <param name="cancellationToken"></param>
         public async UniTask PlayBGMAsync(string address, bool loop = true, CancellationToken cancellationToken = default)
         {
-            cancellationToken.ThrowIfCancellationRequested();
             var clip = await _bgmRegistry.LoadAsync<AudioClip>(address, cancellationToken);
             var channel = GetAvailableBgmChannel();
 
@@ -86,7 +85,6 @@ namespace AndanteTribe.Utils.Unity.Addressable
         /// <param name="cancellationToken"></param>
         public async UniTask PlaySEAsync(string address, CancellationToken cancellationToken = default)
         {
-            cancellationToken.ThrowIfCancellationRequested();
             var handle = Addressables.LoadAssetAsync<AudioClip>(address);
             try
             {

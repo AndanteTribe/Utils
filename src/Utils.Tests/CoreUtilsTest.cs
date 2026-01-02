@@ -163,6 +163,56 @@ namespace AndanteTribe.Utils.Tests
             Flag4 = 1 << 3,
         }
 
+        [System.Flags]
+        public enum BigFlags : long
+        {
+            None = 0L,
+            FlagA = 1L << 0,
+            FlagB = 1L << 1,
+            FlagC = 1L << 2,
+        }
+
+        // AggregateFlags テスト群
+        [Test]
+        public void AggregateFlags_EmptySpan_ReturnsDefault()
+        {
+            var empty = Array.Empty<TestFlags>();
+            var aggregated = empty.AsSpan().AggregateFlags();
+            Assert.That(aggregated, Is.EqualTo(TestFlags.None));
+        }
+
+        [Test]
+        public void AggregateFlags_SingleElement_ReturnsElement()
+        {
+            var single = new[] { TestFlags.Flag2 };
+            var aggregated = single.AsSpan().AggregateFlags();
+            Assert.That(aggregated, Is.EqualTo(TestFlags.Flag2));
+        }
+
+        [Test]
+        public void AggregateFlags_MultipleElements_CombinedCorrectly()
+        {
+            var flags = new[] { TestFlags.Flag1, TestFlags.Flag2, TestFlags.Flag4 };
+            var aggregated = flags.AsSpan().AggregateFlags();
+            Assert.That(aggregated, Is.EqualTo(TestFlags.Flag1 | TestFlags.Flag2 | TestFlags.Flag4));
+        }
+
+        [Test]
+        public void AggregateFlags_DuplicateElements_NoDoubleCount()
+        {
+            var flags = new[] { TestFlags.Flag1, TestFlags.Flag1 };
+            var aggregated = flags.AsSpan().AggregateFlags();
+            Assert.That(aggregated, Is.EqualTo(TestFlags.Flag1));
+        }
+
+        [Test]
+        public void AggregateFlags_LongUnderlyingType_WorksFor8ByteEnums()
+        {
+            var flags = new[] { BigFlags.FlagA, BigFlags.FlagC };
+            var aggregated = flags.AsSpan().AggregateFlags();
+            Assert.That(aggregated, Is.EqualTo(BigFlags.FlagA | BigFlags.FlagC));
+        }
+
         [Test]
         [TestCase(TestFlags.Flag1, TestFlags.Flag1, true)]
         [TestCase(TestFlags.Flag1 | TestFlags.Flag3, TestFlags.Flag1, true)]

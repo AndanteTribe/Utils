@@ -4,6 +4,32 @@
         <name>Utils.GameServices</name>
     </assembly>
     <members>
+        <member name="T:AndanteTribe.Utils.GameServices.Container">
+            <summary>
+            軽量DIのレジスター実装.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.GameServices.Container.#ctor">
+            <summary>
+            デフォルトコンストラクタ.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.GameServices.Container.Bind``1(``0)">
+            <summary>
+            オブジェクトをバインドする.
+            </summary>
+            <param name="instance">バインドするインスタンス.</param>
+            <typeparam name="T">参照型.インターフェイスも登録可.nullは非許容.</typeparam>
+        </member>
+        <member name="M:AndanteTribe.Utils.GameServices.Container.Build">
+            <summary>
+            プロバイダーを構築し、内部状態をリセットする.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.GameServices.Container.System#IDisposable#Dispose">
+            <inheritdoc />
+        </member>
         <member name="T:AndanteTribe.Utils.GameServices.Localize">
             <summary>
             ローカライズ用ユーティリティクラス.
@@ -221,6 +247,24 @@
             <summary>
             Returns a value indicating whether two <see cref="T:AndanteTribe.Utils.GameServices.Obscured`1"/> values are not equal.
             </summary>
+        </member>
+        <member name="T:AndanteTribe.Utils.GameServices.Provider">
+            <summary>
+            軽量DIのProvider実装.
+            </summary>
+        </member>
+        <member name="F:AndanteTribe.Utils.GameServices.Provider.Empty">
+            <summary>
+            空のプロバイダー.
+            </summary>
+        </member>
+        <member name="P:AndanteTribe.Utils.GameServices.Provider.Bindings">
+            <summary>
+            バインドされたオブジェクト群.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.GameServices.Provider.System#IDisposable#Dispose">
+            <inheritdoc />
         </member>
         <member name="T:MessagePack.GeneratedMessagePackResolver">
             <summary>A MessagePack resolver that uses generated formatters for types in this assembly.</summary>
