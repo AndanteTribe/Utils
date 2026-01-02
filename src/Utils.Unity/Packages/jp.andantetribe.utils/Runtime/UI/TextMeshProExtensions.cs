@@ -17,10 +17,9 @@ namespace AndanteTribe.Utils.Unity.UI
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetCharArray(this TMPro.TMP_Text text, in ReadOnlySpan<char> sourceText)
         {
-            var array = ArrayPool<char>.Shared.Rent(sourceText.Length);
+            using var _ = ArrayPool<char>.Shared.Rent(sourceText.Length, out var array);
             sourceText.CopyTo(array);
             text.SetCharArray(array, 0, sourceText.Length);
-            ArrayPool<char>.Shared.Return(array);
         }
     }
 }

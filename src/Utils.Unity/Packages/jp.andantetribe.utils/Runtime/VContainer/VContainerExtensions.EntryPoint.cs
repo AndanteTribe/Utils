@@ -179,11 +179,11 @@ namespace AndanteTribe.Utils.Unity.VContainer
 
     internal sealed class EntryPointsQueueBuilder : IContainerBuilder
     {
-        public List<Func<IObjectResolver, CancellationToken, ValueTask>> Queue { get; private set; } = new();
+        public readonly List<Func<IObjectResolver, CancellationToken, ValueTask>> Queue = new();
         internal IContainerBuilder _builder = null!;
         internal Lifetime _lifetime;
 
-        public void Reset() => Queue = ListPool<Func<IObjectResolver, CancellationToken, ValueTask>>.Get();
+        public void Reset() => Queue.Clear();
 
         public RegistrationBuilder RegisterEnqueue<T>(bool waitForCompletion = true) where T : class, IInitializable
         {
@@ -326,7 +326,7 @@ namespace AndanteTribe.Utils.Unity.VContainer
             new NotSupportedException("RegisterEnqueue以外のメソッドを使用しないでください。");
     }
 
-    internal sealed class EntryPointContainer : IStartable, IDisposable
+    internal sealed class EntryPointContainer : IStartable
     {
         private readonly IObjectResolver _resolver;
         private readonly CancellationToken _cancellationToken;
@@ -350,15 +350,6 @@ namespace AndanteTribe.Utils.Unity.VContainer
                 {
                     await entrypoint(_resolver, _cancellationToken);
                 }
-            }
-        }
-
-        /// <inheritdoc />
-        void IDisposable.Dispose()
-        {
-            if (!_cancellationToken.IsCancellationRequested)
-            {
-                ListPool<Func<IObjectResolver, CancellationToken, ValueTask>>.Release(_entryPoints);
             }
         }
     }

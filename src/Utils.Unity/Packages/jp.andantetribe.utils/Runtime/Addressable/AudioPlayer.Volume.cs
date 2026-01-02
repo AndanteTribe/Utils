@@ -35,12 +35,17 @@ namespace AndanteTribe.Utils.Unity.Addressable
                     {
                         channel.volume = value;
                     }
-                })
-                .AddTo(CancellationDisposable.Token);
+                });
             SeVolume
                 .CombineLatest(MasterVolume, static (seVolume, masterVolume) => seVolume * masterVolume)
-                .Subscribe(SeChannel, static (value, channel) => channel.volume = value)
-                .AddTo(CancellationDisposable.Token);
+                .Subscribe(_seChannel, static (value, channel) => channel.volume = value);
+        }
+
+        partial void Deinitialize()
+        {
+            BgmVolume.Dispose();
+            SeVolume.Dispose();
+            MasterVolume.Dispose();
         }
 
         partial void SetBgmVolume(AudioSource channel, float rate) => channel.volume = BgmVolume.Value * rate * MasterVolume.Value;

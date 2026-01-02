@@ -28,11 +28,6 @@ namespace AndanteTribe.Utils.Unity.Tasks
         /// </summary>
         private readonly List<T> _pool;
 
-        /// <summary>
-        /// キャンセルトークンソース.
-        /// </summary>
-        private readonly CancellationTokenSource _cancellationDisposable = new();
-
         /// <inheritdoc/>
         public int Count => _pool.Count;
 
@@ -50,11 +45,9 @@ namespace AndanteTribe.Utils.Unity.Tasks
         /// <param name="cancellationToken"></param>
         public async UniTask PreallocateAsync(int count, CancellationToken cancellationToken = default)
         {
-            _cancellationDisposable.ThrowIfDisposed(this);
             cancellationToken.ThrowIfCancellationRequested();
-            using var cts = _cancellationDisposable.CreateLinkedTokenSource(cancellationToken);
-            var original = await _reference.LoadAsync(cts.Token);
-            var instances = await Object.InstantiateAsync(original, count, _root).WithCancellation(cts.Token);
+            var original = await _reference.LoadAsync(cancellationToken);
+            var instances = await Object.InstantiateAsync(original, count, _root).WithCancellation(cancellationToken);
             foreach (var instance in instances)
             {
                 instance.gameObject.SetActive(false);
@@ -70,7 +63,6 @@ namespace AndanteTribe.Utils.Unity.Tasks
         /// <returns></returns>
         public async UniTask<T> RentAsync(CancellationToken cancellationToken = default)
         {
-            _cancellationDisposable.ThrowIfDisposed(this);
             cancellationToken.ThrowIfCancellationRequested();
             if (_pool.Count > 0)
             {
@@ -81,9 +73,8 @@ namespace AndanteTribe.Utils.Unity.Tasks
                 return instance;
             }
 
-            using var cts = _cancellationDisposable.CreateLinkedTokenSource(cancellationToken);
-            var original = await _reference.LoadAsync(cts.Token);
-            var results = await Object.InstantiateAsync(original, _root).WithCancellation(cts.Token);
+            var original = await _reference.LoadAsync(cancellationToken);
+            var results = await Object.InstantiateAsync(original, _root).WithCancellation(cancellationToken);
             return results[0];
         }
 
@@ -104,7 +95,6 @@ namespace AndanteTribe.Utils.Unity.Tasks
         /// <param name="element">返却するインスタンス.</param>
         public void Return(T element)
         {
-            _cancellationDisposable.ThrowIfDisposed(this);
             element.gameObject.SetActive(false);
             element.transform.SetParent(_root);
             _pool.Add(element);
@@ -115,7 +105,6 @@ namespace AndanteTribe.Utils.Unity.Tasks
         /// </summary>
         public void Clear()
         {
-            _cancellationDisposable.ThrowIfDisposed(this);
             foreach (var item in _pool.AsSpan())
             {
                 Object.Destroy(item.gameObject);
@@ -130,8 +119,6 @@ namespace AndanteTribe.Utils.Unity.Tasks
         {
             Clear();
             _reference.Dispose();
-            _cancellationDisposable.Cancel();
-            _cancellationDisposable.Dispose();
         }
 
         /// <inheritdoc/>

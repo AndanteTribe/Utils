@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Assertions;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace AndanteTribe.Utils.Unity.Addressable
@@ -14,31 +15,34 @@ namespace AndanteTribe.Utils.Unity.Addressable
     public sealed class AddressableObjectReference<T> : IObjectReference<T> where T : UnityEngine.Object
     {
         private readonly string _address;
-        private readonly CancellationTokenSource _cancellationDisposable;
 
         private AsyncLazy<T>? _cached;
         private AsyncOperationHandle<T> _handle;
 
-        public AddressableObjectReference(string address, CancellationTokenSource? cancellationDisposable = null)
+        public AddressableObjectReference(string address)
         {
             _address = address ?? throw new ArgumentNullException(nameof(address), "Address cannot be null.");
-            _cancellationDisposable = cancellationDisposable ?? new CancellationTokenSource();
         }
 
         public async ValueTask<T> LoadAsync(CancellationToken cancellationToken)
         {
-            _cancellationDisposable.ThrowIfDisposed(this);
             cancellationToken.ThrowIfCancellationRequested();
-            if (_address == null)
-            {
-                throw new NullReferenceException("AssetReference is null.");
-            }
-            using var cts = _cancellationDisposable.CreateLinkedTokenSource(cancellationToken);
-
             if (_cached == null)
             {
                 _handle = Addressables.LoadAssetAsync<T>(_address);
-                _cached ??= _handle.ToUniTask(cancellationToken: cts.Token, autoReleaseWhenCanceled: true).ToAsyncLazy();
+                _cached ??= _handle.ToUniTask(cancellationToken: cancellationToken, autoReleaseWhenCanceled: true).ToAsyncLazy();
+            }
+            return await _cached;
+        }
+
+        /// <inheritdoc />
+        public async ValueTask<T> LoadAsync(IProgress<float> progress, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (_cached == null)
+            {
+                _handle = Addressables.LoadAssetAsync<T>(_address);
+                _cached ??= _handle.ToUniTask(progress: progress, cancellationToken: cancellationToken, autoReleaseWhenCanceled: true).ToAsyncLazy();
             }
             return await _cached;
         }
@@ -46,47 +50,52 @@ namespace AndanteTribe.Utils.Unity.Addressable
         /// <inheritdoc />
         public void Dispose()
         {
-            _cancellationDisposable.ThrowIfDisposed(this);
             if (_cached != null)
             {
                 _handle.Release();
+                _cached = null;
             }
-            _cancellationDisposable.Cancel();
-            _cancellationDisposable.Dispose();
         }
     }
 
     [Serializable]
-    public sealed class SerializableAddressableObjectReference<T> : IObjectReference<T> where T : UnityEngine.Object
+    internal sealed class SerializableAddressableObjectReference<T> : IObjectReference<T> where T : UnityEngine.Object
     {
-        private readonly CancellationTokenSource _cancellationDisposable = new();
-
         [SerializeField]
-        private AssetReferenceT<T>? _value;
+        private AssetReferenceT<T> _value = null!;
         private AsyncLazy<T>? _cached;
 
+        /// <inheritdoc />
         public async ValueTask<T> LoadAsync(CancellationToken cancellationToken)
         {
-            _cancellationDisposable.ThrowIfDisposed(this);
             cancellationToken.ThrowIfCancellationRequested();
-            if (_value == null)
-            {
-                throw new NullReferenceException("AssetReference is null.");
-            }
-            using var cts = _cancellationDisposable.CreateLinkedTokenSource(cancellationToken);
+            Assert.IsTrue(_value.IsValid());
 
             _cached ??= _value.LoadAssetAsync<T>()
-                .ToUniTask(cancellationToken: cts.Token, autoReleaseWhenCanceled: true)
+                .ToUniTask(cancellationToken: cancellationToken, autoReleaseWhenCanceled: true)
+                .ToAsyncLazy();
+            return await _cached;
+        }
+
+        /// <inheritdoc />
+        public async ValueTask<T> LoadAsync(IProgress<float> progress, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            Assert.IsTrue(_value.IsValid());
+
+            _cached ??= _value.LoadAssetAsync<T>()
+                .ToUniTask(progress: progress, cancellationToken: cancellationToken, autoReleaseWhenCanceled: true)
                 .ToAsyncLazy();
             return await _cached;
         }
 
         public void Dispose()
         {
-            _cancellationDisposable.ThrowIfDisposed(this);
-            _value?.ReleaseAsset();
-            _cancellationDisposable.Cancel();
-            _cancellationDisposable.Dispose();
+            if (_cached != null)
+            {
+                _value.ReleaseAsset();
+                _cached = null;
+            }
         }
     }
 }

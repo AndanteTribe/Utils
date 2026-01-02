@@ -28,6 +28,8 @@ namespace AndanteTribe.Utils.Unity
             var rectTransform = transform as RectTransform;
             if (rectTransform != null)
             {
+                rectTransform.offsetMin = new Vector2(0f, 0f);
+                rectTransform.offsetMax = new Vector2(0f, 0f);
                 rectTransform.anchorMin = safeArea.min / screenSize;
                 rectTransform.anchorMax = safeArea.max / screenSize;
             }

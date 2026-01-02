@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
@@ -35,13 +34,13 @@ namespace AndanteTribe.Utils.Unity.Tasks
         public uint MaxCount
         {
             get => (uint)_graphicsBuffer.count;
-            set => _graphicsBuffer.SetCounterValue(value);
+            init => _graphicsBuffer.SetCounterValue(value);
         }
 
         /// <summary>
         /// タップエフェクトの持続時間
         /// </summary>
-        public TimeSpan Duration { get; set; } = TimeSpan.FromSeconds(0.5f);
+        public TimeSpan Duration { get; init; } = TimeSpan.FromSeconds(0.5f);
 
         /// <summary>
         /// Initialize a new instance of the <see cref="TapEffect"/> class.
@@ -75,7 +74,7 @@ namespace AndanteTribe.Utils.Unity.Tasks
                 self._graphicsBuffer.Dispose();
                 ListPool<Vector3>.Release(self._records);
 
-                if (self._image != null && self._image.material != null)
+                if (self._image.material != null)
                 {
                     UnityEngine.Object.Destroy(self._image.material);
                     self._image.material = null!;
