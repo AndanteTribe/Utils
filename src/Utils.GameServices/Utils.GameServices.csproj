@@ -1,18 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.1;net5.0;net6.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1;net6.0</TargetFrameworks>
         <LangVersion>14</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <OutputType>Library</OutputType>
-        <RootNamespace>AndanteTribe.Utils.BackPort</RootNamespace>
+        <RootNamespace>AndanteTribe.Utils.GameServices</RootNamespace>
         <Version>0.2.2</Version>
-        <AssemblyName>Utils.BackPort</AssemblyName>
+        <AssemblyName>Utils.GameServices</AssemblyName>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
         <!-- NuGet Packaging -->
-        <PackageId>AndanteTribe.Utils.BackPort</PackageId>
+        <PackageId>AndanteTribe.Utils.GameServices</PackageId>
         <PackageVersion>$(Version)</PackageVersion>
         <Authors>AndanteTribe</Authors>
         <Copyright>© AndanteTribe</Copyright>
@@ -27,16 +27,16 @@
         <None Remove=".gitignore" />
     </ItemGroup>
 
-    <ItemGroup>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-            <_Parameter1>Utils.Tests</_Parameter1>
-        </AssemblyAttribute>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-            <_Parameter1>Utils.Unity</_Parameter1>
-        </AssemblyAttribute>
+    <ItemGroup Condition="'$(TargetFramework)' != 'net6.0'">
+        <ProjectReference Include="..\Utils.BackPort\Utils.BackPort.csproj" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
-      <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
+    <ItemGroup>
+      <ProjectReference Include="..\Utils.Core\Utils.Core.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MessagePack" Version="3.1.4" />
+    </ItemGroup>
+
 </Project>

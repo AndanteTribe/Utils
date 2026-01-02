@@ -632,60 +632,6 @@
         <member name="M:AndanteTribe.Utils.MemoryExtensions.Enumerator`1.System#IDisposable#Dispose">
             <inheritdoc/>
         </member>
-        <member name="T:AndanteTribe.Utils.Obscured`1">
-            <summary>
-            メモリ改ざん対策構造体.
-            </summary>
-            <remarks>
-            基本的にスコープ内でキャストして使う.
-            </remarks>
-        </member>
-        <member name="P:AndanteTribe.Utils.Obscured`1.Value">
-            <summary>
-            復号化された値.
-            </summary>
-        </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:AndanteTribe.Utils.Obscured`1"/> struct.
-            </summary>
-        </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.op_Implicit(AndanteTribe.Utils.Obscured{`0})~`0">
-            <summary>
-            <see cref="T:AndanteTribe.Utils.Obscured`1"/>から<see cref="!:T"/>への暗黙的変換.
-            </summary>
-            <param name="obscured"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.op_Implicit(`0)~AndanteTribe.Utils.Obscured{`0}">
-            <summary>
-            <see cref="!:T"/>から<see cref="T:AndanteTribe.Utils.Obscured`1"/>への暗黙的変換.
-            </summary>
-            <param name="value"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.Equals(AndanteTribe.Utils.Obscured{`0})">
-            <inheritdoc />
-        </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.CompareTo(AndanteTribe.Utils.Obscured{`0})">
-            <inheritdoc />
-        </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.GetHashCode">
-            <inheritdoc />
-        </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.Equals(System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.op_Equality(AndanteTribe.Utils.Obscured{`0},AndanteTribe.Utils.Obscured{`0})">
-            <summary>
-            Returns a value indicating whether two <see cref="T:AndanteTribe.Utils.Obscured`1"/> values are equal.
-            </summary>
-        </member>
-        <member name="M:AndanteTribe.Utils.Obscured`1.op_Inequality(AndanteTribe.Utils.Obscured{`0},AndanteTribe.Utils.Obscured{`0})">
-            <summary>
-            Returns a value indicating whether two <see cref="T:AndanteTribe.Utils.Obscured`1"/> values are not equal.
-            </summary>
-        </member>
         <member name="T:AndanteTribe.Utils.ValueList`1">
             <summary>
             構造体簡易リスト.
