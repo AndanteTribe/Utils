@@ -31,7 +31,7 @@ namespace AndanteTribe.Utils.Unity
     internal sealed class SerializableObjectReference<T> : IObjectReference<T> where T : UnityEngine.Object
     {
         [SerializeField]
-        private T? _value = null!;
+        private T _value = null!;
 
         /// <inheritdoc />
         public ValueTask<T> LoadAsync(CancellationToken cancellationToken)
