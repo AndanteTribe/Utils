@@ -184,16 +184,20 @@ namespace AndanteTribe.Utils.Unity.UI
         {
             base.OnDestroy();
 
-            if (IsActive())
+#if UNITY_EDITOR
+            if (UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
             {
-                _graphicsBuffer.Dispose();
-                _material.Dispose();
-                ListPool<Vector3>.Release(_records);
+                return;
+            }
+#endif
 
-                if (material != null)
-                {
-                    Destroy(material);
-                }
+            _graphicsBuffer.Dispose();
+            _material.Dispose();
+            ListPool<Vector3>.Release(_records);
+
+            if (material != null)
+            {
+                Destroy(material);
             }
         }
     }
