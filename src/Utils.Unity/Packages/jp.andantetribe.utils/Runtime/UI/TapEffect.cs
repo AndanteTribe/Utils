@@ -168,10 +168,7 @@ namespace AndanteTribe.Utils.Unity.UI
 
                 if (count > 0)
                 {
-                    var records = new NativeArray<Vector3>(count, Allocator.Temp);
-                    _records.AsSpan().CopyTo(records);
-
-                    _graphicsBuffer.SetData(records);
+                    _graphicsBuffer.SetData(_records);
                     material.SetBuffer(_recordsID, _graphicsBuffer);
                     material.SetFloat(_durationID, _lifetime);
                 }
