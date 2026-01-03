@@ -74,7 +74,7 @@ namespace AndanteTribe.Utils.Unity.Tasks
                 self._graphicsBuffer.Dispose();
                 ListPool<Vector3>.Release(self._records);
 
-                if (self._image.material != null)
+                if (self._image != null && self._image.material != null)
                 {
                     UnityEngine.Object.Destroy(self._image.material);
                     self._image.material = null!;
@@ -87,12 +87,12 @@ namespace AndanteTribe.Utils.Unity.Tasks
             isModule.leftClick.action.performed += callback;
             cancellationToken.UnsafeRegister(static state =>
             {
-                var pair = ((UnityEngine.InputSystem.UI.InputSystemUIInputModule module, Action<UnityEngine.InputSystem.InputAction.CallbackContext> callback))state!;
-                if (pair.module != null)
+                var (module, callback) = (StateTuple<UnityEngine.InputSystem.UI.InputSystemUIInputModule, Action<UnityEngine.InputSystem.InputAction.CallbackContext>>)state!;
+                if (module != null)
                 {
-                    pair.module.leftClick.action.performed -= pair.callback;
+                    module.leftClick.action.performed -= callback;
                 }
-            }, (isModule, callback));
+            }, StateTuple.Create(isModule, callback));
 #endif
 
             // マテリアルのロード
