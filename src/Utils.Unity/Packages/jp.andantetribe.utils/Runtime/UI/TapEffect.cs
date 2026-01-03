@@ -161,14 +161,16 @@ namespace AndanteTribe.Utils.Unity.UI
             if (material != null)
             {
                 var count = _records.Count;
-                material.SetInt(_countID, count);
 
                 if (count > 0)
                 {
                     _graphicsBuffer.SetData(_records);
-                    material.SetBuffer(_recordsID, _graphicsBuffer);
-                    material.SetFloat(_durationID, _lifetime);
                 }
+
+                // count <= 0 でもバッファをセットしないと描画エラー発生(d3d12)
+                material.SetInt(_countID, count);
+                material.SetBuffer(_recordsID, _graphicsBuffer);
+                material.SetFloat(_durationID, _lifetime);
             }
 
 #if !ENABLE_INPUT_SYSTEM
