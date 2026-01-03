@@ -166,9 +166,11 @@ namespace AndanteTribe.Utils.Unity.UI
                 if (count > 0)
                 {
                     _graphicsBuffer.SetData(_records);
-                    material.SetBuffer(_recordsID, _graphicsBuffer);
                     material.SetFloat(_durationID, _lifetime);
                 }
+
+                // d3d12: Fragment Shader "UI/TapRippleEffect" requires a buffer (SRV) "_Records" at index 0, but none provided. Skipping draw calls to avoid crashing.
+                material.SetBuffer(_recordsID, _graphicsBuffer);
             }
 
 #if !ENABLE_INPUT_SYSTEM
