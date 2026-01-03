@@ -11,12 +11,9 @@
   "license": "MIT",
   "samples": [
     {
-      "displayName": "Tap Effect Particle (URP)",
-      "path": ".Samples/jp.andantetribe.utils.sample/Tap_Effect_URP"
-    },
-    {
-      "displayName": "Base Canvas",
-      "path": ".Samples/jp.andantetribe.utils.sample/Base_Canvas"
+      "displayName": "Base Kit",
+      "path": ".Samples/jp.andantetribe.utils.sample/Base_Kit",
+      "description": "ベースの設定済みCanvas(SafeArea対応)Prefabや、タップエフェクト・トースト通知の実装サンプル."
     }
   ]
 }
