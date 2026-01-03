@@ -15,7 +15,7 @@ namespace AndanteTribe.Utils.Unity.Tasks
     /// 汎用トースト通知の表示実装クラス.
     /// </summary>
     [Serializable]
-    public class ToastControllerCore
+    public class ToastControllerCore : IDisposable
     {
         [SerializeField, Min(0), Tooltip("縦に並んだトースト間の間隔.")]
         private int _spacingY = 10;
@@ -33,14 +33,14 @@ namespace AndanteTribe.Utils.Unity.Tasks
         private float _consecutiveWaitDuration = 0.5f;
 
         /// <summary>
+        /// トーストの最大表示数.
+        /// </summary>
+        public readonly uint MaxToastCount;
+
+        /// <summary>
         /// タイムスタンプ取得用.
         /// </summary>
         private readonly TimeProvider _timeProvider = null!;
-
-        /// <summary>
-        /// トーストの最大表示数.
-        /// </summary>
-        private readonly uint _maxToastCount;
 
         /// <summary>
         /// 表示しているトースト数を制御するセマフォ.
@@ -83,7 +83,7 @@ namespace AndanteTribe.Utils.Unity.Tasks
         public ToastControllerCore(TimeProvider timeProvider, uint maxToastCount)
         {
             _timeProvider = timeProvider;
-            _maxToastCount = maxToastCount;
+            MaxToastCount = maxToastCount;
             _visibleSemaphore = new UniTaskSemaphore(maxToastCount, maxToastCount);
             _topSemaphore = new UniTaskSemaphore(0, maxToastCount - 1);
         }
@@ -93,7 +93,16 @@ namespace AndanteTribe.Utils.Unity.Tasks
         {
         }
 
-        private async UniTask ShowAsync<TModel, TView>(
+        /// <summary>
+        /// トーストを表示します.
+        /// </summary>
+        /// <param name="model">モデルオブジェクト.</param>
+        /// <param name="pool">プール.</param>
+        /// <param name="toastSetup">トーストセットアップ関数.</param>
+        /// <param name="cancellationToken">キャンセルトークン.</param>
+        /// <typeparam name="TModel">モデルオブジェクトの型.</typeparam>
+        /// <typeparam name="TView">トーストビューの型.</typeparam>
+        public async UniTask ShowAsync<TModel, TView>(
             TModel model,
             GameObjectPool<TView> pool,
             Func<TModel, float, TView, CancellationToken, UniTask> toastSetup,
@@ -103,7 +112,7 @@ namespace AndanteTribe.Utils.Unity.Tasks
             using var _ = await _visibleSemaphore.WaitScopeAsync(cancellationToken);
 
             // visibleSemaphoreの空き枠から、何個目のトーストかを取得.
-            var spawnIndex = _maxToastCount - _visibleSemaphore.CurrentCount - 1;
+            var spawnIndex = MaxToastCount - _visibleSemaphore.CurrentCount - 1;
 
             // 連続表示抑制処理.
             await ConsecutiveWaitAsync(cancellationToken);
@@ -149,13 +158,13 @@ namespace AndanteTribe.Utils.Unity.Tasks
             await LMotion.Create(0, -width, _animDuration).BindToAnchoredPositionX(toast.RectTransform).ToUniTask(cancellationToken);
 
             // 最後のトーストだったら_previousToastをクリア.
-            if (_visibleSemaphore.CurrentCount == _maxToastCount - 1)
+            if (_visibleSemaphore.CurrentCount == MaxToastCount - 1)
             {
                 _previousToast = null;
             }
 
             // 最上部トーストの完了を後続のトーストに通知.
-            var nonTopReleaseCount = _maxToastCount - 1 - _visibleSemaphore.CurrentCount;
+            var nonTopReleaseCount = MaxToastCount - 1 - _visibleSemaphore.CurrentCount;
             if (nonTopReleaseCount > 0)
             {
                 _topSemaphore.Release(nonTopReleaseCount);
@@ -163,6 +172,13 @@ namespace AndanteTribe.Utils.Unity.Tasks
 
             // トースト完了タイムスタンプを更新.
             _lastToastCompletedTimestamp = _timeProvider.GetTimestamp();
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            _visibleSemaphore.Dispose();
+            _topSemaphore.Dispose();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

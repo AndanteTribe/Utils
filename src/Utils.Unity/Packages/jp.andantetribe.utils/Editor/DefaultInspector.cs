@@ -27,10 +27,13 @@ namespace AndanteTribe.Utils.Unity.Editor
             {
                 foreach (var attr in methodInfo.GetCustomAttributes<ButtonAttribute>())
                 {
-                    if (attr == null) continue;
+                    if (attr == null)
+                    {
+                        continue;
+                    }
                     var btn = new Button()
                     {
-                        text = attr.ButtonName
+                        text = string.IsNullOrEmpty(attr.ButtonName) ? methodInfo.Name : attr.ButtonName
                     };
                     btn.RegisterCallback<ClickEvent, (MethodInfo method, UnityEngine.Object target, object[] args)>(static (_, args) =>
                     {

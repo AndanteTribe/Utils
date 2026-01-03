@@ -2,7 +2,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
 namespace AndanteTribe.Utils.Unity
 {
@@ -28,7 +27,7 @@ namespace AndanteTribe.Utils.Unity
         /// </summary>
         /// <param name="buttonName">ボタンの名前.デフォルト値は対象メソッド名.</param>
         /// <param name="parameters">引数.</param>
-        public ButtonAttribute([CallerMemberName] string buttonName = "", params object[] parameters)
+        public ButtonAttribute(string buttonName = "", params object[] parameters)
         {
             ButtonName = buttonName;
             Parameters = parameters;
