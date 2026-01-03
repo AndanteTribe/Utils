@@ -11,8 +11,9 @@ using UnityEngine.UIElements;
 namespace AndanteTribe.Utils.Unity.Editor
 {
     [CustomPropertyDrawer(typeof(TextView), true)]
-    internal sealed class TextViewDrawer : PropertyDrawer
+    public class TextViewDrawer : PropertyDrawer
     {
+        /// <inheritdoc />
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             var root = UIElementUtils.CreateBox();
