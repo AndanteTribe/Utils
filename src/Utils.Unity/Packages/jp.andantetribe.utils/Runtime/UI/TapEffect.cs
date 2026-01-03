@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Unity.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -180,6 +179,15 @@ namespace AndanteTribe.Utils.Unity.UI
                 OnLeftClickAsync().Forget();
             }
 #endif
+        }
+
+        /// <inheritdoc />
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            _graphicsBuffer.Dispose();
+            _material.Dispose();
+            ListPool<Vector3>.Release(_records);
         }
     }
 }

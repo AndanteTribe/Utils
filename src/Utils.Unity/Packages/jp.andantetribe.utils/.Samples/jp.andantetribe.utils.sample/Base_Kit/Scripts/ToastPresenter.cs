@@ -53,6 +53,8 @@ namespace AndanteTribe.Utils.Sample
 
         private void OnDestroy()
         {
+            _core.Dispose();
+            _shortToastReference.Dispose();
             _shortToastPool.Dispose();
         }
     }
