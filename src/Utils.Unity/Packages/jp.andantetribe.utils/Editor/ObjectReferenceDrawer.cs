@@ -24,6 +24,7 @@ namespace AndanteTribe.Utils.Unity.Editor
         private static readonly Lazy<TypeCache.TypeCollection> s_unityObjectTypes = new(static () =>
             TypeCache.GetTypesDerivedFrom(typeof(UnityEngine.Object)));
 
+        /// <inheritdoc />
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             var root = UIElementUtils.CreateBox(property.displayName);

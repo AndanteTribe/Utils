@@ -17,20 +17,19 @@ namespace AndanteTribe.Utils.Unity.Tasks
     [Serializable]
     public class ToastControllerCore
     {
-        [Header("各種設定")]
-        [SerializeField, Tooltip("縦に並んだトースト間の間隔.")]
+        [SerializeField, Min(0), Tooltip("縦に並んだトースト間の間隔.")]
         private int _spacingY = 10;
 
-        [SerializeField, Tooltip("トーストの表示・非表示アニメーションにかける時間.")]
+        [SerializeField, Min(0), Tooltip("トーストの表示・非表示アニメーションにかける時間.")]
         private float _animDuration = 0.15f;
 
-        [SerializeField, Tooltip("トースト表示時間.")]
+        [SerializeField, Min(0), Tooltip("トースト表示時間.")]
         private float _displayDuration = 1.0f;
 
-        [SerializeField, Tooltip("最初のトーストだけ通常より長く表示する場合の追加表示時間.")]
+        [SerializeField, Min(0), Tooltip("最初のトーストだけ通常より長く表示する場合の追加表示時間.")]
         private float _firstExtraDisplayDuration = 0.3f;
 
-        [SerializeField, Tooltip("連続して表示する場合の待機時間.")]
+        [SerializeField, Min(0), Tooltip("連続して表示する場合の待機時間.")]
         private float _consecutiveWaitDuration = 0.5f;
 
         /// <summary>

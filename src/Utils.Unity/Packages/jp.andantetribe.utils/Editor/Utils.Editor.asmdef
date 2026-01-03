@@ -39,6 +39,16 @@
             "name": "jp.hadashikick.vcontainer",
             "expression": "",
             "define": "ENABLE_VCONTAINER"
+        },
+        {
+            "name": "com.cysharp.unitask",
+            "expression": "",
+            "define": "ENABLE_UNITASK"
+        },
+        {
+            "name": "com.annulusgames.lit-motion",
+            "expression": "",
+            "define": "ENABLE_LITMOTION"
         }
     ],
     "noEngineReferences": false
