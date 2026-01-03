@@ -183,9 +183,13 @@ namespace AndanteTribe.Utils.Unity.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            _graphicsBuffer.Dispose();
-            _material.Dispose();
-            ListPool<Vector3>.Release(_records);
+
+            if (IsActive())
+            {
+                _graphicsBuffer.Dispose();
+                _material.Dispose();
+                ListPool<Vector3>.Release(_records);
+            }
         }
     }
 }
