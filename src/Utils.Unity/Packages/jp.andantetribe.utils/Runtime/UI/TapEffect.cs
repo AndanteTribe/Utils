@@ -189,6 +189,11 @@ namespace AndanteTribe.Utils.Unity.UI
                 _graphicsBuffer.Dispose();
                 _material.Dispose();
                 ListPool<Vector3>.Release(_records);
+
+                if (material != null)
+                {
+                    Destroy(material);
+                }
             }
         }
     }
