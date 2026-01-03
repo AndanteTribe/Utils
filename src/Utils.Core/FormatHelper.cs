@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using AndanteTribe.Utils.Internal;
 
 namespace AndanteTribe.Utils;
 

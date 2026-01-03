@@ -3,7 +3,7 @@ using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace AndanteTribe.Utils;
+namespace AndanteTribe.Utils.Internal;
 
 /// <summary>
 /// 構造体簡易リスト.
