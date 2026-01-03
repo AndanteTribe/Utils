@@ -568,6 +568,82 @@
             <param name="cancellationToken">キャンセル用のトークン.</param>
             <returns>初期化が完了したら完了するタスク.</returns>
         </member>
+        <member name="T:AndanteTribe.Utils.Internal.ValueList`1">
+            <summary>
+            構造体簡易リスト.
+            </summary>
+            <param name="capacity">初期容量.</param>
+            <typeparam name="T">要素の型.</typeparam>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.#ctor(System.Int32)">
+            <summary>
+            構造体簡易リスト.
+            </summary>
+            <param name="capacity">初期容量.</param>
+            <typeparam name="T">要素の型.</typeparam>
+        </member>
+        <member name="P:AndanteTribe.Utils.Internal.ValueList`1.Count">
+            <summary>
+            要素数.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.#ctor">
+            <inheritdoc />
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.Add(`0)">
+            <summary>
+            要素を追加します.
+            </summary>
+            <param name="item"></param>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.Clear">
+            <summary>
+            配列プールに返却する.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.Clear(System.ArraySegment{`0}@)">
+            <summary>
+            配列プールに返却する.
+            </summary>
+            <param name="segment"></param>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.Clear(System.ReadOnlyMemory{`0}@)">
+            <summary>
+            配列プールに返却する.
+            </summary>
+            <param name="memory"></param>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.AsSegment">
+            <summary>
+            <see cref="T:System.ArraySegment`1"/>として取得します.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.AsSpan">
+            <summary>
+            <see cref="T:System.Span`1"/>として取得します.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.AsMemory">
+            <summary>
+            <see cref="T:System.Memory`1"/>として取得します.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.GetEnumerator">
+            <summary>
+            列挙子を取得します.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.System#Collections#Generic#IEnumerable{T}#GetEnumerator">
+            <inheritdoc />
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.System#Collections#IEnumerable#GetEnumerator">
+            <inheritdoc />
+        </member>
         <member name="T:AndanteTribe.Utils.MemoryExtensions">
             <summary>
             <see cref="T:System.Memory`1"/>, <see cref="T:System.ReadOnlyMemory`1"/>の拡張メソッド.
@@ -759,82 +835,6 @@
             <param name="item1"></param>
             <param name="item2"></param>
             <param name="item3"></param>
-        </member>
-        <member name="T:AndanteTribe.Utils.ValueList`1">
-            <summary>
-            構造体簡易リスト.
-            </summary>
-            <param name="capacity">初期容量.</param>
-            <typeparam name="T">要素の型.</typeparam>
-        </member>
-        <member name="M:AndanteTribe.Utils.ValueList`1.#ctor(System.Int32)">
-            <summary>
-            構造体簡易リスト.
-            </summary>
-            <param name="capacity">初期容量.</param>
-            <typeparam name="T">要素の型.</typeparam>
-        </member>
-        <member name="P:AndanteTribe.Utils.ValueList`1.Count">
-            <summary>
-            要素数.
-            </summary>
-        </member>
-        <member name="M:AndanteTribe.Utils.ValueList`1.#ctor">
-            <inheritdoc />
-        </member>
-        <member name="M:AndanteTribe.Utils.ValueList`1.Add(`0)">
-            <summary>
-            要素を追加します.
-            </summary>
-            <param name="item"></param>
-        </member>
-        <member name="M:AndanteTribe.Utils.ValueList`1.Clear">
-            <summary>
-            配列プールに返却する.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:AndanteTribe.Utils.ValueList`1.Clear(System.ArraySegment{`0}@)">
-            <summary>
-            配列プールに返却する.
-            </summary>
-            <param name="segment"></param>
-        </member>
-        <member name="M:AndanteTribe.Utils.ValueList`1.Clear(System.ReadOnlyMemory{`0}@)">
-            <summary>
-            配列プールに返却する.
-            </summary>
-            <param name="memory"></param>
-        </member>
-        <member name="M:AndanteTribe.Utils.ValueList`1.AsSegment">
-            <summary>
-            <see cref="T:System.ArraySegment`1"/>として取得します.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:AndanteTribe.Utils.ValueList`1.AsSpan">
-            <summary>
-            <see cref="T:System.Span`1"/>として取得します.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:AndanteTribe.Utils.ValueList`1.AsMemory">
-            <summary>
-            <see cref="T:System.Memory`1"/>として取得します.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:AndanteTribe.Utils.ValueList`1.GetEnumerator">
-            <summary>
-            列挙子を取得します.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:AndanteTribe.Utils.ValueList`1.System#Collections#Generic#IEnumerable{T}#GetEnumerator">
-            <inheritdoc />
-        </member>
-        <member name="M:AndanteTribe.Utils.ValueList`1.System#Collections#IEnumerable#GetEnumerator">
-            <inheritdoc />
         </member>
         <member name="T:AndanteTribe.Utils.ValueTupleExtensions">
             <summary>
