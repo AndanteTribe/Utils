@@ -52,16 +52,27 @@ namespace AndanteTribe.Utils.Unity.UI
         }
 
         [SerializeField, Tooltip("タップエフェクトの持続時間")]
-        private float _duration = 0.5f;
+        private float _lifetime = 0.5f;
 
         /// <summary>
         /// タップエフェクトの持続時間.
         /// </summary>
-        public float Duration
+        public float Lifetime
         {
-            get => _duration;
-            set => _duration = value;
+            get => _lifetime;
+            set => _lifetime = value;
         }
+
+        /// <inheritdoc />
+        public override bool raycastTarget
+        {
+            get => false;
+            set
+            {
+            }
+        }
+
+        protected TapEffect() => useLegacyMeshGeneration = false;
 
         protected override void Awake()
         {
@@ -143,7 +154,7 @@ namespace AndanteTribe.Utils.Unity.UI
             var record = new Vector3(normalizedPos.x, normalizedPos.y, Time.time);
             _records.Add(record);
 
-            await UniTask.Delay(TimeSpan.FromSeconds(_duration), cancellationToken: destroyCancellationToken);
+            await UniTask.Delay(TimeSpan.FromSeconds(_lifetime), cancellationToken: destroyCancellationToken);
             _records.Remove(record);
         }
 
@@ -162,7 +173,7 @@ namespace AndanteTribe.Utils.Unity.UI
 
                     _graphicsBuffer.SetData(records);
                     material.SetBuffer(_recordsID, _graphicsBuffer);
-                    material.SetFloat(_durationID, _duration);
+                    material.SetFloat(_durationID, _lifetime);
                 }
             }
 
