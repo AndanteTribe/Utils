@@ -104,6 +104,11 @@ namespace AndanteTribe.Utils.Unity.Tasks
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public UniTask<bool> WaitAsync(in int millisecondsTimeout, in CancellationToken cancellationToken = default)
         {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return UniTask.FromCanceled<bool>(cancellationToken);
+            }
+
             if (_isDisposed)
             {
                 throw new ObjectDisposedException(nameof(UniTaskSemaphore));
@@ -112,11 +117,6 @@ namespace AndanteTribe.Utils.Unity.Tasks
             if (millisecondsTimeout < -1)
             {
                 throw new ArgumentOutOfRangeException(nameof(millisecondsTimeout), millisecondsTimeout, "The timeout must represent a value between -1 and Int32.MaxValue, inclusive.");
-            }
-
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return UniTask.FromCanceled<bool>(cancellationToken);
             }
 
             if (CurrentCount > 0)
