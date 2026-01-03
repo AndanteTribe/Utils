@@ -227,7 +227,7 @@ namespace AndanteTribe.Utils.Unity.Tasks
             if (_isDisposed)
             {
 #if UNITY_EDITOR
-                if (!UnityEditor.EditorApplication.isPlaying)
+                if (!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
                 {
                     goto ForceRelease;
                 }

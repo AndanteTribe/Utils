@@ -76,7 +76,7 @@ namespace AndanteTribe.Utils.Unity.UI
             base.Awake();
 
 #if UNITY_EDITOR
-            if (!UnityEditor.EditorApplication.isPlaying)
+            if (!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
             {
                 return;
             }
@@ -104,7 +104,7 @@ namespace AndanteTribe.Utils.Unity.UI
 
 #if ENABLE_INPUT_SYSTEM
 #if UNITY_EDITOR
-            if (!UnityEditor.EditorApplication.isPlaying)
+            if (!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
             {
                 return;
             }
@@ -153,7 +153,7 @@ namespace AndanteTribe.Utils.Unity.UI
         private void Update()
         {
 #if UNITY_EDITOR
-            if (!UnityEditor.EditorApplication.isPlaying)
+            if (!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
             {
                 return;
             }
@@ -162,12 +162,12 @@ namespace AndanteTribe.Utils.Unity.UI
             if (material != null)
             {
                 var count = _records.Count;
+                material.SetInt(_countID, count);
 
                 if (count > 0)
                 {
                     _graphicsBuffer.SetData(_records);
                     material.SetFloat(_durationID, _lifetime);
-                    material.SetInt(_countID, count);
                 }
 
                 // d3d12: Fragment Shader "UI/TapRippleEffect" requires a buffer (SRV) "_Records" at index 0, but none provided. Skipping draw calls to avoid crashing.
@@ -188,7 +188,7 @@ namespace AndanteTribe.Utils.Unity.UI
             base.OnDestroy();
 
 #if UNITY_EDITOR
-            if (!UnityEditor.EditorApplication.isPlaying)
+            if (!UnityEditor.EditorApplication.isPlaying && UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
             {
                 return;
             }
