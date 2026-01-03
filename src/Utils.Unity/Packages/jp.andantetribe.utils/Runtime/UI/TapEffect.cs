@@ -7,8 +7,6 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.UI;
 using UnityEngine.Pool;
 using UnityEngine.UI;
 
@@ -104,13 +102,13 @@ namespace AndanteTribe.Utils.Unity.UI
 #if ENABLE_INPUT_SYSTEM
             if (IsActive())
             {
-                var module = (InputSystemUIInputModule)(EventSystem.current.currentInputModule == null
+                var module = (UnityEngine.InputSystem.UI.InputSystemUIInputModule)(EventSystem.current.currentInputModule == null
                     ? EventSystem.current.GetComponent<BaseInputModule>() : EventSystem.current.currentInputModule);
-                var callback = new Action<InputAction.CallbackContext>(_ => OnLeftClickAsync().Forget());
+                var callback = new Action<UnityEngine.InputSystem.InputAction.CallbackContext>(_ => OnLeftClickAsync().Forget());
                 module.leftClick.action.performed += callback;
                 destroyCancellationToken.UnsafeRegister(static state =>
                 {
-                    var (module, callback) = (StateTuple<InputSystemUIInputModule, Action<InputAction.CallbackContext>>)state!;
+                    var (module, callback) = (StateTuple<UnityEngine.InputSystem.UI.InputSystemUIInputModule, Action<UnityEngine.InputSystem.InputAction.CallbackContext>>)state!;
                     if (module != null)
                     {
                         module.leftClick.action.performed -= callback;
