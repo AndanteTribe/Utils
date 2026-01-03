@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using AndanteTribe.Utils.Unity.Tasks.Internal;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace AndanteTribe.Utils.Unity.Tasks
@@ -225,9 +226,16 @@ namespace AndanteTribe.Utils.Unity.Tasks
         {
             if (_isDisposed)
             {
+#if UNITY_EDITOR
+                if (!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
+                {
+                    goto ForceRelease;
+                }
+#endif
                 throw new ObjectDisposedException(nameof(UniTaskSemaphore));
             }
 
+ForceRelease:
             if (releaseCount < 1)
             {
                 throw new ArgumentOutOfRangeException(nameof(releaseCount), releaseCount, "The releaseCount argument must be greater than zero.");

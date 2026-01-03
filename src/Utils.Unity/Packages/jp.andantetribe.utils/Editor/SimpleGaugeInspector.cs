@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 namespace AndanteTribe.Utils.Unity.Editor
 {
     [CustomEditor(typeof(SimpleGauge))]
-    public class SimpleGaugeEditor : UnityEditor.Editor
+    public class SimpleGaugeInspector : UnityEditor.Editor
     {
         /// <inheritdoc/>
         public override VisualElement CreateInspectorGUI()
