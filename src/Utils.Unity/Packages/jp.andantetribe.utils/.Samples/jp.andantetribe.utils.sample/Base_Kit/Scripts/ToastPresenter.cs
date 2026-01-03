@@ -51,7 +51,7 @@ namespace AndanteTribe.Utils.Sample
             ShowShortToastAsync(message, destroyCancellationToken).Forget();
         }
 
-        private void OnDestroy()
+        private void OnApplicationQuit()
         {
             _core.Dispose();
             _shortToastReference.Dispose();

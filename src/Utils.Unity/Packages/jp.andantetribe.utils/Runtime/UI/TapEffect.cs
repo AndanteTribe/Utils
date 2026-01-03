@@ -75,19 +75,22 @@ namespace AndanteTribe.Utils.Unity.UI
         {
             base.Awake();
 
-            if (IsActive())
+#if UNITY_EDITOR
+            if (!UnityEditor.EditorApplication.isPlaying)
             {
-                _graphicsBuffer = new(GraphicsBuffer.Target.Structured, MaxCountDefault, sizeof(float) * 3);
-                _recordsID = Shader.PropertyToID("_Records");
-                _countID = Shader.PropertyToID("_Count");
-                _durationID = Shader.PropertyToID("_Duration");
-                _screen = new Rect(0, 0, Screen.width, Screen.height);
-                if (_records.Capacity < MaxCountDefault)
-                {
-                    _records.Capacity = MaxCountDefault;
-                }
-                LoadMaterialAsync(destroyCancellationToken).Forget();
+                return;
             }
+#endif
+            _graphicsBuffer = new(GraphicsBuffer.Target.Structured, MaxCountDefault, sizeof(float) * 3);
+            _recordsID = Shader.PropertyToID("_Records");
+            _countID = Shader.PropertyToID("_Count");
+            _durationID = Shader.PropertyToID("_Duration");
+            _screen = new Rect(0, 0, Screen.width, Screen.height);
+            if (_records.Capacity < MaxCountDefault)
+            {
+                _records.Capacity = MaxCountDefault;
+            }
+            LoadMaterialAsync(destroyCancellationToken).Forget();
 
             async UniTaskVoid LoadMaterialAsync(CancellationToken cancellationToken)
             {
@@ -100,33 +103,25 @@ namespace AndanteTribe.Utils.Unity.UI
             base.Start();
 
 #if ENABLE_INPUT_SYSTEM
-            if (IsActive())
-            {
-                var module = (UnityEngine.InputSystem.UI.InputSystemUIInputModule)(EventSystem.current.currentInputModule == null
-                    ? EventSystem.current.GetComponent<BaseInputModule>() : EventSystem.current.currentInputModule);
-                var callback = new Action<UnityEngine.InputSystem.InputAction.CallbackContext>(_ => OnLeftClickAsync().Forget());
-                module.leftClick.action.performed += callback;
-                destroyCancellationToken.UnsafeRegister(static state =>
-                {
-                    var (module, callback) = (StateTuple<UnityEngine.InputSystem.UI.InputSystemUIInputModule, Action<UnityEngine.InputSystem.InputAction.CallbackContext>>)state!;
-                    if (module != null)
-                    {
-                        module.leftClick.action.performed -= callback;
-                    }
-                }, StateTuple.Create(module, callback));
-            }
-#endif
-        }
-
-        public override bool IsActive()
-        {
 #if UNITY_EDITOR
-            if (!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
+            if (!UnityEditor.EditorApplication.isPlaying)
             {
-                return false;
+                return;
             }
 #endif
-            return base.IsActive();
+            var module = (UnityEngine.InputSystem.UI.InputSystemUIInputModule)(EventSystem.current.currentInputModule == null
+                ? EventSystem.current.GetComponent<BaseInputModule>() : EventSystem.current.currentInputModule);
+            var callback = new Action<UnityEngine.InputSystem.InputAction.CallbackContext>(_ => OnLeftClickAsync().Forget());
+            module.leftClick.action.performed += callback;
+            destroyCancellationToken.UnsafeRegister(static state =>
+            {
+                var (module, callback) = (StateTuple<UnityEngine.InputSystem.UI.InputSystemUIInputModule, Action<UnityEngine.InputSystem.InputAction.CallbackContext>>)state!;
+                if (module != null)
+                {
+                    module.leftClick.action.performed -= callback;
+                }
+            }, StateTuple.Create(module, callback));
+#endif
         }
 
         private async UniTaskVoid OnLeftClickAsync()
@@ -157,16 +152,22 @@ namespace AndanteTribe.Utils.Unity.UI
 
         private void Update()
         {
+#if UNITY_EDITOR
+            if (!UnityEditor.EditorApplication.isPlaying)
+            {
+                return;
+            }
+#endif
             // update material
             if (material != null)
             {
                 var count = _records.Count;
-                material.SetInt(_countID, count);
 
                 if (count > 0)
                 {
                     _graphicsBuffer.SetData(_records);
                     material.SetFloat(_durationID, _lifetime);
+                    material.SetInt(_countID, count);
                 }
 
                 // d3d12: Fragment Shader "UI/TapRippleEffect" requires a buffer (SRV) "_Records" at index 0, but none provided. Skipping draw calls to avoid crashing.
@@ -187,12 +188,11 @@ namespace AndanteTribe.Utils.Unity.UI
             base.OnDestroy();
 
 #if UNITY_EDITOR
-            if (UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
+            if (!UnityEditor.EditorApplication.isPlaying)
             {
                 return;
             }
 #endif
-
             _graphicsBuffer.Dispose();
             _material.Dispose();
             ListPool<Vector3>.Release(_records);

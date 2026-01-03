@@ -224,11 +224,18 @@ namespace AndanteTribe.Utils.Unity.Tasks
         /// <exception cref="SemaphoreFullException"></exception>
         public uint Release(uint releaseCount = 1)
         {
-            if (Application.isPlaying && _isDisposed)
+            if (_isDisposed)
             {
+#if UNITY_EDITOR
+                if (!UnityEditor.EditorApplication.isPlaying)
+                {
+                    goto ForceRelease;
+                }
+#endif
                 throw new ObjectDisposedException(nameof(UniTaskSemaphore));
             }
 
+ForceRelease:
             if (releaseCount < 1)
             {
                 throw new ArgumentOutOfRangeException(nameof(releaseCount), releaseCount, "The releaseCount argument must be greater than zero.");

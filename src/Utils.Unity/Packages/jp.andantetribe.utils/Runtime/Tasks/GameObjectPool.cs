@@ -94,9 +94,12 @@ namespace AndanteTribe.Utils.Unity.Tasks
         /// <param name="element">返却するインスタンス.</param>
         public void Return(T element)
         {
-            element.gameObject.SetActive(false);
-            element.transform.SetParent(_root);
-            _pool.Add(element);
+            if (element != null)
+            {
+                element.gameObject.SetActive(false);
+                element.transform.SetParent(_root);
+                _pool.Add(element);
+            }
         }
 
         /// <summary>
