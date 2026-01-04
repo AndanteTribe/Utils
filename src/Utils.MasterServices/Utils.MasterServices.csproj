@@ -1,18 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.1;net6.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1;net8.0</TargetFrameworks>
         <LangVersion>14</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <OutputType>Library</OutputType>
-        <RootNamespace>AndanteTribe.Utils.Csv</RootNamespace>
+        <RootNamespace>AndanteTribe.Utils.MasterServices</RootNamespace>
         <Version>1.1.0</Version>
-        <AssemblyName>Utils.Csv</AssemblyName>
+        <AssemblyName>Utils.MasterServices</AssemblyName>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        
+
         <!-- NuGet Packaging -->
-        <PackageId>AndanteTribe.Utils.Csv</PackageId>
+        <PackageId>AndanteTribe.Utils.MasterServices</PackageId>
         <PackageVersion>$(Version)</PackageVersion>
         <Authors>AndanteTribe</Authors>
         <Copyright>© AndanteTribe</Copyright>
@@ -24,10 +24,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Remove=".gitignore" />
+      <PackageReference Include="MasterMemory" Version="3.0.4" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' != 'net6.0'">
+    <ItemGroup>
+      <ProjectReference Include="..\Utils.Csv\Utils.Csv.csproj" />
+      <ProjectReference Include="..\Utils.Core\Utils.Core.csproj" />
+      <ProjectReference Include="..\Utils.GameServices\Utils.GameServices.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' != 'net8.0'">
         <ProjectReference Include="..\Utils.BackPort\Utils.BackPort.csproj" />
     </ItemGroup>
 

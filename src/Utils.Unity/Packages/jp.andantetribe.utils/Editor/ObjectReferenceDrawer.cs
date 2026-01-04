@@ -96,7 +96,11 @@ namespace AndanteTribe.Utils.Unity.Editor
                     }, new DropDownData { Type = type, Property = property });
                 }
 
+#if UNITY_6000_3_OR_NEWER
+                genericDropdown.DropDown(btn.worldBound, btn, DropdownMenuSizeMode.Content);
+#else
                 genericDropdown.DropDown(btn.worldBound, btn, false);
+#endif
             }, property);
 
             var label = root.Q<Label>(property.displayName);

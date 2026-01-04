@@ -89,7 +89,7 @@ namespace AndanteTribe.Utils.Unity.Tasks
                 {
                     awaiter.SourceOnCompleted(static state =>
                     {
-                        var (self, awaiter, i) = ((UniTaskBag<T>, UniTask<T>.Awaiter, int))state;
+                        var (self, awaiter, i) = (StateTuple<UniTaskBag<T>, UniTask<T>.Awaiter, int>)state;
                         TryInvokeContinuation(self, awaiter, i);
                     }, StateTuple.Create(this, awaiter, i));
                 }
@@ -223,7 +223,7 @@ namespace AndanteTribe.Utils.Unity.Tasks
                 {
                     awaiter.SourceOnCompleted(static state =>
                     {
-                        var (self, awaiter) = ((UniTaskBag, UniTask.Awaiter))state;
+                        var (self, awaiter) = (StateTuple<UniTaskBag, UniTask.Awaiter>)state;
                         TryInvokeContinuation(self, awaiter);
                     }, StateTuple.Create(this, awaiter));
                 }

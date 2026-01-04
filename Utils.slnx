@@ -3,5 +3,6 @@
   <Project Path="src/Utils.BackPort/Utils.BackPort.csproj" />
   <Project Path="src/Utils.GameServices/Utils.GameServices.csproj" />
   <Project Path="src/Utils.Csv/Utils.Csv.csproj" />
+  <Project Path="src/Utils.MasterServices/Utils.MasterServices.csproj" />
   <Project Path="src/Utils.Tests/Utils.Tests.csproj" />
 </Solution>

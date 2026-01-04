@@ -526,6 +526,23 @@
              <exception cref="T:System.ArgumentNullException"><see cref="!:equals"/>がnullです.</exception>
              <exception cref="T:System.NotSupportedException"><see cref="!:getHashCode"/>がnullです.</exception>
         </member>
+        <member name="T:AndanteTribe.Utils.FileReferenceAttribute">
+            <summary>
+            ファイルパスを指定する属性.
+            </summary>
+        </member>
+        <member name="F:AndanteTribe.Utils.FileReferenceAttribute.Path">
+            <summary>
+            ファイルパス.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.FileReferenceAttribute.#ctor(System.String,System.String)">
+            <summary>
+            Initialize a new instance of <see cref="T:AndanteTribe.Utils.FileReferenceAttribute"/>.
+            </summary>
+            <param name="path">ファイルパス.</param>
+            <param name="callerFilePath">呼び出し元のファイルパス.</param>
+        </member>
         <member name="T:AndanteTribe.Utils.FormatHelper">
             <summary>
             文字列フォーマットのヘルパー.
