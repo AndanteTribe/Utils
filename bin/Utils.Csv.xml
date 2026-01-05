@@ -192,18 +192,6 @@
             <returns></returns>
             <exception cref="T:System.IO.InvalidDataException"></exception>
         </member>
-        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadDynamic(System.Reflection.PropertyInfo)">
-            <summary>
-            プロパティメタデータから<see cref="T:AndanteTribe.Utils.Csv.CsvReader"/>を用いて値を取得する.
-            </summary>
-            <remarks>
-            列挙体の場合、<see cref="T:System.Runtime.Serialization.EnumMemberAttribute"/>で指定された名前も考慮してパースを試みる.
-            またフラグ列挙体の場合、"Hoge_Fuga_Piyo"のようにアンダースコア区切りで複数指定された場合も対応する.
-            </remarks>
-            <param name="info"></param>
-            <returns></returns>
-            <exception cref="T:System.NotSupportedException"></exception>
-        </member>
         <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadDynamic(System.Type)">
             <summary>
             型情報から<see cref="T:AndanteTribe.Utils.Csv.CsvReader"/>を用いて値を取得する.

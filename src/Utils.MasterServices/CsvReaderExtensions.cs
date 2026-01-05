@@ -10,12 +10,20 @@ namespace AndanteTribe.Utils.MasterServices;
 internal static class CsvReaderExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static object? ReadObject(this CsvReader reader, PropertyInfo info)
+    public static object? ReadObject(this LocalizeCsvReader reader, PropertyInfo info, uint languageIndex)
     {
         if (info.SetMethod == null)
         {
             throw new NotSupportedException($"対象プロパティにセッターがありません。{{ get; init; }}を検討してください, Type:{info.DeclaringType} Prop:{info.Name}");
         }
+
+        // ローカライズ対応.
+        // LocalizeFormatもMessagePackObjectなので、MessagePackObjectAttributeより前に処理.
+        if (reader.TryGetLocalizeObject(info, languageIndex, out var value))
+        {
+            return value;
+        }
+
         var type = info.PropertyType;
 
         // マスターIDだけセル一つで書けるように特別対応. e.g. "Air.0001"
@@ -25,7 +33,7 @@ internal static class CsvReaderExtensions
         }
         if (type.IsDefined(typeof(MessagePackObjectAttribute)))
         {
-            return reader.ReadMessagePackObject(type);
+            return reader.ReadMessagePackObject(type, languageIndex);
         }
 
         return reader.ReadDynamic(type);
@@ -59,7 +67,7 @@ internal static class CsvReaderExtensions
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static object ReadMessagePackObject(this CsvReader reader, Type type)
+    public static object ReadMessagePackObject(this LocalizeCsvReader reader, Type type, uint languageIndex)
     {
         // 現状、StringKey使う方式は対応していない
         var props = type.GetProperties()
@@ -71,7 +79,7 @@ internal static class CsvReaderExtensions
 #endif
         foreach (var prop in props)
         {
-            var value = reader.ReadObject(prop);
+            var value = reader.ReadObject(prop, languageIndex);
             prop.SetValue(obj, value);
         }
         return obj;

@@ -1,173 +1,116 @@
-﻿using System.Reflection;
+﻿using System.Collections.Concurrent;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
-using AndanteTribe.Utils.Csv;
+using System.Security.Cryptography;
 using MasterMemory;
 using MasterMemory.Meta;
 using MessagePack;
 
-namespace AndanteTribe.Utils.MasterServices
+namespace AndanteTribe.Utils.MasterServices;
+
+/// <summary>
+/// マスターデータコンバーター.
+/// </summary>
+public static class MasterConverter
 {
-    public class MasterConverter
+    /// <summary>
+    /// マスターデータをコンバートして、指定されたパスにバイナリを出力します.
+    /// </summary>
+    /// <param name="settings">マスター設定.</param>
+    /// <param name="outputPath">出力パス.</param>
+    /// <param name="aes">暗号化用AES. 指定しない場合は暗号化しません.</param>
+    public static void Build(MasterSettings settings, string outputPath, Aes? aes = null)
     {
-        private sealed class Builder(IFormatterResolver? resolver = null) : DatabaseBuilderBase(resolver);
+        using var fileStream = File.Create(outputPath);
 
-        /// <summary>
-        /// 入力ディレクトリパス.
-        /// </summary>
-        public readonly string InputDirectoryPath;
-
-        /// <summary>
-        /// マスターメタデータ.
-        /// </summary>
-        public readonly MetaDatabase Metadata;
-
-        /// <summary>
-        /// 出力の際に暗号化するかどうか.
-        /// </summary>
-        public bool IsEncrypt { get; init; } = false;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MasterConverter"/> class.
-        /// </summary>
-        /// <param name="inputDirectoryPath">入力ディレクトリパス.</param>
-        /// <param name="metadata">マスターメタデータ.</param>
-        public MasterConverter(string inputDirectoryPath, MetaDatabase metadata)
+        if (aes != null)
         {
-            InputDirectoryPath = inputDirectoryPath;
-            Metadata = metadata;
+            using var cryptoStream = new CryptoStream(fileStream, aes.CreateEncryptor(), CryptoStreamMode.Write);
+            LoadCore(settings).WriteToStream(cryptoStream);
+            cryptoStream.FlushFinalBlock();
+            return;
         }
 
-        /// <summary>
-        /// マスターデータをコンバートして、指定されたパスにバイナリを出力します.
-        /// </summary>
-        /// <param name="outputPath"></param>
-        /// <param name="cancellationToken"></param>
-        public async ValueTask BuildAsync(string outputPath, CancellationToken cancellationToken = default)
+        LoadCore(settings).WriteToStream(fileStream);
+    }
+
+    /// <summary>
+    /// マスターデータをコンバートして、バイナリを生成します.
+    /// </summary>
+    /// <param name="settings">マスター設定.</param>
+    /// <returns>バイナリ.</returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static byte[] Load(MasterSettings settings) => LoadCore(settings).Build();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static DatabaseBuilderBase LoadCore(MasterSettings settings)
+    {
+        var builder = settings.BuilderFactory();
+        var actions = new List<Action>();
+        var container = new ConcurrentBag<(Type, IList<object>)>();
+
+        foreach (var tableInfo in settings.Metadata.GetTableInfos())
         {
-            var bin = await LoadAsync(cancellationToken);
-
-            await using var fileStream = File.Create(outputPath, 4096, FileOptions.Asynchronous);
-            await fileStream.WriteAsync(bin, cancellationToken);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public async Task<byte[]> LoadAsync<TEnum>(TEnum language, CancellationToken cancellationToken = default) where TEnum : unmanaged, Enum
-        {
-
-        }
-
-        /// <summary>
-        /// マスターデータをコンバートして、バイナリを生成します.
-        /// </summary>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException"></exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public async Task<byte[]> LoadAsync(CancellationToken cancellationToken = default)
-        {
-            var builder = new Builder();
-            var tasks = new List<Task<(Type, IList<object>)>>();
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
-            foreach (var tableInfo in Metadata.GetTableInfos())
+            var fileName = tableInfo.DataType.GetCustomAttribute<FileNameAttribute>()?.Name;
+            if (fileName == null)
             {
-                var fileName = tableInfo.DataType.GetCustomAttribute<FileNameAttribute>()?.Name;
-                if (fileName == null)
-                {
-                    throw new InvalidOperationException($"FileReferenceAttribute not found on {tableInfo.DataType.Name}.");
-                }
-
-                var fullPath = Path.Combine(InputDirectoryPath, fileName);
-
-                var task = CreateNonLocalizedLoadTask(tableInfo, fullPath, cts);
-                tasks.Add(task);
+                throw new InvalidOperationException($"{nameof(FileNameAttribute)} not found on {tableInfo.DataType.Name}.");
             }
 
-            var results = await Task.WhenAll(tasks);
-            foreach (var (type, data) in results.AsSpan())
+            if (!fileName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
             {
-                builder.AppendDynamic(type, data);
+                fileName += ".csv";
             }
 
-            return builder.Build();
+            var fullPath = Path.Combine(settings.InputDirectoryPath, fileName);
+
+            actions.Add(() => LoadFileCore(tableInfo, fullPath, settings.LanguageIndex, settings.MaxLanguageCount, container));
         }
 
-        // ビットフラグ列挙体から全言語を取得.
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private IEnumerable<TEnum> GetAllBitLanguage<TEnum>(TEnum language) where TEnum : unmanaged, Enum
+        // foreach (var action in actions)
+        // {
+        //     action.Invoke();
+        // }
+
+        Parallel.Invoke(new ParallelOptions
         {
-            // IgnoreDataMemberAttributeつきフィールドは除外
-            var enumValues = typeof(TEnum).GetFields()
-                .Where(static f => !f.IsDefined(typeof(IgnoreDataMemberAttribute)))
-                .Select(static f => (TEnum)f.GetValue(null))
-                .ToArray();
+            MaxDegreeOfParallelism =  Environment.ProcessorCount,
+        }, actions.ToArray());
 
-            if (typeof(TEnum).IsDefined(typeof(FlagsAttribute)) && language.ConstructFlags())
-            {
-                foreach (var e in enumValues)
-                {
-                    if (language.HasBitFlags(e))
-                    {
-                        yield return e;
-                    }
-                }
-                yield break;
-            }
-
-            yield return language;
+        foreach (var (type, data) in container)
+        {
+            builder.AppendDynamic(type, data);
         }
 
-        // 非ローカライズな読み込み処理生成.
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private Task<(Type, IList<object>)> CreateNonLocalizedLoadTask(MetaTable table, string path, CancellationTokenSource cancellationTokenSource)
+        return builder;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void LoadFileCore(MetaTable table, string path, uint languageIndex, uint maxLanguageCount, ConcurrentBag<(Type, IList<object>)> container)
+    {
+        using var stream = File.OpenRead(path);
+        using var reader = new LocalizeCsvReader(stream) { MaxLanguageCount = maxLanguageCount };
+        var list = new List<object>();
+
+        while (reader.ReadLine())
         {
-            return new Task<(Type, IList<object>)>(static args =>
-            {
-                var (table, path, cts) = (StateTuple<MetaTable, string, CancellationTokenSource>)args;
-                try
-                {
-                    var list = new List<object>();
-
-                    using var stream = File.OpenRead(path);
-                    using var reader = new CsvReader(stream);
-
-                    while (reader.ReadLine())
-                    {
 #if NET8_0_OR_GREATER
-                        var data = RuntimeHelpers.GetUninitializedObject(table.DataType);
+            var data = RuntimeHelpers.GetUninitializedObject(table.DataType);
 #else
-                        var data = FormatterServices.GetUninitializedObject(table.DataType);
+            var data = FormatterServices.GetUninitializedObject(table.DataType);
 #endif
-                        // bind value
-                        foreach (var prop in table.Properties)
-                        {
-                            var value = reader.ReadObject(prop.PropertyInfo);
-                            prop.PropertyInfo.SetValue(data, value);
-                        }
+            // bind value
+            foreach (var prop in table.Properties)
+            {
+                var value = reader.ReadObject(prop.PropertyInfo, languageIndex);
+                prop.PropertyInfo.SetValue(data, value);
+            }
 
-                        list.Add(data);
-                    }
-
-                    return (table.DataType, list);
-                }
-                catch (OperationCanceledException e) when (e.CancellationToken == cts.Token)
-                {
-                    // 別スレッドのキャンセルによる例外は無視.
-                    return default;
-                }
-                catch (Exception) when (!cts.IsCancellationRequested)
-                {
-                    cts.Cancel();
-                    throw;
-                }
-
-            }, StateTuple.Create(table, path, cancellationTokenSource), cancellationTokenSource.Token);
+            list.Add(data);
         }
 
-        private Task<(Type, IList<object>)> CreateLocalizedLoadTask(MetaTable table, int languageNo, string path, CancellationTokenSource cancellationTokenSource)
-        {
-
-        }
+        container.Add((table.DataType, list));
     }
 }

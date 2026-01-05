@@ -11,7 +11,7 @@ namespace AndanteTribe.Utils.Csv;
 /// 2. #コメント行対応済み(行頭が#の行はスキップ)
 /// 3. #コメント列対応済み(#で始まるヘッダーはスキップ e.g. #Comment)
 /// </remarks>
-public sealed partial class CsvReader : IDisposable
+public partial class CsvReader : IDisposable
 {
     private readonly StreamReader _reader;
     private readonly string[] _header;

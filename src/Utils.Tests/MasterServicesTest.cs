@@ -1,0 +1,50 @@
+﻿using System;
+using System.IO;
+using AndanteTribe.Utils.MasterSample;
+using AndanteTribe.Utils.MasterServices;
+using NUnit.Framework;
+
+namespace AndanteTribe.Utils.Tests
+{
+    public class MasterServicesTest
+    {
+        private const uint MaxLanguageCount = 2;
+        private static readonly MasterSettings[] s_testCases =
+        {
+            new MasterSettings(
+                GetMasterDirectoryPath(),
+                MemoryDatabase.GetMetaDatabase(),
+                static () => new DatabaseBuilder()
+            )
+            {
+                MaxLanguageCount = MaxLanguageCount,
+                LanguageIndex = 0,
+            },
+            new MasterSettings(
+                GetMasterDirectoryPath(),
+                MemoryDatabase.GetMetaDatabase(),
+                () => new DatabaseBuilder()
+            )
+            {
+                MaxLanguageCount = MaxLanguageCount,
+                LanguageIndex = 1,
+            },
+        };
+
+        [Test]
+        [TestCaseSource(nameof(s_testCases))]
+        public void AllValidationTest(MasterSettings settings)
+        {
+            var bin = MasterConverter.Load(settings);
+            var table = new MemoryDatabase(bin, maxDegreeOfParallelism: Environment.ProcessorCount);
+
+            var validateResult = table.Validate();
+            Assert.That(validateResult.IsValidationFailed, Is.False, "マスターバリデーションに失敗しました。\n" + validateResult.FormatFailedResults());
+        }
+
+        private static string GetMasterDirectoryPath()
+        {
+            return Path.GetFullPath(Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "..", "..", "..", ".master"));
+        }
+    }
+}
