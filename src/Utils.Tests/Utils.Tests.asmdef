@@ -12,7 +12,11 @@
         "Utils.Core.dll",
         "Utils.BackPort.dll",
         "Utils.GameServices.dll",
-        "nunit.framework.dll"
+        "Utils.MasterSample.dll",
+        "Utils.MasterServices.dll",
+        "nunit.framework.dll",
+        "MasterMemory.dll",
+        "MessagePack.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

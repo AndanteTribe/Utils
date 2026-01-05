@@ -7,7 +7,7 @@ namespace AndanteTribe.Utils.Csv;
 public partial class CsvReader
 {
     /// <summary>
-    /// 型情報から<see cref="CsvReader"/>を用いて値を取得する.
+    /// 型情報から値を読み込む.
     /// </summary>
     /// <remarks>
     /// 列挙体の場合、<see cref="EnumMemberAttribute"/>で指定された名前も考慮してパースを試みる.

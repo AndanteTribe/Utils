@@ -9,6 +9,14 @@ namespace AndanteTribe.Utils.MasterServices;
 
 internal static class CsvReaderExtensions
 {
+    /// <summary>
+    /// プロパティの型に応じてオブジェクトを読み込む.
+    /// </summary>
+    /// <param name="reader"></param>
+    /// <param name="info"></param>
+    /// <param name="languageIndex"></param>
+    /// <returns></returns>
+    /// <exception cref="NotSupportedException"></exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static object? ReadObject(this LocalizeCsvReader reader, PropertyInfo info, uint languageIndex)
     {
@@ -39,6 +47,13 @@ internal static class CsvReaderExtensions
         return reader.ReadDynamic(type);
     }
 
+    /// <summary>
+    /// <see cref="MasterId{TGroup}"/>を読み込む.
+    /// </summary>
+    /// <param name="reader"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    /// <exception cref="FormatException"></exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static object ReadMasterId(this CsvReader reader, Type type)
     {
@@ -66,6 +81,13 @@ internal static class CsvReaderExtensions
         return obj;
     }
 
+    /// <summary>
+    /// <see cref="MessagePackObjectAttribute"/>が付与されたオブジェクトを読み込む.
+    /// </summary>
+    /// <param name="reader"></param>
+    /// <param name="type"></param>
+    /// <param name="languageIndex"></param>
+    /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static object ReadMessagePackObject(this LocalizeCsvReader reader, Type type, uint languageIndex)
     {

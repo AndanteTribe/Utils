@@ -5,7 +5,6 @@ using System.Runtime.Serialization;
 using System.Security.Cryptography;
 using MasterMemory;
 using MasterMemory.Meta;
-using MessagePack;
 
 namespace AndanteTribe.Utils.MasterServices;
 

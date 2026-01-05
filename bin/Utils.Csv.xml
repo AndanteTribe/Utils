@@ -194,7 +194,7 @@
         </member>
         <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadDynamic(System.Type)">
             <summary>
-            型情報から<see cref="T:AndanteTribe.Utils.Csv.CsvReader"/>を用いて値を取得する.
+            型情報から値を読み込む.
             </summary>
             <remarks>
             列挙体の場合、<see cref="T:System.Runtime.Serialization.EnumMemberAttribute"/>で指定された名前も考慮してパースを試みる.

@@ -35,6 +35,7 @@ namespace AndanteTribe.Utils.Tests
         [TestCaseSource(nameof(s_testCases))]
         public void AllValidationTest(MasterSettings settings)
         {
+            TestContext.Out.WriteLine(settings.InputDirectoryPath);
             var bin = MasterConverter.Load(settings);
             var table = new MemoryDatabase(bin, maxDegreeOfParallelism: Environment.ProcessorCount);
 
@@ -44,7 +45,12 @@ namespace AndanteTribe.Utils.Tests
 
         private static string GetMasterDirectoryPath()
         {
-            return Path.GetFullPath(Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "..", "..", "..", ".master"));
+#if UNITY_EDITOR
+            var path = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "../Utils.Tests/.master"));
+#else
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", ".master");
+#endif
+            return Path.GetFullPath(path);
         }
     }
 }
