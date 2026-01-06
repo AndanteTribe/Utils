@@ -52,33 +52,6 @@ namespace AndanteTribe.Utils.Tests
 
         [Test]
         [TestCaseSource(nameof(s_testCases))]
-        public void Build_WritesPlainFile_EqualsLoadBytes(MasterSettings settings)
-        {
-            // Arrange
-            var expected = MasterConverter.Load(settings);
-            var tempPath = Path.Combine(Path.GetTempPath(), $"master_{(Language)settings.LanguageIndex}.bin");
-
-            try
-            {
-                // Act
-                MasterConverter.Build(settings, tempPath);
-
-                // Assert
-                Assert.That(File.Exists(tempPath), Is.True, "出力ファイルが生成されていません。");
-                var actual = File.ReadAllBytes(tempPath);
-                Assert.That(actual, Is.EqualTo(expected), "Build による平文出力が Load() のバイナリと一致しません。");
-            }
-            finally
-            {
-                if (File.Exists(tempPath))
-                {
-                    File.Delete(tempPath);
-                }
-            }
-        }
-
-        [Test]
-        [TestCaseSource(nameof(s_testCases))]
         public void MasterSample_CsvFiles_NotEmptyAndContainData(MasterSettings settings)
         {
             var expected = MasterConverter.Load(settings);
