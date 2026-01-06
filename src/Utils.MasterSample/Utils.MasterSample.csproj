@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.1;net5.0;</TargetFrameworks>
+        <LangVersion>14</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsPackable>false</IsPackable>
+        <RootNamespace>AndanteTribe.Utils.MasterSample</RootNamespace>
+        <AssemblyName>Utils.MasterSample</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Utils.GameServices\Utils.GameServices.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MasterMemory" Version="3.0.4" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+        <ProjectReference Include="..\Utils.BackPort\Utils.BackPort.csproj" />
+    </ItemGroup>
+</Project>
