@@ -27,6 +27,12 @@
             "**/*.cs"
           ]
         },
+        {
+          "src": "../src/Utils.MasterServices",
+          "files": [
+            "**/*.cs"
+          ]
+        },
       ],
       "dest": "api",
       "disableGitFeatures": false,
