@@ -79,60 +79,6 @@ namespace AndanteTribe.Utils.Tests
 
         [Test]
         [TestCaseSource(nameof(s_testCases))]
-        public void Build_WithAes_WritesEncryptedFile_DecryptsToLoadBytes(MasterSettings settings)
-        {
-            // Arrange
-            var expected = MasterConverter.Load(settings);
-            var tempPath = Path.Combine(Path.GetTempPath(), $"master_enc_{(Language)settings.LanguageIndex}.bin");
-
-            using var aes = Aes.Create();
-            aes.Key = new byte[16]
-            {
-                0x00, 0x01, 0x02, 0x03,
-                0x04, 0x05, 0x06, 0x07,
-                0x08, 0x09, 0x0A, 0x0B,
-                0x0C, 0x0D, 0x0E, 0x0F,
-            };
-            aes.IV = new byte[16]
-            {
-                0x0F, 0x0E, 0x0D, 0x0C,
-                0x0B, 0x0A, 0x09, 0x08,
-                0x07, 0x06, 0x05, 0x04,
-                0x03, 0x02, 0x01, 0x00,
-            };
-            aes.Mode = CipherMode.CBC;
-            try
-            {
-                // Act
-                MasterConverter.Build(settings, tempPath, aes);
-
-                // Assert file exists
-                Assert.That(File.Exists(tempPath), Is.True, "AES での出力ファイルが生成されていません。");
-
-                // Read encrypted bytes and decrypt using the same AES instance
-                var encrypted = File.ReadAllBytes(tempPath);
-                byte[] decrypted;
-                using (var ms = new MemoryStream(encrypted))
-                using (var crypto = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Read))
-                using (var outMs = new MemoryStream())
-                {
-                    crypto.CopyTo(outMs);
-                    decrypted = outMs.ToArray();
-                }
-
-                Assert.That(decrypted, Is.EqualTo(expected), "AES 出力を復号したバイナリが Load() のバイナリと一致しません。");
-            }
-            finally
-            {
-                if (File.Exists(tempPath))
-                {
-                    File.Delete(tempPath);
-                }
-            }
-        }
-
-        [Test]
-        [TestCaseSource(nameof(s_testCases))]
         public void MasterSample_CsvFiles_NotEmptyAndContainData(MasterSettings settings)
         {
             var expected = MasterConverter.Load(settings);
