@@ -75,7 +75,7 @@ public static class MasterConverter
 
         Parallel.Invoke(new ParallelOptions
         {
-            MaxDegreeOfParallelism =  Environment.ProcessorCount,
+            MaxDegreeOfParallelism = Environment.ProcessorCount,
         }, actions.ToArray());
 
         foreach (var (type, data) in container)

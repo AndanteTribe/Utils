@@ -36,12 +36,12 @@ public class LocalizeCsvReader : CsvReader
     /// <summary>
     /// 指定した言語インデックスのローカライズ文字列を読み込みます.
     /// </summary>
-    /// <param name="languageIndex">言語インデックス(1以上).</param>
+    /// <param name="languageIndex">言語インデックス.</param>
     /// <returns>ローカライズ文字列.</returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public string ReadLocalizedString(uint languageIndex)
     {
-        if (languageIndex > MaxLanguageCount)
+        if (languageIndex >= MaxLanguageCount)
         {
             throw new ArgumentOutOfRangeException(nameof(languageIndex));
         }

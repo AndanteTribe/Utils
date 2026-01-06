@@ -23,7 +23,7 @@ namespace AndanteTribe.Utils.Tests
             new MasterSettings(
                 GetMasterDirectoryPath(),
                 MemoryDatabase.GetMetaDatabase(),
-                () => new DatabaseBuilder()
+                static () => new DatabaseBuilder()
             )
             {
                 MaxLanguageCount = MaxLanguageCount,

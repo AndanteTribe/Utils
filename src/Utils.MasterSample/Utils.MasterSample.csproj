@@ -7,6 +7,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <IsPackable>false</IsPackable>
         <RootNamespace>AndanteTribe.Utils.MasterSample</RootNamespace>
+        <AssemblyName>Utils.MasterSample</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>

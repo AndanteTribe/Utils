@@ -74,7 +74,7 @@ public partial class CsvReader
                 return single;
             }
 
-            foreach (var prop in type.GetFields())
+            foreach (var prop in type.GetFields().AsSpan())
             {
                 if (prop.GetCustomAttribute<EnumMemberAttribute>()?.Value is { } attrValue && rawValue.SequenceEqual(attrValue))
                 {
@@ -98,9 +98,9 @@ public partial class CsvReader
             value[i] = rawValue[i] == '_' ? ',' : rawValue[i];
         }
 #if NET6_0_OR_GREATER
-        if (Enum.TryParse(type, rawValue, out var result))
+        if (Enum.TryParse(type, value, out var result))
 #else
-        if (Enum.TryParse(type, rawValue.ToString(), out var result))
+        if (Enum.TryParse(type, value.ToString(), out var result))
 #endif
         {
             return result!;
