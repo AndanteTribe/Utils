@@ -7,7 +7,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <OutputType>Library</OutputType>
         <RootNamespace>AndanteTribe.Utils.Csv</RootNamespace>
-        <Version>1.1.0</Version>
+        <Version>1.2.0</Version>
         <AssemblyName>Utils.Csv</AssemblyName>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         
