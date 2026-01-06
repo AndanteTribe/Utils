@@ -65,8 +65,8 @@ jobs:
       with:
         dotnet-version: 10.0.x
     - run: |
-        dotnet restore ./src/Utils.Core/Utils.Core.slnx
-        dotnet build ./src/Utils.Core/Utils.Core.slnx --configuration Release --no-restore
+        dotnet restore Utils.slnx
+        dotnet build Utils.slnx --configuration Release --no-restore
     - name: commit and push
       run: |
           VERSION="${{ github.event.inputs.version }}"
