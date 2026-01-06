@@ -11,6 +11,7 @@
 /[Uu]ser[Ss]ettings/
 
 # NugetForUnity library cache
+!/[Pp]ackages/jp.andantetribe.utils/
 /[Pp]ackages/nuget-packages/[Ii]nstalledPackages/
 /[Pp]ackages/nuget-packages/[Ii]nstalledPackages.meta
 
@@ -83,4 +84,3 @@ crashlytics-build.properties
 # Build Folders (you can keep bin if you'd like, to store dlls and pdbs)
 [Bb]in/
 [Oo]bj/
-!**/[Pp]ackages/
