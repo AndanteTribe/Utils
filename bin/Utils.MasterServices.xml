@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Utils.MasterServices</name>
+    </assembly>
+    <members>
+        <member name="M:AndanteTribe.Utils.MasterServices.CsvReaderExtensions.ReadObject(AndanteTribe.Utils.MasterServices.LocalizeCsvReader,System.Reflection.PropertyInfo,System.UInt32)">
+            <summary>
+            プロパティの型に応じてオブジェクトを読み込む.
+            </summary>
+            <param name="reader"></param>
+            <param name="info"></param>
+            <param name="languageIndex"></param>
+            <returns></returns>
+            <exception cref="T:System.NotSupportedException"></exception>
+        </member>
+        <member name="M:AndanteTribe.Utils.MasterServices.CsvReaderExtensions.ReadMasterId(AndanteTribe.Utils.Csv.CsvReader,System.Type)">
+            <summary>
+            <see cref="T:AndanteTribe.Utils.GameServices.MasterId`1"/>を読み込む.
+            </summary>
+            <param name="reader"></param>
+            <param name="type"></param>
+            <returns></returns>
+            <exception cref="T:System.FormatException"></exception>
+        </member>
+        <member name="M:AndanteTribe.Utils.MasterServices.CsvReaderExtensions.ReadMessagePackObject(AndanteTribe.Utils.MasterServices.LocalizeCsvReader,System.Type,System.UInt32)">
+            <summary>
+            <see cref="T:MessagePack.MessagePackObjectAttribute"/>が付与されたオブジェクトを読み込む.
+            </summary>
+            <param name="reader"></param>
+            <param name="type"></param>
+            <param name="languageIndex"></param>
+            <returns></returns>
+        </member>
+        <member name="T:AndanteTribe.Utils.MasterServices.LocalizeCsvReader">
+            <summary>
+            ローカライズ対応CSVリーダー.
+            </summary>
+        </member>
+        <member name="P:AndanteTribe.Utils.MasterServices.LocalizeCsvReader.MaxLanguageCount">
+            <summary>
+            最大言語数.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.MasterServices.LocalizeCsvReader.#ctor(System.IO.Stream)">
+            <summary>
+            Initialize a new instance of <see cref="T:AndanteTribe.Utils.MasterServices.LocalizeCsvReader"/>.
+            </summary>
+            <param name="stream"></param>
+        </member>
+        <member name="M:AndanteTribe.Utils.MasterServices.LocalizeCsvReader.#ctor(System.IO.StreamReader)">
+            <summary>
+            Initialize a new instance of <see cref="T:AndanteTribe.Utils.MasterServices.LocalizeCsvReader"/>.
+            </summary>
+            <param name="reader"></param>
+        </member>
+        <member name="M:AndanteTribe.Utils.MasterServices.LocalizeCsvReader.ReadLocalizedString(System.UInt32)">
+            <summary>
+            指定した言語インデックスのローカライズ文字列を読み込みます.
+            </summary>
+            <param name="languageIndex">言語インデックス.</param>
+            <returns>ローカライズ文字列.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="M:AndanteTribe.Utils.MasterServices.LocalizeCsvReader.TryGetLocalizeObject(System.Reflection.PropertyInfo,System.UInt32,System.Object@)">
+            <summary>
+            指定したプロパティがローカライズ対応オブジェクトかどうかを判定し、対応していれば値を取得します.
+            </summary>
+            <param name="info"></param>
+            <param name="languageIndex"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="T:AndanteTribe.Utils.MasterServices.MasterConverter">
+            <summary>
+            マスターデータコンバーター.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.MasterServices.MasterConverter.Build(AndanteTribe.Utils.MasterServices.MasterSettings,System.String,System.Security.Cryptography.Aes)">
+            <summary>
+            マスターデータをコンバートして、指定されたパスにバイナリを出力します.
+            </summary>
+            <param name="settings">マスター設定.</param>
+            <param name="outputPath">出力パス.</param>
+            <param name="aes">暗号化用AES. 指定しない場合は暗号化しません.</param>
+        </member>
+        <member name="M:AndanteTribe.Utils.MasterServices.MasterConverter.Load(AndanteTribe.Utils.MasterServices.MasterSettings)">
+            <summary>
+            マスターデータをコンバートして、バイナリを生成します.
+            </summary>
+            <param name="settings">マスター設定.</param>
+            <returns>バイナリ.</returns>
+            <exception cref="T:System.InvalidOperationException"></exception>
+        </member>
+        <member name="T:AndanteTribe.Utils.MasterServices.MasterSettings">
+            <summary>
+            マスターコンバート設定.
+            </summary>
+            <param name="InputDirectoryPath">入力ディレクトリパス.</param>
+            <param name="Metadata">マスターメタデータ.</param>
+            <param name="BuilderFactory">データベースビルダーファクトリ.</param>
+        </member>
+        <member name="M:AndanteTribe.Utils.MasterServices.MasterSettings.#ctor(System.String,MasterMemory.Meta.MetaDatabase,System.Func{MasterMemory.DatabaseBuilderBase})">
+            <summary>
+            マスターコンバート設定.
+            </summary>
+            <param name="InputDirectoryPath">入力ディレクトリパス.</param>
+            <param name="Metadata">マスターメタデータ.</param>
+            <param name="BuilderFactory">データベースビルダーファクトリ.</param>
+        </member>
+        <member name="P:AndanteTribe.Utils.MasterServices.MasterSettings.InputDirectoryPath">
+            <summary>入力ディレクトリパス.</summary>
+        </member>
+        <member name="P:AndanteTribe.Utils.MasterServices.MasterSettings.Metadata">
+            <summary>マスターメタデータ.</summary>
+        </member>
+        <member name="P:AndanteTribe.Utils.MasterServices.MasterSettings.BuilderFactory">
+            <summary>データベースビルダーファクトリ.</summary>
+        </member>
+        <member name="P:AndanteTribe.Utils.MasterServices.MasterSettings.MaxLanguageCount">
+            <summary>
+            ローカライズ対応している最大言語数.
+            </summary>
+        </member>
+        <member name="P:AndanteTribe.Utils.MasterServices.MasterSettings.LanguageIndex">
+            <summary>
+            ローカライズ出力する言語インデックス.
+            </summary>
+        </member>
+    </members>
+</doc>
