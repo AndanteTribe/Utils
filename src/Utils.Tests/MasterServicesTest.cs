@@ -57,6 +57,12 @@ namespace AndanteTribe.Utils.Tests
             var expected = MasterConverter.Load(settings);
             var table = new MemoryDatabase(expected, maxDegreeOfParallelism: Environment.ProcessorCount);
 
+            ValidateMasterData(table, settings);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void ValidateMasterData(MemoryDatabase table, MasterSettings settings)
+        {
             // enemy
             var enemyTable = table.EnemyMasterEntityTable;
 
@@ -175,6 +181,52 @@ namespace AndanteTribe.Utils.Tests
                     var te3 = textTable.FindById((TextCategory.Toast, 9999));
                     Assert.That(te3.Format.ToString(), Is.EqualTo("Magic Store {0:N0}"));
                     break;
+            }
+        }
+
+        [Test]
+        [TestCaseSource(nameof(s_testCases))]
+        public void MasterSample_EncryptedBuild_LoadsAndValidatesCorrectly(MasterSettings settings)
+        {
+            // テスト用の暗号化キーとIVを生成
+            using var aes = Aes.Create();
+            aes.GenerateKey();
+            aes.GenerateIV();
+
+            // 暗号化されたファイルを一時的に作成
+            var tempEncryptedFile = Path.Combine(Path.GetTempPath(), $"encrypted_master_{Guid.NewGuid()}.bin");
+            try
+            {
+                // MasterConverter.Buildで暗号化されたファイルを生成
+                using (var encryptor = aes.CreateEncryptor())
+                {
+                    MasterConverter.Build(settings, tempEncryptedFile, encryptor);
+                }
+
+                // 暗号化されたファイルを読み込んで復号化
+                byte[] decryptedData;
+                using (var fileStream = File.OpenRead(tempEncryptedFile))
+                using (var decryptor = aes.CreateDecryptor())
+                using (var cryptoStream = new CryptoStream(fileStream, decryptor, CryptoStreamMode.Read))
+                using (var memoryStream = new MemoryStream())
+                {
+                    cryptoStream.CopyTo(memoryStream);
+                    decryptedData = memoryStream.ToArray();
+                }
+
+                // MemoryDatabaseインスタンスを作成
+                var table = new MemoryDatabase(decryptedData, maxDegreeOfParallelism: Environment.ProcessorCount);
+
+                // 抽出した検証関数を使用してデータを検証
+                ValidateMasterData(table, settings);
+            }
+            finally
+            {
+                // 一時ファイルをクリーンアップ
+                if (File.Exists(tempEncryptedFile))
+                {
+                    File.Delete(tempEncryptedFile);
+                }
             }
         }
 
