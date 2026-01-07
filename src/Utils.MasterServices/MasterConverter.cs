@@ -18,14 +18,14 @@ public static class MasterConverter
     /// </summary>
     /// <param name="settings">マスター設定.</param>
     /// <param name="outputPath">出力パス.</param>
-    /// <param name="aes">暗号化用AES. 指定しない場合は暗号化しません.</param>
-    public static void Build(MasterSettings settings, string outputPath, Aes? aes = null)
+    /// <param name="cryptoTransform">暗号化用トランスフォーム. 指定しない場合は暗号化しません.</param>
+    public static void Build(MasterSettings settings, string outputPath, ICryptoTransform? cryptoTransform = null)
     {
         using var fileStream = File.Create(outputPath);
 
-        if (aes != null)
+        if (cryptoTransform != null)
         {
-            using var cryptoStream = new CryptoStream(fileStream, aes.CreateEncryptor(), CryptoStreamMode.Write);
+            using var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Write);
             LoadCore(settings).WriteToStream(cryptoStream);
             cryptoStream.FlushFinalBlock();
             return;

@@ -76,13 +76,13 @@
             マスターデータコンバーター.
             </summary>
         </member>
-        <member name="M:AndanteTribe.Utils.MasterServices.MasterConverter.Build(AndanteTribe.Utils.MasterServices.MasterSettings,System.String,System.Security.Cryptography.Aes)">
+        <member name="M:AndanteTribe.Utils.MasterServices.MasterConverter.Build(AndanteTribe.Utils.MasterServices.MasterSettings,System.String,System.Security.Cryptography.ICryptoTransform)">
             <summary>
             マスターデータをコンバートして、指定されたパスにバイナリを出力します.
             </summary>
             <param name="settings">マスター設定.</param>
             <param name="outputPath">出力パス.</param>
-            <param name="aes">暗号化用AES. 指定しない場合は暗号化しません.</param>
+            <param name="cryptoTransform">暗号化用トランスフォーム. 指定しない場合は暗号化しません.</param>
         </member>
         <member name="M:AndanteTribe.Utils.MasterServices.MasterConverter.Load(AndanteTribe.Utils.MasterServices.MasterSettings)">
             <summary>
