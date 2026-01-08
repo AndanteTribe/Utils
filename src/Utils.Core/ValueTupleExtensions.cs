@@ -219,7 +219,7 @@ public static class ValueTupleExtensions
     /// <typeparam name="T">要素の型.</typeparam>
     public struct Enumerator<T>
     {
-        private readonly (T, T, T, T, T, T, T) _tuple;
+        private readonly Buffer7<T> _buffer;
         private readonly byte _length;
         private sbyte _index;
         private bool _moveNext;
@@ -229,13 +229,13 @@ public static class ValueTupleExtensions
         /// </summary>
         public T Current => _index switch
         {
-            0 => _tuple.Item1,
-            1 => _tuple.Item2,
-            2 when _moveNext => _tuple.Item3,
-            3 when _moveNext  => _tuple.Item4,
-            4 when _moveNext  => _tuple.Item5,
-            5 when _moveNext  => _tuple.Item6,
-            6 when _moveNext  => _tuple.Item7,
+            0 => _buffer[0],
+            1 => _buffer[1],
+            2 when _moveNext => _buffer[2],
+            3 when _moveNext => _buffer[3],
+            4 when _moveNext => _buffer[4],
+            5 when _moveNext => _buffer[5],
+            6 when _moveNext => _buffer[6],
             _ => throw new IndexOutOfRangeException(),
         };
 
@@ -246,7 +246,7 @@ public static class ValueTupleExtensions
         /// <param name="length"></param>
         internal Enumerator(in (T, T, T, T, T, T, T) tuple, byte length)
         {
-            _tuple = tuple;
+            _buffer = new Buffer7<T>(tuple);
             _length = length;
             _index = -1;
         }
@@ -257,5 +257,41 @@ public static class ValueTupleExtensions
         /// <returns>列挙が可能な場合はtrue.</returns>
         public bool MoveNext() => _moveNext = _index <= _length && ++_index < _length;
     }
+
+#if NET8_0_OR_GREATER
+    [System.Runtime.CompilerServices.InlineArray(7)]
+    internal struct Buffer7<T>
+    {
+        private T _element;
+    }
+#else
+    internal struct Buffer7<T>
+    {
+        private T _e0, _e1, _e2, _e3, _e4, _e5, _e6;
+
+        internal Buffer7((T, T, T, T, T, T, T) tuple)
+        {
+            _e0 = tuple.Item1;
+            _e1 = tuple.Item2;
+            _e2 = tuple.Item3;
+            _e3 = tuple.Item4;
+            _e4 = tuple.Item5;
+            _e5 = tuple.Item6;
+            _e6 = tuple.Item7;
+        }
+
+        internal T this[int index] => index switch
+        {
+            0 => _e0,
+            1 => _e1,
+            2 => _e2,
+            3 => _e3,
+            4 => _e4,
+            5 => _e5,
+            6 => _e6,
+            _ => throw new IndexOutOfRangeException(),
+        };
+    }
+#endif
 
 }

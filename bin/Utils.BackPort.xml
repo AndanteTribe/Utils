@@ -216,6 +216,34 @@
         <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.GrowCore(System.UInt32)">
             <summary>Grow the size of <see cref="F:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler._chars"/> to at least the specified <paramref name="requiredMinCapacity"/>.</summary>
         </member>
+        <member name="T:System.Runtime.CompilerServices.InlineArrayAttribute">
+            <summary>
+            Indicates that the instance's storage is sequentially replicated "length" times.
+            </summary>
+            <remarks>
+            <para>
+            This attribute can be used to annotate a <see langword="struct"/> type with a single field.
+            The runtime will replicate that field in the actual type layout as many times as is specified.
+            </para>
+            <para>
+            Here's an example of how an inline array type with 8 <see cref="T:System.Single"/> values can be declared:
+            <code lang="csharp">
+            [InlineArray(8)]
+            struct Float8InlineArray
+            {
+                private float _value;
+            }
+            </code>
+            </para>
+            </remarks>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.InlineArrayAttribute.#ctor(System.Int32)">
+            <summary>Creates a new <see cref="T:System.Runtime.CompilerServices.InlineArrayAttribute"/> instance with the specified length.</summary>
+            <param name="length">The number of sequential fields to replicate in the inline array type.</param>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.InlineArrayAttribute.Length">
+            <summary>Gets the number of sequential fields to replicate in the inline array type.</summary>
+        </member>
         <member name="T:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute">
             <summary>Indicates which arguments to a method involving an interpolated string handler should be passed to that handler.</summary>
         </member>
