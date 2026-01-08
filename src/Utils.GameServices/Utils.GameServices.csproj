@@ -27,7 +27,7 @@
         <None Remove=".gitignore" />
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' != 'net6.0'">
         <ProjectReference Include="..\Utils.BackPort\Utils.BackPort.csproj" />
     </ItemGroup>
 

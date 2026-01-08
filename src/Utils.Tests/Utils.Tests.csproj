@@ -27,11 +27,11 @@
     <ProjectReference Include="..\Utils.BackPort\Utils.BackPort.csproj" />
   </ItemGroup>
 
-    <ItemGroup>
-        <None Remove="**\package.json" />
-        <None Remove="**\*.asmdef" />
-        <None Remove="**\*.meta" />
-        <None Remove=".gitignore" />
-    </ItemGroup>
+  <ItemGroup>
+    <None Remove="**\package.json" />
+    <None Remove="**\*.asmdef" />
+    <None Remove="**\*.meta" />
+    <None Remove=".gitignore" />
+  </ItemGroup>
 
 </Project>
