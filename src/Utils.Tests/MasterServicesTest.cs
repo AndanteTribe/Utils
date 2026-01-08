@@ -137,7 +137,7 @@ namespace AndanteTribe.Utils.Tests
             Assert.That(e2.Compatibilities, Is.EqualTo(new CompatibilityGroup(Compatibility.Normal, Compatibility.Normal, Compatibility.Normal, Compatibility.Normal, Compatibility.Normal)));
 
             var e10 = enemyTable.FindById((BattleField.Ground, 10));
-            Assert.That(e10.Species, Is.EqualTo(settings.LanguageIndex == (uint)Language.Japanese ? "ヘカトンケイル(全体)" : "Hecatoncheires(All)"));
+            Assert.That(e10.Species, Is.EqualTo(settings.LanguageIndex == (uint)Language.Japanese ? "ヘカトンケイル（全体）" : "Hecatoncheires(All)"));
             Assert.That(e10.Property, Is.EqualTo(Nature.Chaos | Nature.Good));
             Assert.That(e10.Status, Is.EqualTo(new BasicStatus(5000, 100, 20, 50, 1, 0, 0)));
             Assert.That(e10.Compatibilities, Is.EqualTo(new CompatibilityGroup(Compatibility.Normal, Compatibility.Normal, Compatibility.Normal, Compatibility.Normal, Compatibility.Normal)));
