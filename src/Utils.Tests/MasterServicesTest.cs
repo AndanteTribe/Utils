@@ -1,9 +1,8 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
 using System.Security.Cryptography;
-using System.Linq;
 using AndanteTribe.Utils.GameServices;
 using AndanteTribe.Utils.MasterSample;
 using AndanteTribe.Utils.MasterSample.Enums;
@@ -60,6 +59,65 @@ namespace AndanteTribe.Utils.Tests
             ValidateMasterData(table, settings);
         }
 
+        [Test]
+        [TestCaseSource(nameof(s_testCases))]
+        public void MasterSample_EncryptedBuild_LoadsAndValidatesCorrectly(MasterSettings settings)
+        {
+            // テスト用の暗号化キーとIVを生成
+            using var aes = Aes.Create();
+            aes.GenerateKey();
+            aes.GenerateIV();
+
+            // 暗号化されたファイルを一時的に作成
+            var tempEncryptedFile = Path.Combine(Path.GetTempPath(), $"encrypted_master_{Guid.NewGuid()}.bin");
+            try
+            {
+                // MasterConverter.Buildで暗号化されたファイルを生成
+                using (var encryptor = aes.CreateEncryptor())
+                {
+                    MasterConverter.Build(settings, tempEncryptedFile, encryptor);
+                }
+
+                // 暗号化されたファイルを読み込んで復号化
+                byte[] decryptedData;
+                using (var fileStream = File.OpenRead(tempEncryptedFile))
+                using (var decryptor = aes.CreateDecryptor())
+                using (var cryptoStream = new CryptoStream(fileStream, decryptor, CryptoStreamMode.Read))
+                using (var memoryStream = new MemoryStream())
+                {
+                    cryptoStream.CopyTo(memoryStream);
+                    decryptedData = memoryStream.ToArray();
+                }
+
+                // MemoryDatabaseインスタンスを作成
+                var table = new MemoryDatabase(decryptedData, maxDegreeOfParallelism: Environment.ProcessorCount);
+
+                // 抽出した検証関数を使用してデータを検証
+                ValidateMasterData(table, settings);
+            }
+            finally
+            {
+                // 一時ファイルをクリーンアップ
+                if (File.Exists(tempEncryptedFile))
+                {
+                    File.Delete(tempEncryptedFile);
+                }
+            }
+        }
+
+        [Test]
+        [TestCaseSource(nameof(s_testCases))]
+        public void MasterSample_CollectAllCharacters(MasterSettings settings)
+        {
+            var result = MasterConverter.GetAllCharacters(settings);
+            Assert.That(result, Is.EqualTo((Language)settings.LanguageIndex switch
+            {
+                Language.Japanese => "ゲイザー人間ヘカトンケル（全体）頭胴右腕左脚こんにちは！がアテムを個渡しまた。N0魔法石",
+                Language.English => "GazerHumnctohis(Al)dByRgLfF!v.N0MS",
+                _ => throw new InvalidEnumArgumentException(),
+            }));
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void ValidateMasterData(MemoryDatabase table, MasterSettings settings)
         {
@@ -79,7 +137,7 @@ namespace AndanteTribe.Utils.Tests
             Assert.That(e2.Compatibilities, Is.EqualTo(new CompatibilityGroup(Compatibility.Normal, Compatibility.Normal, Compatibility.Normal, Compatibility.Normal, Compatibility.Normal)));
 
             var e10 = enemyTable.FindById((BattleField.Ground, 10));
-            Assert.That(e10.Species, Is.EqualTo(settings.LanguageIndex == (uint)Language.Japanese ? "ヘカトンケイル(全体)" : "Hecatoncheires(All)"));
+            Assert.That(e10.Species, Is.EqualTo(settings.LanguageIndex == (uint)Language.Japanese ? "ヘカトンケイル（全体）" : "Hecatoncheires(All)"));
             Assert.That(e10.Property, Is.EqualTo(Nature.Chaos | Nature.Good));
             Assert.That(e10.Status, Is.EqualTo(new BasicStatus(5000, 100, 20, 50, 1, 0, 0)));
             Assert.That(e10.Compatibilities, Is.EqualTo(new CompatibilityGroup(Compatibility.Normal, Compatibility.Normal, Compatibility.Normal, Compatibility.Normal, Compatibility.Normal)));
@@ -181,52 +239,6 @@ namespace AndanteTribe.Utils.Tests
                     var te3 = textTable.FindById((TextCategory.Toast, 9999));
                     Assert.That(te3.Format.ToString(), Is.EqualTo("Magic Store {0:N0}"));
                     break;
-            }
-        }
-
-        [Test]
-        [TestCaseSource(nameof(s_testCases))]
-        public void MasterSample_EncryptedBuild_LoadsAndValidatesCorrectly(MasterSettings settings)
-        {
-            // テスト用の暗号化キーとIVを生成
-            using var aes = Aes.Create();
-            aes.GenerateKey();
-            aes.GenerateIV();
-
-            // 暗号化されたファイルを一時的に作成
-            var tempEncryptedFile = Path.Combine(Path.GetTempPath(), $"encrypted_master_{Guid.NewGuid()}.bin");
-            try
-            {
-                // MasterConverter.Buildで暗号化されたファイルを生成
-                using (var encryptor = aes.CreateEncryptor())
-                {
-                    MasterConverter.Build(settings, tempEncryptedFile, encryptor);
-                }
-
-                // 暗号化されたファイルを読み込んで復号化
-                byte[] decryptedData;
-                using (var fileStream = File.OpenRead(tempEncryptedFile))
-                using (var decryptor = aes.CreateDecryptor())
-                using (var cryptoStream = new CryptoStream(fileStream, decryptor, CryptoStreamMode.Read))
-                using (var memoryStream = new MemoryStream())
-                {
-                    cryptoStream.CopyTo(memoryStream);
-                    decryptedData = memoryStream.ToArray();
-                }
-
-                // MemoryDatabaseインスタンスを作成
-                var table = new MemoryDatabase(decryptedData, maxDegreeOfParallelism: Environment.ProcessorCount);
-
-                // 抽出した検証関数を使用してデータを検証
-                ValidateMasterData(table, settings);
-            }
-            finally
-            {
-                // 一時ファイルをクリーンアップ
-                if (File.Exists(tempEncryptedFile))
-                {
-                    File.Delete(tempEncryptedFile);
-                }
             }
         }
 
