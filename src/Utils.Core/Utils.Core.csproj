@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.1;net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1;net5.0;net6.0;net7.0</TargetFrameworks>
         <LangVersion>13</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -27,11 +27,11 @@
         <None Remove=".gitignore" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' != 'net7.0' AND '$(TargetFramework)' != 'net8.0' AND '$(TargetFramework)' != 'net9.0'">
+    <ItemGroup Condition="'$(TargetFramework)' != 'net7.0'">
       <ProjectReference Include="..\Utils.BackPort\Utils.BackPort.csproj" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' != 'net7.0' AND '$(TargetFramework)' != 'net8.0' AND '$(TargetFramework)' != 'net9.0'">
+    <ItemGroup Condition="'$(TargetFramework)' != 'net7.0'">
       <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
     </ItemGroup>
 
