@@ -263,6 +263,17 @@ public static class ValueTupleExtensions
     internal struct Buffer7<T>
     {
         private T _element;
+
+        internal Buffer7((T, T, T, T, T, T, T) tuple)
+        {
+            this[0] = tuple.Item1;
+            this[1] = tuple.Item2;
+            this[2] = tuple.Item3;
+            this[3] = tuple.Item4;
+            this[4] = tuple.Item5;
+            this[5] = tuple.Item6;
+            this[6] = tuple.Item7;
+        }
     }
 #else
     internal struct Buffer7<T>
