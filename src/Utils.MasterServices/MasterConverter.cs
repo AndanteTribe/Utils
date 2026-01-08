@@ -47,7 +47,7 @@ public static class MasterConverter
     public static byte[] Load(MasterSettings settings) => LoadCore(settings).Build();
 
     /// <summary>
-    /// マスターデータ内に含まれる全ての文字を取得するスコープを取得します.
+    /// マスターデータ内に含まれる全ての文字を取得します.
     /// </summary>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -58,7 +58,14 @@ public static class MasterConverter
         var resolver = new CollectAllCharactersResolver(MessagePackSerializerOptions.Standard.Resolver, hashset);
         MessagePackSerializer.DefaultOptions = option.WithResolver(resolver);
 
-        LoadCore(settings);
+        try
+        {
+            LoadCore(settings);
+        }
+        finally
+        {
+            MessagePackSerializer.DefaultOptions = option;
+        }
 
         return string.Create(hashset.Count, hashset, static (span, set) =>
         {
@@ -169,6 +176,11 @@ public static class MasterConverter
         void IMessagePackFormatter<string?>.Serialize(ref MessagePackWriter writer, string? value, MessagePackSerializerOptions options)
         {
             writer.Write(value);
+            if (value == null)
+            {
+                return;
+            }
+
             lock (_lock)
             {
                 foreach (var c in value.AsSpan())

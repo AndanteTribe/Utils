@@ -94,7 +94,7 @@
         </member>
         <member name="M:AndanteTribe.Utils.MasterServices.MasterConverter.GetAllCharacters(AndanteTribe.Utils.MasterServices.MasterSettings)">
             <summary>
-            マスターデータ内に含まれる全ての文字を取得するスコープを取得します.
+            マスターデータ内に含まれる全ての文字を取得します.
             </summary>
             <returns></returns>
         </member>
