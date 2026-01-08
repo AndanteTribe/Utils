@@ -16,16 +16,29 @@ concurrency:
 jobs:
   test:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        include:
+          - dotnet-version: '5.0.x'
+            framework: 'net5.0'
+          - dotnet-version: '6.0.x'
+            framework: 'net6.0'
+          - dotnet-version: '7.0.x'
+            framework: 'net7.0'
+          - dotnet-version: '8.0.x'
+            framework: 'net8.0'
+          - dotnet-version: '9.0.x'
+            framework: 'net9.0'
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 5.0.x
+        dotnet-version: ${{ matrix.dotnet-version }}
     - run: dotnet restore ./src/Utils.Tests
     - run: dotnet build ./src/Utils.Tests --configuration Release --no-restore
-    - run: dotnet test ./src/Utils.Tests --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage"
+    - run: dotnet test ./src/Utils.Tests --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --framework ${{ matrix.framework }}
     - name: Find coverage output path
       shell: pwsh
       run: |
@@ -41,5 +54,5 @@ jobs:
         Get-Content report/Summary.md | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8
     - uses: actions/upload-artifact@v4
       with:
-        name: coverage-report
+        name: coverage-report-${{ matrix.framework }}
         path: report/
