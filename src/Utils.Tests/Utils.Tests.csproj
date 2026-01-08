@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net5.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
     <LangVersion>9</LangVersion>
     <RootNamespace>AndanteTribe.Utils.Tests</RootNamespace>
     <IsPackable>false</IsPackable>
@@ -23,7 +23,7 @@
     <ProjectReference Include="..\Utils.MasterServices\Utils.MasterServices.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0' OR '$(TargetFramework)' == 'net6.0'">
     <ProjectReference Include="..\Utils.BackPort\Utils.BackPort.csproj" />
   </ItemGroup>
 
