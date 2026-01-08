@@ -3,8 +3,11 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
+using AndanteTribe.Utils.GameServices;
 using MasterMemory;
 using MasterMemory.Meta;
+using MessagePack;
+using MessagePack.Formatters;
 
 namespace AndanteTribe.Utils.MasterServices;
 
@@ -42,6 +45,30 @@ public static class MasterConverter
     /// <exception cref="InvalidOperationException"></exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static byte[] Load(MasterSettings settings) => LoadCore(settings).Build();
+
+    /// <summary>
+    /// マスターデータ内に含まれる全ての文字を取得するスコープを取得します.
+    /// </summary>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string GetAllCharacters(MasterSettings settings)
+    {
+        var option = MessagePackSerializer.DefaultOptions;
+        var hashset = new HashSet<char>();
+        var resolver = new CollectAllCharactersResolver(MessagePackSerializerOptions.Standard.Resolver, hashset);
+        MessagePackSerializer.DefaultOptions = option.WithResolver(resolver);
+
+        LoadCore(settings);
+
+        return string.Create(hashset.Count, hashset, static (span, set) =>
+        {
+            var index = 0;
+            foreach (var c in set)
+            {
+                span[index++] = c;
+            }
+        });
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static DatabaseBuilderBase LoadCore(MasterSettings settings)
@@ -111,5 +138,70 @@ public static class MasterConverter
         }
 
         container.Add((table.DataType, list));
+    }
+
+#pragma warning disable MsgPack013 // Inaccessible formatter
+    internal class CollectAllCharactersResolver(IFormatterResolver innerResolver, HashSet<char> hashset) : IFormatterResolver, IMessagePackFormatter<string?>, IMessagePackFormatter<LocalizeFormat?>
+    {
+        private readonly object _lock = new();
+        private readonly IMessagePackFormatter<LocalizeFormat?> _localizeFormatter = GameServiceResolver.Instance.GetFormatter<LocalizeFormat?>()!;
+
+        public IMessagePackFormatter<T>? GetFormatter<T>()
+        {
+            if (typeof(T) == typeof(string) || typeof(T) == typeof(LocalizeFormat))
+            {
+                return (IMessagePackFormatter<T>)this;
+            }
+
+            return innerResolver.GetFormatter<T>();
+        }
+
+        string IMessagePackFormatter<string?>.Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
+        LocalizeFormat? IMessagePackFormatter<LocalizeFormat?>.Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        {
+            return _localizeFormatter.Deserialize(ref reader, options);
+        }
+
+        void IMessagePackFormatter<string?>.Serialize(ref MessagePackWriter writer, string? value, MessagePackSerializerOptions options)
+        {
+            writer.Write(value);
+            lock (_lock)
+            {
+                foreach (var c in value.AsSpan())
+                {
+                    if (!char.IsWhiteSpace(c))
+                    {
+                        hashset.Add(c);
+                    }
+                }
+            }
+        }
+
+        void IMessagePackFormatter<LocalizeFormat?>.Serialize(ref MessagePackWriter writer, LocalizeFormat? value, MessagePackSerializerOptions options)
+        {
+            _localizeFormatter.Serialize(ref writer, value, options);
+            if (value == null)
+            {
+                return;
+            }
+
+            lock (_lock)
+            {
+                foreach (var literal in value.Literal)
+                {
+                    foreach (var c in literal.AsSpan())
+                    {
+                        if (!char.IsWhiteSpace(c))
+                        {
+                            hashset.Add(c);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

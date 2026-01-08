@@ -92,6 +92,12 @@
             <returns>バイナリ.</returns>
             <exception cref="T:System.InvalidOperationException"></exception>
         </member>
+        <member name="M:AndanteTribe.Utils.MasterServices.MasterConverter.GetAllCharacters(AndanteTribe.Utils.MasterServices.MasterSettings)">
+            <summary>
+            マスターデータ内に含まれる全ての文字を取得するスコープを取得します.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:AndanteTribe.Utils.MasterServices.MasterSettings">
             <summary>
             マスターコンバート設定.
