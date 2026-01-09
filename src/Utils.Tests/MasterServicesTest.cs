@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using AndanteTribe.Utils.GameServices;
@@ -110,18 +111,19 @@ namespace AndanteTribe.Utils.Tests
         public void MasterSample_CollectAllCharacters(MasterSettings settings)
         {
             var results = MasterConverter.GetAllCharacters(settings);
-            var str = string.Create(results.Count, results, static (span, results) =>
+            var sortedChars = results.OrderBy(c => c).ToArray();
+            var str = string.Create(sortedChars.Length, sortedChars, static (span, chars) =>
             {
                 var index = 0;
-                foreach (var c in results)
+                foreach (var c in chars)
                 {
                     span[index++] = c;
                 }
             });
             Assert.That(str, Is.EqualTo((Language)settings.LanguageIndex switch
             {
-                Language.Japanese => "ゲイザー人間ヘカトンケル（全体）頭胴右腕左脚こんにちは！がアテムを個渡しまた。N0魔法石",
-                Language.English => "GazerHumnctohis(Al)dByRgLfF!v.N0MS",
+                Language.Japanese => "0N。がこしたちにはまをんアイカケゲザテトヘムルンー人体個全右左法渡石胴脚腕間頭魔！（）",
+                Language.English => "!().0ABFGHLMNRSacdefghilmnorstuvyz",
                 _ => throw new InvalidEnumArgumentException(),
             }));
         }
