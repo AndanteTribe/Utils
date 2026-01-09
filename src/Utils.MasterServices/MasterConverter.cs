@@ -49,9 +49,9 @@ public static class MasterConverter
     /// <summary>
     /// マスターデータ内に含まれる全ての文字を取得します.
     /// </summary>
-    /// <returns>マスターデータ内の全ての文字を含む文字配列.</returns>
+    /// <returns>マスターデータ内の全ての文字を含む読み取り専用セット.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static char[] GetAllCharacters(MasterSettings settings)
+    public static IReadOnlySet<char> GetAllCharacters(MasterSettings settings)
     {
         var option = MessagePackSerializer.DefaultOptions;
         var hashset = new HashSet<char>();
@@ -67,7 +67,11 @@ public static class MasterConverter
             MessagePackSerializer.DefaultOptions = option;
         }
 
-        return hashset.ToArray();
+#if NET5_0_OR_GREATER
+        return hashset;
+#else
+        return new ReadOnlySetWrapper<char>(hashset);
+#endif
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

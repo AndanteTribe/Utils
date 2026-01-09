@@ -96,7 +96,7 @@
             <summary>
             マスターデータ内に含まれる全ての文字を取得します.
             </summary>
-            <returns>マスターデータ内の全ての文字を含む文字配列.</returns>
+            <returns>マスターデータ内の全ての文字を含む読み取り専用セット.</returns>
         </member>
         <member name="T:AndanteTribe.Utils.MasterServices.MasterSettings">
             <summary>

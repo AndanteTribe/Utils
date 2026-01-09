@@ -282,6 +282,67 @@
             be used to unregister the callback.</returns>
             <exception cref="T:System.ArgumentNullException"><paramref name="callback"/> is null.</exception>
         </member>
+        <member name="T:System.Collections.Generic.IReadOnlySet`1">
+            <summary>
+            Provides a read-only abstraction of a set.
+            </summary>
+            <typeparam name="T">The type of elements in the set.</typeparam>
+        </member>
+        <member name="M:System.Collections.Generic.IReadOnlySet`1.Contains(`0)">
+            <summary>
+            Determines whether the current set contains a specific element.
+            </summary>
+            <param name="item">The element to locate in the set.</param>
+            <returns>true if the element is found in the set; otherwise, false.</returns>
+        </member>
+        <member name="M:System.Collections.Generic.IReadOnlySet`1.IsProperSubsetOf(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Determines whether the current set is a proper (strict) subset of a specified collection.
+            </summary>
+            <param name="other">The collection to compare to the current set.</param>
+            <returns>true if the current set is a proper subset of other; otherwise, false.</returns>
+        </member>
+        <member name="M:System.Collections.Generic.IReadOnlySet`1.IsProperSupersetOf(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Determines whether the current set is a proper (strict) superset of a specified collection.
+            </summary>
+            <param name="other">The collection to compare to the current set.</param>
+            <returns>true if the current set is a proper superset of other; otherwise, false.</returns>
+        </member>
+        <member name="M:System.Collections.Generic.IReadOnlySet`1.IsSubsetOf(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Determines whether the current set is a subset of a specified collection.
+            </summary>
+            <param name="other">The collection to compare to the current set.</param>
+            <returns>true if the current set is a subset of other; otherwise, false.</returns>
+        </member>
+        <member name="M:System.Collections.Generic.IReadOnlySet`1.IsSupersetOf(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Determines whether the current set is a superset of a specified collection.
+            </summary>
+            <param name="other">The collection to compare to the current set.</param>
+            <returns>true if the current set is a superset of other; otherwise, false.</returns>
+        </member>
+        <member name="M:System.Collections.Generic.IReadOnlySet`1.Overlaps(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Determines whether the current set overlaps with the specified collection.
+            </summary>
+            <param name="other">The collection to compare to the current set.</param>
+            <returns>true if the current set and other share at least one common element; otherwise, false.</returns>
+        </member>
+        <member name="M:System.Collections.Generic.IReadOnlySet`1.SetEquals(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Determines whether the current set and the specified collection contain the same elements.
+            </summary>
+            <param name="other">The collection to compare to the current set.</param>
+            <returns>true if the current set is equal to other; otherwise, false.</returns>
+        </member>
+        <member name="T:System.Collections.Generic.ReadOnlySetWrapper`1">
+            <summary>
+            Provides a read-only wrapper for a HashSet.
+            </summary>
+            <typeparam name="T">The type of elements in the set.</typeparam>
+        </member>
         <member name="T:System.ISpanFormattable">
             <summary>Provides functionality to format the string representation of an object into a span.</summary>
         </member>
