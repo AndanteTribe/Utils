@@ -49,7 +49,7 @@ public static class MasterConverter
     /// <summary>
     /// マスターデータ内に含まれる全ての文字を取得します.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>マスターデータ内の全ての文字を含む文字配列.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static char[] GetAllCharacters(MasterSettings settings)
     {

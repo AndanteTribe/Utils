@@ -1,0 +1,375 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Utils.BackPort</name>
+    </assembly>
+    <members>
+        <member name="T:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute">
+            <summary>
+            Indicates that compiler support for a particular feature is required for the location where this attribute is applied.
+            </summary>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName">
+            <summary>
+            The name of the compiler feature.
+            </summary>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.IsOptional">
+            <summary>
+            If true, the compiler can choose to allow access to the location where this attribute is applied if it does not understand <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/>.
+            </summary>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.RefStructs">
+            <summary>
+            The <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/> used for the ref structs C# feature.
+            </summary>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.RequiredMembers">
+            <summary>
+            The <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/> used for the required members C# feature.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler">
+            <summary>Provides a handler used by the language compiler to process interpolated strings into <see cref="T:System.String"/> instances.</summary>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.GuessedLengthPerHole">
+            <summary>Expected average length of formatted data used for an individual interpolation expression result.</summary>
+            <remarks>
+            This is inherited from string.Format, and could be changed based on further data.
+            string.Format actually uses `format.Length + args.Length * 8`, but format.Length
+            includes the format items themselves, e.g. "{0}", and since it's rare to have double-digit
+            numbers of items, we bump the 8 up to 11 to account for the three extra characters in "{d}",
+            since the compiler-provided base length won't include the equivalent character count.
+            </remarks>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.MinimumArrayPoolLength">
+            <summary>Minimum size array to rent from the pool.</summary>
+            <remarks>Same as stack-allocation size used today by string.Format.</remarks>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler._provider">
+            <summary>Optional provider to pass to IFormattable.ToString or ISpanFormattable.TryFormat calls.</summary>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler._arrayToReturnToPool">
+            <summary>Array rented from the array pool and used to back <see cref="F:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler._chars"/>.</summary>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler._chars">
+            <summary>The span to write into.</summary>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler._pos">
+            <summary>Position at which to write the next character.</summary>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler._hasCustomFormatter">
+            <summary>Whether <see cref="F:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler._provider"/> provides an ICustomFormatter.</summary>
+            <remarks>
+            Custom formatters are very rare.  We want to support them, but it's ok if we make them more expensive
+            in order to make them as pay-for-play as possible.  So, we avoid adding another reference type field
+            to reduce the size of the handler and to reduce required zero'ing, by only storing whether the provider
+            provides a formatter, rather than actually storing the formatter.  This in turn means, if there is a
+            formatter, we pay for the extra interface call on each AppendFormatted that needs it.
+            </remarks>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.#ctor(System.Int32,System.Int32)">
+            <summary>Creates a handler used to translate an interpolated string into a <see cref="T:System.String"/>.</summary>
+            <param name="literalLength">The number of constant characters outside of interpolation expressions in the interpolated string.</param>
+            <param name="formattedCount">The number of interpolation expressions in the interpolated string.</param>
+            <remarks>This is intended to be called only by compiler-generated code. Arguments are not validated as they'd otherwise be for members intended to be used directly.</remarks>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.#ctor(System.Int32,System.Int32,System.IFormatProvider)">
+            <summary>Creates a handler used to translate an interpolated string into a <see cref="T:System.String"/>.</summary>
+            <param name="literalLength">The number of constant characters outside of interpolation expressions in the interpolated string.</param>
+            <param name="formattedCount">The number of interpolation expressions in the interpolated string.</param>
+            <param name="provider">An object that supplies culture-specific formatting information.</param>
+            <remarks>This is intended to be called only by compiler-generated code. Arguments are not validated as they'd otherwise be for members intended to be used directly.</remarks>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.#ctor(System.Int32,System.Int32,System.IFormatProvider,System.Span{System.Char})">
+            <summary>Creates a handler used to translate an interpolated string into a <see cref="T:System.String"/>.</summary>
+            <param name="literalLength">The number of constant characters outside of interpolation expressions in the interpolated string.</param>
+            <param name="formattedCount">The number of interpolation expressions in the interpolated string.</param>
+            <param name="provider">An object that supplies culture-specific formatting information.</param>
+            <param name="initialBuffer">A buffer temporarily transferred to the handler for use as part of its formatting.  Contents may be overwritten.</param>
+            <remarks>This is intended to be called only by compiler-generated code. Arguments are not validated as they'd otherwise be for members intended to be used directly.</remarks>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.GetDefaultLength(System.Int32,System.Int32)">
+            <summary>Derives a default length with which to seed the handler.</summary>
+            <param name="literalLength">The number of constant characters outside of interpolation expressions in the interpolated string.</param>
+            <param name="formattedCount">The number of interpolation expressions in the interpolated string.</param>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.ToString">
+            <summary>Gets the built <see cref="T:System.String"/>.</summary>
+            <returns>The built string.</returns>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.ToStringAndClear">
+            <summary>Gets the built <see cref="T:System.String"/> and clears the handler.</summary>
+            <returns>The built string.</returns>
+            <remarks>
+            This releases any resources used by the handler. The method should be invoked only
+            once and as the last thing performed on the handler. Subsequent use is erroneous, ill-defined,
+            and may destabilize the process, as may using any other copies of the handler after
+            <see cref="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.ToStringAndClear" /> is called on any one of them.
+            </remarks>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.Clear">
+            <summary>Clears the handler.</summary>
+            <remarks>
+            This releases any resources used by the handler. The method should be invoked only
+            once and as the last thing performed on the handler. Subsequent use is erroneous, ill-defined,
+            and may destabilize the process, as may using any other copies of the handler after <see cref="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.Clear"/>
+            is called on any one of them.
+            </remarks>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.Text">
+            <summary>Gets a span of the characters appended to the handler.</summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.AppendLiteral(System.String)">
+            <summary>Writes the specified string to the handler.</summary>
+            <param name="value">The string to write.</param>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.AppendFormatted``1(``0)">
+            <summary>Writes the specified value to the handler.</summary>
+            <param name="value">The value to write.</param>
+            <typeparam name="T">The type of the value to write.</typeparam>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.AppendFormatted``1(``0,System.String)">
+            <summary>Writes the specified value to the handler.</summary>
+            <param name="value">The value to write.</param>
+            <param name="format">The format string.</param>
+            <typeparam name="T">The type of the value to write.</typeparam>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.AppendFormatted``1(``0,System.Int32)">
+            <summary>Writes the specified value to the handler.</summary>
+            <param name="value">The value to write.</param>
+            <param name="alignment">Minimum number of characters that should be written for this value.  If the value is negative, it indicates left-aligned and the required minimum is the absolute value.</param>
+            <typeparam name="T">The type of the value to write.</typeparam>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.AppendFormatted``1(``0,System.Int32,System.String)">
+            <summary>Writes the specified value to the handler.</summary>
+            <param name="value">The value to write.</param>
+            <param name="format">The format string.</param>
+            <param name="alignment">Minimum number of characters that should be written for this value.  If the value is negative, it indicates left-aligned and the required minimum is the absolute value.</param>
+            <typeparam name="T">The type of the value to write.</typeparam>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.AppendFormatted(System.ReadOnlySpan{System.Char})">
+            <summary>Writes the specified character span to the handler.</summary>
+            <param name="value">The span to write.</param>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.AppendFormatted(System.ReadOnlySpan{System.Char},System.Int32,System.String)">
+            <summary>Writes the specified string of chars to the handler.</summary>
+            <param name="value">The span to write.</param>
+            <param name="alignment">Minimum number of characters that should be written for this value.  If the value is negative, it indicates left-aligned and the required minimum is the absolute value.</param>
+            <param name="format">The format string.</param>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.AppendFormatted(System.String)">
+            <summary>Writes the specified value to the handler.</summary>
+            <param name="value">The value to write.</param>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.AppendFormattedSlow(System.String)">
+            <summary>Writes the specified value to the handler.</summary>
+            <param name="value">The value to write.</param>
+            <remarks>
+            Slow path to handle a custom formatter, potentially null value,
+            or a string that doesn't fit in the current buffer.
+            </remarks>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.AppendFormatted(System.String,System.Int32,System.String)">
+            <summary>Writes the specified value to the handler.</summary>
+            <param name="value">The value to write.</param>
+            <param name="alignment">Minimum number of characters that should be written for this value.  If the value is negative, it indicates left-aligned and the required minimum is the absolute value.</param>
+            <param name="format">The format string.</param>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.AppendFormatted(System.Object,System.Int32,System.String)">
+            <summary>Writes the specified value to the handler.</summary>
+            <param name="value">The value to write.</param>
+            <param name="alignment">Minimum number of characters that should be written for this value.  If the value is negative, it indicates left-aligned and the required minimum is the absolute value.</param>
+            <param name="format">The format string.</param>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.HasCustomFormatter(System.IFormatProvider)">
+            <summary>Gets whether the provider provides a custom formatter.</summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.AppendCustomFormatter``1(``0,System.String)">
+            <summary>Formats the value using the custom formatter from the provider.</summary>
+            <param name="value">The value to write.</param>
+            <param name="format">The format string.</param>
+            <typeparam name="T">The type of the value to write.</typeparam>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.AppendOrInsertAlignmentIfNeeded(System.Int32,System.Int32)">
+            <summary>Handles adding any padding required for aligning a formatted value in an interpolation expression.</summary>
+            <param name="startingPos">The position at which the written value started.</param>
+            <param name="alignment">Non-zero minimum number of characters that should be written for this value.  If the value is negative, it indicates left-aligned and the required minimum is the absolute value.</param>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.EnsureCapacityForAdditionalChars(System.Int32)">
+            <summary>Ensures <see cref="F:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler._chars"/> has the capacity to store <paramref name="additionalChars"/> beyond <see cref="F:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler._pos"/>.</summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.GrowThenCopyString(System.String)">
+            <summary>Fallback for fast path in <see cref="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.AppendLiteral(System.String)"/> when there's not enough space in the destination.</summary>
+            <param name="value">The string to write.</param>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.GrowThenCopySpan(System.ReadOnlySpan{System.Char})">
+            <summary>Fallback for <see cref="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.AppendFormatted(System.ReadOnlySpan{System.Char})"/> for when not enough space exists in the current buffer.</summary>
+            <param name="value">The span to write.</param>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.Grow(System.Int32)">
+            <summary>Grows <see cref="F:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler._chars"/> to have the capacity to store at least <paramref name="additionalChars"/> beyond <see cref="F:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler._pos"/>.</summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.Grow">
+            <summary>Grows the size of <see cref="F:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler._chars"/>.</summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler.GrowCore(System.UInt32)">
+            <summary>Grow the size of <see cref="F:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler._chars"/> to at least the specified <paramref name="requiredMinCapacity"/>.</summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute">
+            <summary>Indicates which arguments to a method involving an interpolated string handler should be passed to that handler.</summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute.#ctor(System.String)">
+            <summary>Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute"/> class.</summary>
+            <param name="argument">The name of the argument that should be passed to the handler.</param>
+            <remarks>The empty string may be used as the name of the receiver in an instance method.</remarks>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute.#ctor(System.String[])">
+            <summary>Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute"/> class.</summary>
+            <param name="arguments">The names of the arguments that should be passed to the handler.</param>
+            <remarks>The empty string may be used as the name of the receiver in an instance method.</remarks>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute.Arguments">
+            <summary>Gets the names of the arguments that should be passed to the handler.</summary>
+            <remarks>The empty string may be used as the name of the receiver in an instance method.</remarks>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.InterpolatedStringHandlerAttribute">
+            <summary>Indicates the attributed type is to be used as an interpolated string handler.</summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.InterpolatedStringHandlerAttribute.#ctor">
+            <summary>Initializes the <see cref="T:System.Runtime.CompilerServices.InterpolatedStringHandlerAttribute"/>.</summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.RequiredMemberAttribute">
+            <summary>Specifies that a type has required members or that a member is required.</summary>
+        </member>
+        <member name="T:System.Runtime.InteropServices.CollectionsMarshal">
+            <summary>
+            An unsafe class that provides a set of methods to access the underlying data representations of collections.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.InteropServices.CollectionsMarshal.AsSpan``1(System.Collections.Generic.List{``0})">
+            <summary>
+            Get a <see cref="T:System.Span`1"/> view over a <see cref="T:System.Collections.Generic.List`1"/>'s data.
+            Items should not be added or removed from the <see cref="T:System.Collections.Generic.List`1"/> while the <see cref="T:System.Span`1"/> is in use.
+            </summary>
+            <param name="list">The list to get the data view over.</param>
+            <typeparam name="T">The type of the elements in the list.</typeparam>
+        </member>
+        <member name="T:System.Threading.CancellationTokenExtensions">
+            <summary>
+            Provides extension methods for <see cref="T:System.Threading.CancellationToken"/> to allow
+            </summary>
+        </member>
+        <member name="M:System.Threading.CancellationTokenExtensions.UnsafeRegister(System.Threading.CancellationToken,System.Action{System.Object},System.Object)">
+            <summary>
+            Registers a delegate that will be called when this
+            <see cref="T:System.Threading.CancellationToken">CancellationToken</see> is canceled.
+            </summary>
+            <remarks>
+            <para>
+            If this token is already in the canceled state, the delegate will be run immediately and synchronously.
+            Any exception the delegate generates will be propagated out of this method call.
+            </para>
+            <para>
+            <see cref="T:System.Threading.ExecutionContext">ExecutionContext</see> is not captured nor flowed
+            to the callback's invocation.
+            </para>
+            </remarks>
+            <param name="cancellationToken"> The <see cref="T:System.Threading.CancellationToken">CancellationToken</see> to register the callback with.</param>
+            <param name="callback">The delegate to be executed when the <see cref="T:System.Threading.CancellationToken">CancellationToken</see> is canceled.</param>
+            <param name="state">The state to pass to the <paramref name="callback"/> when the delegate is invoked.  This may be null.</param>
+            <returns>The <see cref="T:System.Threading.CancellationTokenRegistration"/> instance that can
+            be used to unregister the callback.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="callback"/> is null.</exception>
+        </member>
+        <member name="T:System.ISpanFormattable">
+            <summary>Provides functionality to format the string representation of an object into a span.</summary>
+        </member>
+        <member name="M:System.ISpanFormattable.TryFormat(System.Span{System.Char},System.Int32@,System.ReadOnlySpan{System.Char},System.IFormatProvider)">
+            <summary>Tries to format the value of the current instance into the provided span of characters.</summary>
+            <param name="destination">When this method returns, this instance's value formatted as a span of characters.</param>
+            <param name="charsWritten">When this method returns, the number of characters that were written in <paramref name="destination"/>.</param>
+            <param name="format">A span containing the characters that represent a standard or custom format string that defines the acceptable format for <paramref name="destination"/>.</param>
+            <param name="provider">An optional object that supplies culture-specific formatting information for <paramref name="destination"/>.</param>
+            <returns><see langword="true"/> if the formatting was successful; otherwise, <see langword="false"/>.</returns>
+            <remarks>
+            An implementation of this interface should produce the same string of characters as an implementation of <see cref="M:System.IFormattable.ToString(System.String,System.IFormatProvider)"/>
+            on the same type.
+            TryFormat should return false only if there is not enough space in the destination buffer. Any other failures should throw an exception.
+            </remarks>
+        </member>
+        <member name="M:System.RandomExtensions.get_Shared">
+            <inheritdoc cref="P:System.RandomExtensions.&lt;G&gt;$5AB4ABAAFA3359CDE65D50F3C2439F05.Shared"/>
+        </member>
+        <member name="T:System.RandomExtensions.&lt;G&gt;$5AB4ABAAFA3359CDE65D50F3C2439F05.&lt;M&gt;$EC2569F64B67E99BDCA1C56A212CE29C">
+            <summary>
+            <see cref="T:System.Random"/> extensions.
+            </summary>
+        </member>
+        <member name="P:System.RandomExtensions.&lt;G&gt;$5AB4ABAAFA3359CDE65D50F3C2439F05.Shared">
+            <summary>
+            Provides a thread-safe <see cref="T:System.Random"/> instance that may be used concurrently from any thread.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.SetsRequiredMembersAttribute">
+            <summary>
+            Specifies that this constructor sets all required members for the current type, and callers
+            do not need to set any required members themselves.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute">
+            <summary>Specifies the syntax used in a string.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.#ctor(System.String)">
+            <summary>Initializes the <see cref="T:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute"/> with the identifier of the syntax used.</summary>
+            <param name="syntax">The syntax identifier.</param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.#ctor(System.String,System.Object[])">
+            <summary>Initializes the <see cref="T:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute"/> with the identifier of the syntax used.</summary>
+            <param name="syntax">The syntax identifier.</param>
+            <param name="arguments">Optional arguments associated with the specific syntax employed.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Syntax">
+            <summary>Gets the identifier of the syntax used.</summary>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Arguments">
+            <summary>Optional arguments associated with the specific syntax employed.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.CompositeFormat">
+            <summary>The syntax identifier for strings containing composite formats for string formatting.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.DateOnlyFormat">
+            <summary>The syntax identifier for strings containing date format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.DateTimeFormat">
+            <summary>The syntax identifier for strings containing date and time format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.EnumFormat">
+            <summary>The syntax identifier for strings containing <see cref="T:System.Enum"/> format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.GuidFormat">
+            <summary>The syntax identifier for strings containing <see cref="T:System.Guid"/> format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Json">
+            <summary>The syntax identifier for strings containing JavaScript Object Notation (JSON).</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.NumericFormat">
+            <summary>The syntax identifier for strings containing numeric format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Regex">
+            <summary>The syntax identifier for strings containing regular expressions.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.TimeOnlyFormat">
+            <summary>The syntax identifier for strings containing time format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.TimeSpanFormat">
+            <summary>The syntax identifier for strings containing <see cref="T:System.TimeSpan"/> format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Uri">
+            <summary>The syntax identifier for strings containing URIs.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Xml">
+            <summary>The syntax identifier for strings containing XML.</summary>
+        </member>
+    </members>
+</doc>

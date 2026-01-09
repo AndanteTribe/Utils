@@ -1,0 +1,1080 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Utils.Core</name>
+    </assembly>
+    <members>
+        <member name="T:AndanteTribe.Utils.CollectionsExtensions">
+            <summary>
+            <see cref="N:System.Collections.Generic"/>または<see cref="N:System.Linq"/>または<see cref="T:System.Buffers.ArrayPool`1"/>周りの追加拡張メソッド群.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.CollectionsExtensions.AsSpan``1(System.Collections.Generic.List{``0})">
+             <summary>
+             <see cref="T:System.Collections.Generic.List`1"/>を<see cref="T:System.Span`1"/>に変換します.
+             </summary>
+             <example>
+             <code>
+             <![CDATA[
+             using System.Runtime.CompilerServices;
+            
+             public class Example
+             {
+                public static void Main(string[] args)
+                {
+                    List<int> numbers = new List<int> { 10, 20, 30, 40, 50 };
+            
+                    // List<int> を Span<int> に変換
+                    Span<int> numbersSpan = numbers.AsSpan();
+            
+                    // List<T>よりも高速にループ処理可能
+                    foreach (var item in numbersSpan)
+                    {
+                         Console.WriteLine(item);
+                    }
+            
+                }
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="list"></param>
+             <typeparam name="T"></typeparam>
+             <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.CollectionsExtensions.Rent``1(System.Buffers.ArrayPool{``0},System.Int32,``0[]@)">
+            <summary>
+            <see cref="T:System.Buffers.ArrayPool`1"/>から借りた配列を返却するためのハンドルを取得します.
+            </summary>
+            <remarks>
+            基本的に<see langword="using"/>ステートメントと組み合わせて使用します.
+            </remarks>
+            <param name="pool"></param>
+            <param name="minimumLength"></param>
+            <param name="array"></param>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="T:AndanteTribe.Utils.CollectionsExtensions.Handle`1">
+            <summary>
+            <see cref="T:System.Buffers.ArrayPool`1"/>から借りた配列を返却するためのハンドル.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:AndanteTribe.Utils.CollectionsExtensions.Handle`1.System#IDisposable#Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="T:AndanteTribe.Utils.DisposableUtils">
+            <summary>
+            <see cref="T:System.IDisposable"/>のユーティリティ.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.DisposableUtils.AddTo``1(``0,``0@)">
+             <summary>
+             <see cref="T:System.IDisposable"/>を指定した<see cref="T:System.IDisposable"/>コンテナに追加します.
+             </summary>
+             <example>
+             <code>
+             <![CDATA[
+             using System.Threading;
+             using AndanteTribe.Utils;
+             using R3;
+             using UnityEngine;
+            
+             public class AddToExample : MonoBehaviour
+             {
+                 private CancellationTokenRegistration _subscription;
+            
+                 private void Start()
+                 {
+                     // Same as the following code:
+                     // _subscription = Observable
+                     //     .EveryUpdate()
+                     //     .Subscribe(static _ => Debug.Log(Time.frameCount))
+                     //     .RegisterTo(destroyCancellationToken);
+            
+                     Observable
+                         .EveryUpdate()
+                         .Subscribe(static _ => Debug.Log(Time.frameCount))
+                         .RegisterTo(destroyCancellationToken) // return CancellationTokenRegistration that is struct
+                         .AddTo(ref _subscription);
+                 }
+            
+                 public void CancelSubscription()
+                 {
+                     _subscription.Dispose();
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="disposable">任意の<see cref="T:System.IDisposable"/>実装オブジェクト.</param>
+             <param name="disposableContainer">追加先の<see cref="T:System.IDisposable"/>コンテナ.</param>
+             <typeparam name="T">追加した<see cref="T:System.IDisposable"/>.</typeparam>
+        </member>
+        <member name="M:AndanteTribe.Utils.DisposableUtils.ThrowIfDisposed(System.Threading.CancellationTokenSource,System.Object)">
+             <summary>
+             <see cref="T:System.Threading.CancellationTokenSource"/>がキャンセルされているかどうかを確認し、キャンセルされている場合は<see cref="T:System.ObjectDisposedException"/>をスローします。
+             </summary>
+             <example>
+             <code>
+             <![CDATA[
+             using System;
+             using System.Threading;
+             using System.Threading.Tasks;
+            
+             public class Sample
+             {
+                 private CancellationTokenSource _cancellationDisposable = new();
+            
+                 public async Task LoadAsync()
+                 {
+                     // //従来の書き方
+                     // //既にキャンセル処理が呼ばれているか確認
+                     // if (_cancellationDisposable.IsCancellationRequested)
+                     // {
+                     //     throw new ObjectDisposedException("AudioPlayer");
+                     // }
+            
+                     //このように一行でキャンセル済みか確認可能
+                     _cancellationDisposable.ThrowIfDisposed(this);
+            
+                     var token = _cancellationDisposable.Token;
+            
+                     // 以下、非同期処理が続く
+                     // await Addressables.LoadAsync(token);
+                 }
+            
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="cancellationTokenSource">対象のインスタンス.</param>
+             <param name="instance">オプションのインスタンス名。<see cref="T:System.ObjectDisposedException"/>のメッセージに使用されます。</param>
+             <exception cref="T:System.ObjectDisposedException">キャンセルされている場合にスローされます。</exception>
+             <remarks><see cref="T:System.Threading.CancellationTokenSource"/>を<see cref="T:System.IDisposable"/>に見立てるような思想のメソッド.</remarks>
+        </member>
+        <member name="M:AndanteTribe.Utils.DisposableUtils.CreateLinkedTokenSource(System.Threading.CancellationTokenSource,System.Threading.CancellationToken)">
+             <summary>
+             <see cref="T:System.Threading.CancellationTokenSource"/>と<see cref="T:System.Threading.CancellationToken"/>をリンクさせた新しい<see cref="T:System.Threading.CancellationTokenSource"/>を作成します。
+             </summary>
+             <example>
+             <code>
+             <![CDATA[
+             using System.Threading;
+             using Cysharp.Threading.Tasks;
+             using UnityEngine;
+            
+             public class Sample : MonoBehaviour
+             {
+                 private CancellationTokenSource _cancellationTokenSource = new();
+            
+                 public async UniTaskVoid Load()
+                 {
+                     var token = Application.exitCancellationToken;
+            
+                     // このインスタンスのCancellationTokenSource、またはアプリケーションの終了が要求されたときにキャンセルされる、リンクされたCancellationTokenを作成します。
+                     var linkedTokenSource = _cancellationTokenSource.CreateLinkedTokenSource(token);
+            
+                     await UniTask.Delay(TimeSpan.FromSeconds(10), cancellationToken:linkedTokenSource.Token);
+            
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="cancellationTokenSource">リンク元の<see cref="T:System.Threading.CancellationTokenSource"/>.</param>
+             <param name="token">リンクする<see cref="T:System.Threading.CancellationToken"/>.</param>
+             <returns>新しい<see cref="T:System.Threading.CancellationTokenSource"/>.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.DisposableUtils.CreateLinkedTokenSource(System.Threading.CancellationTokenSource,System.Threading.CancellationToken,System.Threading.CancellationToken)">
+             <summary>
+             <see cref="T:System.Threading.CancellationTokenSource"/>と2つの<see cref="T:System.Threading.CancellationToken"/>をリンクさせた新しい<see cref="T:System.Threading.CancellationTokenSource"/>を作成します。
+             </summary>
+             <example>
+             <code>
+             <![CDATA[
+             using System.Threading;
+             using Cysharp.Threading.Tasks;
+             using UnityEngine;
+            
+             public class Sample : MonoBehaviour
+             {
+                 [SerializeField] private Player _player;
+                 [SerializeField] private Enemy _enemy;
+            
+                 private CancellationTokenSource _cancellationTokenSource = new();
+            
+                 public async UniTaskVoid Load()
+                 {
+                     var token = _player.destroyCancellationToken;
+                     var token2 = _enemy.destroyCancellationToken;
+            
+                     // プレイヤーか敵が破棄された場合、またはこのクラスのCancellationTokenSourceがキャンセルされた場合にキャンセルされるトークンを作成する。
+                     var linkedTokenSource = _cancellationTokenSource.CreateLinkedTokenSource(token,token2);
+            
+                     await UniTask.Delay(TimeSpan.FromSeconds(10), cancellationToken:linkedTokenSource.Token);
+            
+                 }
+             }
+            
+             public class Player : MonoBehaviour
+             {
+                 //以下コード
+             }
+            
+             public class Enemy : MonoBehaviour
+             {
+                 //以下コード
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="cancellationTokenSource">リンク元の<see cref="T:System.Threading.CancellationTokenSource"/>.</param>
+             <param name="tokens1">リンクする最初の<see cref="T:System.Threading.CancellationToken"/>.</param>
+             <param name="tokens2">リンクする2つ目の<see cref="T:System.Threading.CancellationToken"/>.</param>
+             <returns>新しい<see cref="T:System.Threading.CancellationTokenSource"/>.</returns>
+        </member>
+        <member name="T:AndanteTribe.Utils.EnumExtensions">
+            <summary>
+            列挙体の拡張メソッド.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.EnumExtensions.HasBitFlags``1(``0,``0)">
+             <summary>
+             指定のビットフラグを持っているかどうかを判定します.
+             </summary>
+             <param name="value"></param>
+             <param name="flag"></param>
+             <typeparam name="T"></typeparam>
+             <example>
+             <code>
+             <![CDATA[
+             /// <summary>
+             /// ファイルアクセス権を定義するフラグ付き列挙体
+             /// </summary>
+             [System.Flags]
+             public enum FileAccess
+             {
+                 None = 0,
+                 Read = 1 << 0,      // 0001
+                 Write = 1 << 1,     // 0010
+                 Execute = 1 << 2,   // 0100
+                 ReadWrite = Read | Write, // 0011
+             }
+            
+             public class Sample
+             {
+                 public void Run()
+                 {
+                     // 現在の権限を設定
+                     const FileAccess currentPermissions = FileAccess.ReadWrite;
+            
+                     // 1. 単一のフラグを確認する
+                     // Read権限を持っているか？ (true)
+                     var hasRead = currentPermissions.HasBitFlags(FileAccess.Read);
+                     Console.WriteLine($"Read権限があるか: {hasRead}");
+            
+                     // Execute権限を持っているか？ (false)
+                     var hasExecute = currentPermissions.HasBitFlags(FileAccess.Execute);
+                     Console.WriteLine($"Execute権限があるか: {hasExecute}");
+            
+                     // 2. 複数のフラグをまとめて確認する
+                     // ReadとWriteの両方の権限を持っているか？ (true)
+                     var hasReadWrite = currentPermissions.HasBitFlags(FileAccess.ReadWrite);
+                     Console.WriteLine($"ReadとWrite権限があるか: {hasReadWrite}");
+            
+                     // 3. 自身に含まれないフラグを確認する
+                     const FileAccess fullAccess = FileAccess.Read | FileAccess.Write | FileAccess.Execute;
+            
+                     // すべての権限を持っているか？ (false)
+                     var hasFullAccess = currentPermissions.HasBitFlags(fullAccess);
+                     Console.WriteLine($"すべての権限があるか: {hasFullAccess}");
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <returns></returns>
+             <exception cref="T:System.NotSupportedException">対象の列挙体の基礎型がサポートされていない場合にスローされます.</exception>
+        </member>
+        <member name="M:AndanteTribe.Utils.EnumExtensions.ConstructFlags``1(``0)">
+             <summary>
+             1つのビットフラグを持っているかどうかを判定します.
+             </summary>
+             <param name="value"></param>
+             <typeparam name="T"></typeparam>
+             <example>
+             <code>
+             <![CDATA[
+             /// <summary>
+             /// ファイルアクセス権を定義するフラグ付き列挙体
+             /// </summary>
+             [System.Flags]
+             public enum FileAccess
+             {
+                 None = 0,
+                 Read = 1 << 0,      // 0001
+                 Write = 1 << 1,     // 0010
+                 Execute = 1 << 2,   // 0100
+                 ReadWrite = Read | Write, // 0011
+                 All = Read | Write | Execute
+             }
+            
+             public class Sample
+             {
+                 public void Run()
+                 {
+                     // Readのみなので単一フラグ
+                     // 単一フラグか: (true)
+                     Console.WriteLine($"単一フラグか:{FileAccess.Read.ConstructFlags()}");
+            
+                     // ReadとWrite２つのフラグを持っているので単一フラグではない
+                     // 単一フラグか: (false)
+                     Console.WriteLine($"単一フラグか:{FileAccess.ReadWrite.ConstructFlags()}");
+            
+                     // ReadとWriteとExecute3つのフラグを持っているので単一フラグではない
+                     // 単一フラグか: (false)
+                     Console.WriteLine($"単一フラグか:{FileAccess.All.ConstructFlags()}");
+            
+                     // 何もフラグを持っていないので単一フラグではない
+                     // 単一フラグか: (false)
+                     Console.WriteLine($"単一フラグか:{FileAccess.None.ConstructFlags()}");
+            
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <returns></returns>
+             <exception cref="T:System.NotSupportedException">対象の列挙体の基礎型がサポートされていない場合にスローされます.</exception>
+        </member>
+        <member name="M:AndanteTribe.Utils.EnumExtensions.AggregateFlags``1(System.Span{``0})">
+             <summary>
+             指定のビットフラグを集約します.
+             </summary>
+             <param name="flags"></param>
+             <typeparam name="T"></typeparam>
+             <returns></returns>
+             <exception cref="T:System.NotSupportedException">対象の列挙体の基礎型がサポートされていない場合にスローされます.</exception>
+             <example>
+             <code>
+             <![CDATA[
+             [System.Flags]
+             public enum FileAccess
+             {
+                 None = 0,
+                 Read = 1 << 0,      // 0001
+                 Write = 1 << 1,     // 0010
+                 Execute = 1 << 2,   // 0100
+                 ReadWrite = Read | Write,
+                 All = Read | Write | Execute
+             }
+            
+             public class Sample
+             {
+                 public void Run()
+                 {
+                     // 配列から ReadOnlySpan を作って集約する例
+                     var flags = new[] { FileAccess.Read, FileAccess.Write };
+                     var aggregated = flags.AsSpan().AggregateFlags();
+                     // 出力: ReadWrite
+                     Console.WriteLine(aggregated);
+            
+                     // 単一要素
+                     var single = new[] { FileAccess.Execute };
+                     var aggregatedSingle = single.AsSpan().AggregateFlags();
+                     // 出力: Execute
+                     Console.WriteLine(aggregatedSingle);
+            
+                     // 空配列 -> デフォルト(= None)
+                     var empty = Array.Empty<FileAccess>();
+                     var aggregatedEmpty = empty.AsSpan().AggregateFlags();
+                     // 出力: None
+                     Console.WriteLine(aggregatedEmpty);
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+        </member>
+        <member name="M:AndanteTribe.Utils.EnumExtensions.AggregateFlags``1(System.ReadOnlySpan{``0})">
+            <summary>
+            指定のビットフラグを集約します.
+            </summary>
+            <param name="flags"></param>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+            <exception cref="T:System.NotSupportedException">対象の列挙体の基礎型がサポートされていない場合にスローされます.</exception>
+        </member>
+        <member name="M:AndanteTribe.Utils.EnumExtensions.GetEnumerator``1(``0)">
+             <summary>
+             列挙体の全てのビットフラグを取得します.
+             </summary>
+             <param name="value"></param>
+             <typeparam name="T"></typeparam>
+             <example>
+             <code>
+             <![CDATA[
+             [System.Flags]
+             public enum FileAccess
+             {
+                 None = 0,
+                 Read = 1 << 0,      // 0001
+                 Write = 1 << 1,     // 0010
+                 Execute = 1 << 2,   // 0100
+                 ReadWrite = Read | Write, // 0011
+                 All = Read | Write | Execute
+             }
+            
+             public class Sample
+             {
+                 public void Run()
+                 {
+                     FileAccess currentPermissions = FileAccess.Read | FileAccess.Write;
+            
+                     //foreachが実行可能になる
+                     foreach (var flag in currentPermissions)
+                     {
+                         // 実行結果
+                         // Read
+                         // Write
+                         Console.WriteLine(flag);
+                     }
+            
+                     currentPermissions = FileAccess.None | FileAccess.All ;
+            
+                     foreach (var flag in currentPermissions)
+                     {
+                         // 実行結果 Noneは出力されない
+                         // Read
+                         // Write
+                         // Execute
+                         Console.WriteLine(flag);
+                     }
+            
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <returns></returns>
+        </member>
+        <member name="T:AndanteTribe.Utils.EnumExtensions.Enumerator`1">
+            <summary>
+            列挙体の全てのビットフラグを取得します.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:AndanteTribe.Utils.EnumExtensions.Enumerator`1.Current">
+            <summary>
+            現在の列挙体の値を取得します.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.EnumExtensions.Enumerator`1.MoveNext">
+            <summary>
+            列挙体の次のビットフラグを取得します.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:AndanteTribe.Utils.EqualityComparer">
+            <summary>
+            <see cref="T:System.Collections.Generic.EqualityComparer`1"/>の拡張クラス.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.EqualityComparer.Create``1(System.Func{``0,``0,System.Boolean},System.Func{``0,System.Int32})">
+             <summary>
+             指定した比較処理を使用して<see cref="T:System.Collections.Generic.IEqualityComparer`1"/>を生成します.
+             </summary>
+             <example>
+             <code>
+             <![CDATA[
+             using System.Collections.Generic;
+             using AndanteTribe.Utils;
+            
+             public enum Fruits : int
+             {
+                 Apple,
+                 Orange,
+                 Banana,
+             }
+            
+             public class EqualityComparerFactoryExample
+             {
+                 private readonly Dictionary<Fruits, string> _fruits;
+            
+                 public EqualityComparerFactoryExample()
+                 {
+                     var equalityComparer = EqualityComparer.Create<Fruits>(
+                         static (x, y) => (int) x == (int) y,
+                         static x => ((int) x).GetHashCode());
+                     _fruits = new Dictionary<Fruits, string>(3, equalityComparer)
+                     {
+                         {Fruits.Apple, "Apple"},
+                         {Fruits.Orange, "Orange"},
+                         {Fruits.Banana, "Banana"},
+                     };
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="equals"><see cref="M:System.Collections.Generic.IEqualityComparer`1.Equals(`0,`0)"/>に使用する処理.</param>
+             <param name="getHashCode"><see cref="M:System.Collections.Generic.IEqualityComparer`1.GetHashCode(`0)"/>に使用する処理.</param>
+             <typeparam name="T">比較対象の型.</typeparam>
+             <returns>生成された<see cref="T:System.Collections.Generic.IEqualityComparer`1"/>.</returns>
+             <exception cref="T:System.ArgumentNullException"><see cref="!:equals"/>がnullです.</exception>
+             <exception cref="T:System.NotSupportedException"><see cref="!:getHashCode"/>がnullです.</exception>
+        </member>
+        <member name="T:AndanteTribe.Utils.FileNameAttribute">
+            <summary>
+            ファイルパスを指定する属性.
+            </summary>
+        </member>
+        <member name="F:AndanteTribe.Utils.FileNameAttribute.Name">
+            <summary>
+            ファイル名.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.FileNameAttribute.#ctor(System.String)">
+            <summary>
+            Initialize a new instance of <see cref="T:AndanteTribe.Utils.FileNameAttribute"/>.
+            </summary>
+            <param name="name">ファイル名.</param>
+        </member>
+        <member name="T:AndanteTribe.Utils.FormatHelper">
+            <summary>
+            文字列フォーマットのヘルパー.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.FormatHelper.AnalyzeFormat(System.String@)">
+            <summary>
+            フォーマット文字列を解析します.
+            </summary>
+            <param name="format"></param>
+            <returns></returns>
+            <exception cref="T:System.FormatException"></exception>
+        </member>
+        <member name="M:AndanteTribe.Utils.FormatHelper.AnalyzeFormat(System.ReadOnlySpan{System.Char}@)">
+            <summary>
+            フォーマット文字列を解析します.
+            </summary>
+            <param name="format"></param>
+            <returns></returns>
+            <exception cref="T:System.FormatException"></exception>
+        </member>
+        <member name="T:AndanteTribe.Utils.IInitializable">
+            <summary>
+            初期化処理を提供するインターフェース.
+            </summary>
+            <exception cref="T:System.NotImplementedException">
+            <see cref="T:AndanteTribe.Utils.IInitializable"/>を実装する場合、<see cref="M:AndanteTribe.Utils.IInitializable.Initialize(System.Threading.CancellationToken)"/>または<see cref="M:AndanteTribe.Utils.IInitializable.InitializeAsync(System.Threading.CancellationToken)"/>のいずれかを実装する必要があります.
+            </exception>
+        </member>
+        <member name="M:AndanteTribe.Utils.IInitializable.Initialize(System.Threading.CancellationToken)">
+            <summary>
+            同期的に初期化処理を行う.
+            </summary>
+            <param name="cancellationToken">キャンセル用のトークン.</param>
+        </member>
+        <member name="M:AndanteTribe.Utils.IInitializable.InitializeAsync(System.Threading.CancellationToken)">
+            <summary>
+            非同期で初期化処理を行う.
+            </summary>
+            <param name="cancellationToken">キャンセル用のトークン.</param>
+            <returns>初期化が完了したら完了するタスク.</returns>
+        </member>
+        <member name="T:AndanteTribe.Utils.Internal.ValueList`1">
+            <summary>
+            構造体簡易リスト.
+            </summary>
+            <param name="capacity">初期容量.</param>
+            <typeparam name="T">要素の型.</typeparam>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.#ctor(System.Int32)">
+            <summary>
+            構造体簡易リスト.
+            </summary>
+            <param name="capacity">初期容量.</param>
+            <typeparam name="T">要素の型.</typeparam>
+        </member>
+        <member name="P:AndanteTribe.Utils.Internal.ValueList`1.Count">
+            <summary>
+            要素数.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.#ctor">
+            <inheritdoc />
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.Add(`0)">
+            <summary>
+            要素を追加します.
+            </summary>
+            <param name="item"></param>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.Clear">
+            <summary>
+            配列プールに返却する.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.Clear(System.ArraySegment{`0}@)">
+            <summary>
+            配列プールに返却する.
+            </summary>
+            <param name="segment"></param>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.Clear(System.ReadOnlyMemory{`0}@)">
+            <summary>
+            配列プールに返却する.
+            </summary>
+            <param name="memory"></param>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.AsSegment">
+            <summary>
+            <see cref="T:System.ArraySegment`1"/>として取得します.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.AsSpan">
+            <summary>
+            <see cref="T:System.Span`1"/>として取得します.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.AsMemory">
+            <summary>
+            <see cref="T:System.Memory`1"/>として取得します.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.GetEnumerator">
+            <summary>
+            列挙子を取得します.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.System#Collections#Generic#IEnumerable{T}#GetEnumerator">
+            <inheritdoc />
+        </member>
+        <member name="M:AndanteTribe.Utils.Internal.ValueList`1.System#Collections#IEnumerable#GetEnumerator">
+            <inheritdoc />
+        </member>
+        <member name="T:AndanteTribe.Utils.MemoryExtensions">
+            <summary>
+            <see cref="T:System.Memory`1"/>, <see cref="T:System.ReadOnlyMemory`1"/>の拡張メソッド.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.MemoryExtensions.GetEnumerator``1(System.Memory{``0}@)">
+             <summary>
+             <see cref="T:System.Memory`1"/>のforeach対応.
+             </summary>
+             <remarks>
+             <see cref="M:AndanteTribe.Utils.MemoryExtensions.GetEnumerator``1(System.ReadOnlyMemory{``0}@)"/>と使い方や機能は同じ.
+             </remarks>
+             <example>
+             <code>
+             <![CDATA[
+             using System;
+             using System.Collections;
+             using AndanteTribe.Utils;
+             using UnityEngine;
+            
+             public class MemoryExtensionsSample : MonoBehaviour
+             {
+                 private Memory<char> _text;
+            
+                 private void Start()
+                 {
+                     const string text = "Hello, World!";
+                     _text = text.AsMemory().Slice(7, 5); // 'W', 'o', 'r', 'l', 'd'
+            
+                     StartCoroutine(UpdateText());
+                 }
+            
+                 private IEnumerator UpdateText()
+                 {
+                     foreach (var c in _text)
+                     {
+                         Debug.Log(c);
+                         yield return null; // Wait for next frame
+                     }
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="memory">対象の<see cref="T:System.Memory`1"/>.</param>
+             <typeparam name="T">要素の型.</typeparam>
+             <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.MemoryExtensions.Enumerator`1"/>.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.MemoryExtensions.GetEnumerator``1(System.ReadOnlyMemory{``0}@)">
+             <summary>
+             <see cref="T:System.ReadOnlyMemory`1"/>のforeach対応.
+             </summary>
+             <example>
+             <code>
+             <![CDATA[
+             using System;
+             using System.Collections;
+             using AndanteTribe.Utils;
+             using UnityEngine;
+            
+             public class MemoryExtensionsSample : MonoBehaviour
+             {
+                 private ReadOnlyMemory<char> _text;
+            
+                 private void Start()
+                 {
+                     const string text = "Hello, World!";
+                     _text = text.AsMemory().Slice(7, 5); // 'W', 'o', 'r', 'l', 'd'
+            
+                     StartCoroutine(UpdateText());
+                 }
+            
+                 private IEnumerator UpdateText()
+                 {
+                     foreach (var c in _text)
+                     {
+                         Debug.Log(c);
+                         yield return null; // Wait for next frame
+                     }
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="memory">対象の<see cref="T:System.ReadOnlyMemory`1"/>.</param>
+             <typeparam name="T">要素の型.</typeparam>
+             <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.MemoryExtensions.Enumerator`1"/>.</returns>
+        </member>
+        <member name="T:AndanteTribe.Utils.MemoryExtensions.Enumerator`1">
+            <summary>
+            <see cref="T:System.ReadOnlyMemory`1"/>のforeach対応.
+            </summary>
+            <typeparam name="T">要素の型.</typeparam>
+        </member>
+        <member name="P:AndanteTribe.Utils.MemoryExtensions.Enumerator`1.Current">
+            <inheritdoc/>
+        </member>
+        <member name="P:AndanteTribe.Utils.MemoryExtensions.Enumerator`1.System#Collections#IEnumerator#Current">
+            <inheritdoc/>
+        </member>
+        <member name="M:AndanteTribe.Utils.MemoryExtensions.Enumerator`1.#ctor(System.ReadOnlyMemory{`0}@)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AndanteTribe.Utils.MemoryExtensions.Enumerator`1"/> struct.
+            </summary>
+            <param name="memory"><see cref="T:System.ReadOnlyMemory`1"/>.</param>
+        </member>
+        <member name="M:AndanteTribe.Utils.MemoryExtensions.Enumerator`1.MoveNext">
+            <inheritdoc/>
+        </member>
+        <member name="M:AndanteTribe.Utils.MemoryExtensions.Enumerator`1.System#Collections#IEnumerator#Reset">
+            <inheritdoc/>
+        </member>
+        <member name="M:AndanteTribe.Utils.MemoryExtensions.Enumerator`1.System#IDisposable#Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="T:AndanteTribe.Utils.StateTuple">
+            <summary>
+            スレッドセーフなプールを持つ参照タプル. <see cref="T:System.ValueTuple"/>でボクシングするような場面での使用を想定.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.StateTuple.Create``1(``0)">
+            <summary>
+            参照タプルを作成します.
+            </summary>
+            <param name="item1"></param>
+            <typeparam name="T1"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.StateTuple.Create``2(``0,``1)">
+            <summary>
+            参照タプルを作成します.
+            </summary>
+            <param name="item1"></param>
+            <param name="item2"></param>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.StateTuple.Create``3(``0,``1,``2)">
+            <summary>
+            参照タプルを作成します.
+            </summary>
+            <param name="item1"></param>
+            <param name="item2"></param>
+            <param name="item3"></param>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+            <typeparam name="T3"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="T:AndanteTribe.Utils.StateTuple`1">
+            <summary>
+            スレッドセーフなプールを持つ参照タプル. <see cref="T:System.ValueTuple"/>でボクシングするような場面での使用を想定.
+            </summary>
+            <typeparam name="T1"></typeparam>
+        </member>
+        <member name="M:AndanteTribe.Utils.StateTuple`1.Deconstruct(`0@)">
+            <summary>
+            Deconstructs the tuple into its components.
+            </summary>
+            <param name="item1"></param>
+        </member>
+        <member name="T:AndanteTribe.Utils.StateTuple`2">
+            <summary>
+            スレッドセーフなプールを持つ参照タプル. <see cref="T:System.ValueTuple"/>でボクシングするような場面での使用を想定.
+            </summary>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+        </member>
+        <member name="M:AndanteTribe.Utils.StateTuple`2.Deconstruct(`0@,`1@)">
+            <summary>
+            Deconstructs the tuple into its components.
+            </summary>
+            <param name="item1"></param>
+            <param name="item2"></param>
+        </member>
+        <member name="T:AndanteTribe.Utils.StateTuple`3">
+            <summary>
+            スレッドセーフなプールを持つ参照タプル. <see cref="T:System.ValueTuple"/>でボクシングするような場面での使用を想定.
+            </summary>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+            <typeparam name="T3"></typeparam>
+        </member>
+        <member name="M:AndanteTribe.Utils.StateTuple`3.Deconstruct(`0@,`1@,`2@)">
+            <summary>
+            Deconstructs the tuple into its components.
+            </summary>
+            <param name="item1"></param>
+            <param name="item2"></param>
+            <param name="item3"></param>
+        </member>
+        <member name="T:AndanteTribe.Utils.ValueTupleExtensions">
+            <summary>
+            <see cref="T:System.ValueTuple"/>の拡張メソッド.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.ValueTupleExtensions.GetEnumerator``1(System.ValueTuple{``0,``0}@)">
+             <summary>
+             <see cref="T:System.ValueTuple`2"/>のforeach対応.
+             </summary>
+             <example>
+             <code>
+             <![CDATA[
+             using UnityEngine;
+            
+             public class Sample : MonoBehaviour
+             {
+                 [SerializeField] private GameObject _button;
+                 [SerializeField] private GameObject _button1;
+            
+                 private void Start()
+                 {
+                     //タプルでforeachが回せる
+                     foreach (var obj in (_button,_button1))
+                     {
+                         obj.SetActive(false);
+                     }
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="tuple">対象の<see cref="T:System.ValueTuple`2"/>.</param>
+             <typeparam name="T">要素の型.</typeparam>
+             <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1"/>.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.ValueTupleExtensions.GetEnumerator``1(System.ValueTuple{``0,``0,``0}@)">
+             <summary>
+             <see cref="T:System.ValueTuple`3"/>のforeach対応.
+             </summary>
+             <example>
+             <code>
+             <![CDATA[
+             using UnityEngine;
+            
+             public class Sample : MonoBehaviour
+             {
+                 [SerializeField] private GameObject _button;
+                 [SerializeField] private GameObject _button1;
+                 [SerializeField] private GameObject _button2;
+            
+                 private void Start()
+                 {
+                     //タプルでforeachが回せる
+                     foreach (var obj in (_button,_button1,_button2))
+                     {
+                         obj.SetActive(false);
+                     }
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="tuple">対象の<see cref="T:System.ValueTuple`3"/>.</param>
+             <typeparam name="T">要素の型.</typeparam>
+             <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1"/>.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.ValueTupleExtensions.GetEnumerator``1(System.ValueTuple{``0,``0,``0,``0}@)">
+             <summary>
+             <see cref="T:System.ValueTuple`4"/>のforeach対応.
+             </summary>
+             <example>
+             <code>
+             <![CDATA[
+             using UnityEngine;
+            
+             public class Sample : MonoBehaviour
+             {
+                 [SerializeField] private GameObject _button;
+                 [SerializeField] private GameObject _button1;
+                 [SerializeField] private GameObject _button2;
+                 [SerializeField] private GameObject _button3;
+            
+                 private void Start()
+                 {
+                     //タプルでforeachが回せる
+                     foreach (var obj in (_button,_button1,_button2,_button3))
+                     {
+                         obj.SetActive(false);
+                     }
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="tuple">対象の<see cref="T:System.ValueTuple`4"/>.</param>
+             <typeparam name="T">要素の型.</typeparam>
+             <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1"/>.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.ValueTupleExtensions.GetEnumerator``1(System.ValueTuple{``0,``0,``0,``0,``0}@)">
+             <summary>
+             <see cref="T:System.ValueTuple`5"/>のforeach対応.
+             </summary>
+             <example>
+             <code>
+             <![CDATA[
+             using UnityEngine;
+            
+             public class Sample : MonoBehaviour
+             {
+                 [SerializeField] private GameObject _button;
+                 [SerializeField] private GameObject _button1;
+                 [SerializeField] private GameObject _button2;
+                 [SerializeField] private GameObject _button3;
+                 [SerializeField] private GameObject _button4;
+            
+                 private void Start()
+                 {
+                     //タプルでforeachが回せる
+                     foreach (var obj in (_button,_button1,_button2,_button3,_button4))
+                     {
+                         obj.SetActive(false);
+                     }
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="tuple">対象の<see cref="T:System.ValueTuple`5"/>.</param>
+             <typeparam name="T">要素の型.</typeparam>
+             <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1"/>.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.ValueTupleExtensions.GetEnumerator``1(System.ValueTuple{``0,``0,``0,``0,``0,``0}@)">
+             <summary>
+             <see cref="T:System.ValueTuple`6"/>のforeach対応.
+             </summary>
+             <example>
+             <code>
+             <![CDATA[
+             using UnityEngine;
+            
+             public class Sample : MonoBehaviour
+             {
+                 [SerializeField] private GameObject _button;
+                 [SerializeField] private GameObject _button1;
+                 [SerializeField] private GameObject _button2;
+                 [SerializeField] private GameObject _button3;
+                 [SerializeField] private GameObject _button4;
+                 [SerializeField] private GameObject _button5;
+            
+                 private void Start()
+                 {
+                     //タプルでforeachが回せる
+                     foreach (var obj in (_button,_button1,_button2,_button3,_button4,_button5))
+                     {
+                         obj.SetActive(false);
+                     }
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="tuple">対象の<see cref="T:System.ValueTuple`6"/>.</param>
+             <typeparam name="T">要素の型.</typeparam>
+             <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1"/>.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.ValueTupleExtensions.GetEnumerator``1(System.ValueTuple{``0,``0,``0,``0,``0,``0,``0}@)">
+             <summary>
+             <see cref="T:System.ValueTuple`7"/>のforeach対応.
+             </summary>
+             <example>
+             <code>
+             <![CDATA[
+             using UnityEngine;
+            
+             public class Sample : MonoBehaviour
+             {
+                 [SerializeField] private GameObject _button;
+                 [SerializeField] private GameObject _button1;
+                 [SerializeField] private GameObject _button2;
+                 [SerializeField] private GameObject _button3;
+                 [SerializeField] private GameObject _button4;
+                 [SerializeField] private GameObject _button5;
+                 [SerializeField] private GameObject _button6;
+            
+                 private void Start()
+                 {
+                     //タプルでforeachが回せる
+                     foreach (var obj in (_button,_button1,_button2,_button3,_button4,_button5,_button6))
+                     {
+                         obj.SetActive(false);
+                     }
+                 }
+             }
+             ]]>
+             </code>
+             </example>
+             <param name="tuple">対象の<see cref="T:System.ValueTuple`7"/>.</param>
+             <typeparam name="T">要素の型.</typeparam>
+             <returns>要素を列挙する<see cref="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1"/>.</returns>
+        </member>
+        <member name="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1">
+            <summary>
+            ValueTupleのforeach対応.
+            </summary>
+            <typeparam name="T">要素の型.</typeparam>
+        </member>
+        <member name="P:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1.Current">
+            <summary>
+            <see cref="P:System.Collections.Generic.IEnumerator`1.Current"/>に同じ.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1.#ctor(System.ValueTuple{`0,`0,`0,`0,`0,`0,`0}@,System.Byte)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1"/> struct.
+            </summary>
+            <param name="tuple"></param>
+            <param name="length"></param>
+        </member>
+        <member name="M:AndanteTribe.Utils.ValueTupleExtensions.Enumerator`1.MoveNext">
+            <summary>
+            <see cref="!:System.Collections.Generic.IEnumerator&lt;T&gt;.MoveNext"/>に同じ.
+            </summary>
+            <returns>列挙が可能な場合はtrue.</returns>
+        </member>
+    </members>
+</doc>

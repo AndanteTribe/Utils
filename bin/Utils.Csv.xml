@@ -1,0 +1,208 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Utils.Csv</name>
+    </assembly>
+    <members>
+        <member name="T:AndanteTribe.Utils.Csv.CsvReader">
+            <summary>
+            CSVリーダー.
+            </summary>
+            <remarks>
+            1. ヘッダー対応済み
+            2. #コメント行対応済み(行頭が#の行はスキップ)
+            3. #コメント列対応済み(#で始まるヘッダーはスキップ e.g. #Comment)
+            </remarks>
+        </member>
+        <member name="P:AndanteTribe.Utils.Csv.CsvReader.Header">
+            <summary>
+            csvのヘッダー.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.#ctor(System.IO.Stream)">
+            <summary>
+            Initialize a new instance of <see cref="T:AndanteTribe.Utils.Csv.CsvReader"/>.
+            </summary>
+            <param name="stream"></param>
+            <exception cref="T:System.IO.InvalidDataException"></exception>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.#ctor(System.IO.StreamReader)">
+            <summary>
+            Initialize a new instance of <see cref="T:AndanteTribe.Utils.Csv.CsvReader"/>.
+            </summary>
+            <param name="reader"></param>
+            <exception cref="T:System.IO.InvalidDataException"></exception>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadLine">
+            <summary>
+            改行まで読み込む. コメント行(#で始まる行)はスキップする.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadBool">
+            <summary>
+            <see cref="T:System.Boolean"/>値を読み込む.
+            </summary>
+            <returns>結果.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadChar">
+            <summary>
+            <see cref="T:System.Char"/>値を読み込む.
+            </summary>
+            <returns>結果.</returns>
+            <exception cref="T:System.IO.InvalidDataException">無効な値.長さが1未満など.</exception>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadSbyte">
+            <summary>
+            <see cref="T:System.SByte"/>値を読み込む.
+            </summary>
+            <returns>結果.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadByte">
+            <summary>
+            <see cref="T:System.Byte"/>値を読み込む.
+            </summary>
+            <returns>結果.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadShort">
+            <summary>
+            <see cref="T:System.Int16"/>値を読み込む.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadUshort">
+            <summary>
+            <see cref="T:System.UInt16"/>値を読み込む.
+            </summary>
+            <returns>結果.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadInt">
+            <summary>
+            <see cref="T:System.Int32"/>値を読み込む.
+            </summary>
+            <returns>結果.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadUint">
+            <summary>
+            <see cref="T:System.UInt32"/>値を読み込む.
+            </summary>
+            <returns>結果.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadLong">
+            <summary>
+            <see cref="T:System.Int64"/>値を読み込む.
+            </summary>
+            <returns>結果.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadUlong">
+            <summary>
+            <see cref="T:System.UInt64"/>値を読み込む.
+            </summary>
+            <returns>結果.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadFloat">
+            <summary>
+            <see cref="T:System.Single"/>値を読み込む.
+            </summary>
+            <returns>結果.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadDouble">
+            <summary>
+            <see cref="T:System.Double"/>値を読み込む.
+            </summary>
+            <returns>結果.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadDecimal">
+            <summary>
+            <see cref="T:System.Decimal"/>値を読み込む.
+            </summary>
+            <returns>結果.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadDateTime">
+            <summary>
+            <see cref="T:System.DateTime"/>値を読み込む.
+            </summary>
+            <returns>結果.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadDateTimeOffset">
+            <summary>
+            <see cref="T:System.DateTimeOffset"/>値を読み込む.
+            </summary>
+            <returns>結果.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadTimeSpan">
+            <summary>
+            <see cref="T:System.TimeSpan"/>値を読み込む.
+            </summary>
+            <returns>結果.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadGuid">
+            <summary>
+            <see cref="T:System.Guid"/>値を読み込む.
+            </summary>
+            <returns>結果.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadVersion">
+            <summary>
+            <see cref="T:System.Version"/>値を読み込む.
+            </summary>
+            <returns>結果.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadUri(System.UriKind)">
+            <summary>
+            <see cref="T:System.Uri"/>値を読み込む.
+            </summary>
+            <param name="uriKind">URI文字列が相対URI、絶対URI、または不確定であるかを指定する.</param>
+            <returns>結果.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadString">
+            <summary>
+            文字列を読み込む.
+            </summary>
+            <returns>結果.</returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadRawValue">
+            <summary>
+            生の値を読み込む.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.PeekRawValue">
+            <summary>
+            生の値をピークする.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.System#IDisposable#Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadHeaderLine(System.IO.Stream)">
+            <summary>
+            ヘッダー行を読み込む.
+            </summary>
+            <param name="stream"></param>
+            <returns></returns>
+            <exception cref="T:System.IO.InvalidDataException"></exception>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadHeaderLine(System.IO.StreamReader)">
+            <summary>
+            ヘッダー行を読み込む.
+            </summary>
+            <param name="reader"></param>
+            <returns></returns>
+            <exception cref="T:System.IO.InvalidDataException"></exception>
+        </member>
+        <member name="M:AndanteTribe.Utils.Csv.CsvReader.ReadDynamic(System.Type)">
+            <summary>
+            型情報から値を読み込む.
+            </summary>
+            <remarks>
+            列挙体の場合、<see cref="T:System.Runtime.Serialization.EnumMemberAttribute"/>で指定された名前も考慮してパースを試みる.
+            またフラグ列挙体の場合、"Hoge_Fuga_Piyo"のようにアンダースコア区切りで複数指定された場合も対応する.
+            </remarks>
+            <param name="type"></param>
+            <returns></returns>
+            <exception cref="T:System.NotSupportedException"></exception>
+        </member>
+    </members>
+</doc>
