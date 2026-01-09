@@ -110,7 +110,7 @@ namespace AndanteTribe.Utils.Tests
         public void MasterSample_CollectAllCharacters(MasterSettings settings)
         {
             var result = MasterConverter.GetAllCharacters(settings);
-            Assert.That(result, Is.EqualTo((Language)settings.LanguageIndex switch
+            Assert.That(new string(result), Is.EqualTo((Language)settings.LanguageIndex switch
             {
                 Language.Japanese => "ゲイザー人間ヘカトンケル（全体）頭胴右腕左脚こんにちは！がアテムを個渡しまた。N0魔法石",
                 Language.English => "GazerHumnctohis(Al)dByRgLfF!v.N0MS",
