@@ -49,9 +49,9 @@ public static class MasterConverter
     /// <summary>
     /// マスターデータ内に含まれる全ての文字を取得します.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>マスターデータ内の全ての文字を含む読み取り専用コレクション.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string GetAllCharacters(MasterSettings settings)
+    public static IReadOnlyCollection<char> GetAllCharacters(MasterSettings settings)
     {
         var option = MessagePackSerializer.DefaultOptions;
         var hashset = new HashSet<char>();
@@ -67,14 +67,7 @@ public static class MasterConverter
             MessagePackSerializer.DefaultOptions = option;
         }
 
-        return string.Create(hashset.Count, hashset, static (span, set) =>
-        {
-            var index = 0;
-            foreach (var c in set)
-            {
-                span[index++] = c;
-            }
-        });
+        return hashset;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
