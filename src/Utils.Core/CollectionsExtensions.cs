@@ -49,6 +49,33 @@ public static class CollectionsExtensions
     /// <remarks>
     /// 基本的に<see langword="using"/>ステートメントと組み合わせて使用します.
     /// </remarks>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// using System;
+    /// using System.Buffers;
+    ///
+    /// public class Example
+    /// {
+    ///    public static void Main()
+    ///    {
+    ///        // ArrayPool<int>.Shared を直接使って Rent する例
+    ///        using (var handle = ArrayPool<int>.Shared.Rent(10, out int[] array))
+    ///        {
+    ///            // 必要サイズだけ Span を作る（借りた配列は必ず minimumLength 以上の長さがある）
+    ///            var span = array.AsSpan(0, 10);
+    ///            for (int i = 0; i < span.Length; i++)
+    ///            {
+    ///                span[i] = i;
+    ///            }
+    ///            Console.WriteLine(string.Join(",", span.ToArray()));
+    ///        } // スコープを抜けると Dispose が呼ばれて配列が返却される
+    ///
+    ///    }
+    /// }
+    /// ]]>
+    /// </code>
+    /// </example>
     /// <param name="pool"></param>
     /// <param name="minimumLength"></param>
     /// <param name="array"></param>

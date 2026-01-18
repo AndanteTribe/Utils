@@ -1,2 +1,8 @@
-- name: BackPort
+- name: Utils.BackPort
+- name: バックポートAPI一覧
   href: backport.md
+- name: 利用上のポイント集
+  href: backport-points.md
+- name: Utils.Core
+- name: 利用上のポイント集
+  href: core-points.md
