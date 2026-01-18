@@ -46,8 +46,8 @@ public record PlayerRecord(string Name, int Level);
 ```
 
 上記の実装は、以下のようにコンパイル過程で展開される．
-`ToString()` の自動実装はログ出力時に中身の値を表示するなど、非常に便利．
-中身の実装が気に入らない場合、生成に頼らず自力実装していればその実装が優先される（≒実質上書き可能）ので、実装を制限されるデメリットもない．
+
+<details><summary>PlayerRecordの逆コンパイル結果</summary>
 
 ```csharp
 [NullableContext(1)]
@@ -187,6 +187,11 @@ public class PlayerRecord : IEquatable<PlayerRecord>
     }
 }
 ```
+
+</details>
+
+`ToString()` の自動実装はログ出力時に中身の値を表示するなど、非常に便利．
+中身の実装が気に入らない場合、生成に頼らず自力実装していればその実装が優先される（≒実質上書き可能）ので、実装を制限されるデメリットもない．
 
 ## 4. `with` 式
 `record` 型と組み合わせて使うと便利なのが `with` 式．
