@@ -6,3 +6,9 @@
 - name: Utils.Core
 - name: 利用上のポイント集
   href: core-points.md
+- name: Utils.GameServices
+- name: 利用上のポイント集
+  href: game-services-points.md
+- name: Utils.MasterServices
+- name: 利用上のポイント集
+  href: master-services-points.md
