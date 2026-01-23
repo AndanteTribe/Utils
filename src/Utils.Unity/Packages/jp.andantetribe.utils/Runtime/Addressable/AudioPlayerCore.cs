@@ -18,10 +18,10 @@ namespace AndanteTribe.Utils.Unity.Addressable
         private readonly AudioSource[] _bgmChannels;
 
         protected readonly AudioSource SeChannel;
-        protected readonly AssetsRegistry _bgmRegistry;
+        protected readonly AssetsRegistry BgmRegistry;
         protected ReadOnlySpan<AudioSource> BgmChannels => _bgmChannels;
 
-        protected int _currentBgmChannelIndex = -1;
+        protected int CurrentBgmChannelIndex = -1;
 
         /// <summary>
         /// Initialize a new instance of <see cref="AudioPlayerCore"/>.
@@ -41,7 +41,7 @@ namespace AndanteTribe.Utils.Unity.Addressable
                 bgmChannels[i] = channel;
             }
             SeChannel = root.AddComponent<AudioSource>();
-            _bgmRegistry = bgmRegistry ?? new AssetsRegistry();
+            BgmRegistry = bgmRegistry ?? new AssetsRegistry();
             Initialize();
         }
 
@@ -53,7 +53,7 @@ namespace AndanteTribe.Utils.Unity.Addressable
         /// <param name="cancellationToken"></param>
         public async UniTask PlayBGMAsync(string address, bool loop = true, CancellationToken cancellationToken = default)
         {
-            var clip = await _bgmRegistry.LoadAsync<AudioClip>(address, cancellationToken);
+            var clip = await BgmRegistry.LoadAsync<AudioClip>(address, cancellationToken);
             var channel = GetAvailableBgmChannel();
 
             channel.Stop();
@@ -76,8 +76,8 @@ namespace AndanteTribe.Utils.Unity.Addressable
                     channel.clip = null;
                 }
             }
-            _bgmRegistry.Clear();
-            _currentBgmChannelIndex = -1;
+            BgmRegistry.Clear();
+            CurrentBgmChannelIndex = -1;
         }
 
         /// <summary>
@@ -116,11 +116,12 @@ namespace AndanteTribe.Utils.Unity.Addressable
             StopAllBGM();
             SeChannel.Stop();
             SeChannel.clip = null;
-            _bgmRegistry.Dispose();
+            BgmRegistry.Dispose();
+            Deinitialize();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private AudioSource GetAvailableBgmChannel() => _bgmChannels[(_currentBgmChannelIndex + 1) % _bgmChannels.Length];
+        private AudioSource GetAvailableBgmChannel() => _bgmChannels[(CurrentBgmChannelIndex + 1) % _bgmChannels.Length];
 
         partial void Initialize();
         partial void Deinitialize();
