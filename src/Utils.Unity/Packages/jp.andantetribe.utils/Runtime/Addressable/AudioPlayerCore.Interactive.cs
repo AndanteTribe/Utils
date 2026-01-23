@@ -18,7 +18,7 @@ namespace AndanteTribe.Utils.Unity.Addressable
             var clip = await BgmRegistry.LoadAsync<AudioClip>(address, cancellationToken);
 
             // 再生曲がなければフェードインで再生開始
-            if (CurrentBgmChannelIndex != -1)
+            if (CurrentBgmChannelIndex == -1)
             {
                 var channel = GetAvailableBgmChannel();
                 channel.Stop();
