@@ -17,18 +17,19 @@ namespace AndanteTribe.Utils.Unity.Addressable
     {
         private readonly AudioSource[] _bgmChannels;
 
-        private readonly AudioSource _seChannel;
-        private readonly AssetsRegistry _bgmRegistry = new AssetsRegistry();
-        private ReadOnlySpan<AudioSource> BgmChannels => _bgmChannels;
+        protected readonly AudioSource SeChannel;
+        protected readonly AssetsRegistry _bgmRegistry;
+        protected ReadOnlySpan<AudioSource> BgmChannels => _bgmChannels;
 
-        private int _currentBgmChannelIndex = -1;
+        protected int _currentBgmChannelIndex = -1;
 
         /// <summary>
         /// Initialize a new instance of <see cref="AudioPlayerCore"/>.
         /// </summary>
         /// <param name="root"></param>
         /// <param name="bgmChannelCount"></param>
-        public AudioPlayerCore(GameObject root, int bgmChannelCount = 3)
+        /// <param name="bgmRegistry"></param>
+        public AudioPlayerCore(GameObject root, int bgmChannelCount = 3, AssetsRegistry? bgmRegistry = null)
         {
             _bgmChannels = new AudioSource[bgmChannelCount];
             var bgmChannels = _bgmChannels.AsSpan();
@@ -39,7 +40,8 @@ namespace AndanteTribe.Utils.Unity.Addressable
                 channel.loop = true;
                 bgmChannels[i] = channel;
             }
-            _seChannel = root.AddComponent<AudioSource>();
+            SeChannel = root.AddComponent<AudioSource>();
+            _bgmRegistry = bgmRegistry ?? new AssetsRegistry();
             Initialize();
         }
 
@@ -95,7 +97,7 @@ namespace AndanteTribe.Utils.Unity.Addressable
                     return;
                 }
 
-                _seChannel.PlayOneShot(result);
+                SeChannel.PlayOneShot(result);
 
                 await UniTask.Delay(TimeSpan.FromSeconds(result.length), cancellationToken: cancellationToken);
             }
@@ -112,8 +114,8 @@ namespace AndanteTribe.Utils.Unity.Addressable
         public void Dispose()
         {
             StopAllBGM();
-            _seChannel.Stop();
-            _seChannel.clip = null;
+            SeChannel.Stop();
+            SeChannel.clip = null;
             _bgmRegistry.Dispose();
         }
 
