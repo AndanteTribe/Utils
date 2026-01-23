@@ -13,13 +13,14 @@
 - 後述する `Utils.Unity` では [Utils.Core](https://www.nuget.org/packages/AndanteTribe.Utils.Core), [Utils.BackPort](https://www.nuget.org/packages/AndanteTribe.Utils.BackPort), [Utils.GameServices](https://www.nuget.org/packages/AndanteTribe.Utils.GameServices) あたりに依存している．
 
 > [!Tip]
-> [Utils.MasterServices](https://www.nuget.org/packages/AndanteTribe.Utils.MasterServices) (と依存する [Utils.Csv](https://www.nuget.org/packages/AndanteTribe.Utils.Csv) ) は、Unityで使用する場合ランタイムに含める必要のない実装である．
+> [Utils.MasterServices](https://www.nuget.org/packages/AndanteTribe.Utils.MasterServices) (と依存する [Utils.Csv](https://www.nuget.org/packages/AndanteTribe.Utils.Csv) ) は、Unityで使用する場合ランタイムに含める必要のない実装である．  
 > 可能であればEditorだけに含ませるよう構成設定したい．
 
 ## 2. Unity（`Utils.Unity` : Unity用の拡張）
 1. [NuGetForUnity](https://github.com/GlitchEnzo/NuGetForUnity) などで [Utils.Core](https://www.nuget.org/packages/AndanteTribe.Utils.Core) or [Utils.GameServices](https://www.nuget.org/packages/AndanteTribe.Utils.GameServices) をインストール
   - [Utils.BackPort](https://www.nuget.org/packages/AndanteTribe.Utils.BackPort) は [Utils.Core](https://www.nuget.org/packages/AndanteTribe.Utils.Core) も [Utils.GameServices](https://www.nuget.org/packages/AndanteTribe.Utils.GameServices) も依存しているため、自動参照でインストールされるはず．
-  - `Utils.Unity` は `UniTask` など、インストールされたサードパーティーライブラリによって依存関係が若干変わる． [Utils.GameServices](https://www.nuget.org/packages/AndanteTribe.Utils.GameServices) がなくても依存関係が解決できるときもあるが、わからなければとりあえずインストールはあり．
+  - `Utils.Unity` は `UniTask` など、インストールされたサードパーティーライブラリによって依存関係が若干変わる．  
+  [Utils.GameServices](https://www.nuget.org/packages/AndanteTribe.Utils.GameServices) がなくても依存関係が解決できるときもあるが、わからなければとりあえずインストールはあり．
 2. Unityの `Package Manager` 経由で以下URLからインストール．
 
 ```
