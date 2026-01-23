@@ -5,6 +5,30 @@
 内部的に [Utils.Csv](https://www.nuget.org/packages/AndanteTribe.Utils.Csv) を使った、CSVマスターのコンバート実装だが、利用者側で実装するコードは多くない．  
 挙動として、自動的に実行環境のコア数などを参照して、並列実行で高速にコンバート作業を進行する．
 
+まず [MasterMemory](https://github.com/Cysharp/MasterMemory) を活用してマスターテーブルを構築する実装をする．  
+このときに、[Utils.FileNameAttribute](https://andantetribe.github.io/Utils/api/AndanteTribe.Utils.FileNameAttribute.html)で該当するCSVファイルを指定する．
+
+```cs
+[MemoryTable(nameof(TextMasterEntity)), MessagePackObject]
+[FileName("text.csv")] // ファイル名を属性で紐づけする：:*.csvの拡張子はあってもなくてもよい
+public class TextMasterEntity
+{
+    [PrimaryKey, Key(0)]
+    public required MasterId<TextCategory> Id { get; init; }
+
+    [SecondaryKey(0), NonUnique, IgnoreMember]
+    public TextCategory Group => Id.Group;
+
+    [Key(1)]
+    public required LocalizeFormat Format { get; init; }
+
+    [IgnoreMember]
+    public string Text => Format.ToString();
+}
+```
+
+あとは以下のようなコードを書けば、ひとまず指定したディレクトリにマスターバイナリを出力する．
+
 ```cs
 // 設定定義.
 var settings = new MasterSettings(
