@@ -20,7 +20,7 @@ var player = new Player("Hero", 1);
 // デバッグ用途で攻撃力を設定したい場合など、必要なときに有用
 var debugPlayer = new Player("Hero", 1)
 {
-    Attack = 20
+    Attack = 20 // こういう書き方をイニシャライザー（初期化子）といい、プロパティ名を明示的に書くのでわかりやすい.
 };
 
 public sealed class Player
@@ -28,7 +28,7 @@ public sealed class Player
     public readonly string Name; // 必須
     public readonly int Level;  // 必須
 
-    public int Attack { get; init; } = 10; // 任意、デフォルト値あり
+    public int Attack { get; init; } = 10; // 任意、デフォルト値あり（オプション寄りの書き方）
 
     public Player(string name, int level)
     {
