@@ -1,7 +1,7 @@
 # `Utils.Unity` で提供するエディタ拡張機能群
 ## Utils.Unity
 ### 1. ButtonAttribute
-以下のように実装すると、インスペクタービューでボタンが表示され、押下すると属性を付与したメソッドの処理が実行される．
+以下のように実装すると、インスペクタービューでボタンが表示され、押下すると属性を付与したメソッドの処理が実行される．  
 引数も設定可能．
 
 ![button-attribute.png](images/button-attribute.png)
@@ -30,13 +30,13 @@ public class Test : MonoBehaviour
 ```
 
 ### 2. IObjectReference
-開発初期は `SerializeField` を使いたいが、後でAddressableに切り替えたい場合などに便利なインターフェイス．
-コード上は `IObjectReference` インターフェイスを経由して該当オブジェクトを参照できる．
+開発初期は `SerializeField` を使いたいが、後でAddressableに切り替えたい場合などに便利なインターフェイス．  
+コード上は `IObjectReference` インターフェイスを経由して該当オブジェクトを参照できる．  
 Unity エディタからは、`SerializeField` な参照を使うか、Addressable を利用した参照に切り替えるかを簡単な操作で切り替えることができる．
 
 ![iobject-reference.png](images/iobject-reference.png)
 
-上記画像のうち、`Material1` は `SerializeField` で参照可能だが、`Material2` は Addressable の機能で参照可能．
+上記画像のうち、`Material1` は `SerializeField` で参照可能だが、`Material2` は Addressable の機能で参照可能．  
 `Material3` にあるように、右上の歯車マークから、どちらの参照方法で参照するかを選択できる．
 
 コード上のアクセスは、以下のように行う．
@@ -56,17 +56,17 @@ public class Test : MonoBehaviour
 ```
 
 ### 3. SafeAreaAdjuster
-セーフエリア対応コンポーネント．
-Canvasの直下の空オブジェクトにアタッチして、その子オブジェクトとしてUIを展開していければ、セーフエリアに対応したUIレイアウトが可能になる．
-なお、シミュレーターモードでのUI調整など、ゲーム再生外の状態でもセーフエリアの確認ができるように `Adjust SafeArea` ボタンを提供している．
+セーフエリア対応コンポーネント．  
+Canvasの直下の空オブジェクトにアタッチして、その子オブジェクトとしてUIを展開していければ、セーフエリアに対応したUIレイアウトが可能になる．  
+なお、シミュレーターモードでのUI調整など、ゲーム再生外の状態でもセーフエリアの確認ができるように `Adjust SafeArea` ボタンを提供している．  
 
 ![safe-area-adjuster.png](images/safe-area-adjuster.png)
 
 ## Utils.Unity.UI
 ### 1. TextView
-ここでは、`TextView` を継承した実装提供群をまとめて扱う．
-`TextView` はTextMeshProをラップするビュー．
-例えばint型の値をTextMeshProに表示したい場合、以下のように実装できる．
+ここでは、`TextView` を継承した実装提供群をまとめて扱う．  
+`TextView` はTextMeshProをラップするビュー．  
+例えばint型の値をTextMeshProに表示したい場合、以下のように実装できる．  
 
 ```csharp
 public class Test : MonoBehaviour
@@ -115,7 +115,7 @@ Formatで指定する数値書式指定文字列は `Project Settings > Format S
 | Value | ゲージの割合．(0 ~ 1)    |
 
 ### 3. SkewMeshEffect
-UGUIのメッシュを斜めに変形するエフェクト.
+UGUIのメッシュを斜めに変形するエフェクト.  
 斜めHPゲージなどに利用可能.
 
 ![skew-mesh-effect.png](images/skew-mesh-effect.png)
@@ -137,7 +137,7 @@ UGUIのメッシュを斜めに変形するエフェクト.
 
 ## Utils.Unity.VContainer
 ### 1. LifetimeScopeBase
-継承して使う．
+継承して使う．  
 なお、`Configure` メソッドで基底の実装を呼び出すことを忘れないように注意する．
 
 ```csharp
@@ -163,7 +163,7 @@ public class TestLifetimeScope : LifetimeScopeBase
 
 ## Utils.Unity.Editor
 ### 1. TransformInspector
-`Transform` コンポーネントのインスペクター表示を拡張する．
+`Transform` コンポーネントのインスペクター表示を拡張する．  
 標準の表示に加えて、ワールド座標での指定やワールド回転・ワールドスケールを確認できる．
 
 ![transform.png](images/transform.png)
