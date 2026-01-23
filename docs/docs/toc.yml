@@ -1,3 +1,5 @@
+- name: インストール手順
+  href: installation.md
 - name: Utils.BackPort
 - name: バックポートAPI一覧
   href: backport.md
