@@ -16,6 +16,38 @@ namespace AndanteTribe.Utils.Unity.Addressable
     /// <summary>
     /// ロードしたアセットのハンドルをキャッシュしているレジストリ.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// using System.Threading;
+    /// using AndanteTribe.Utils.Unity.Addressable;
+    /// using Cysharp.Threading.Tasks;
+    /// using UnityEngine;
+    ///
+    /// public class AssetsRegistrySample : MonoBehaviour
+    /// {
+    ///     private readonly AssetsRegistry _registry = new AssetsRegistry();
+    ///
+    ///     private async UniTaskVoid Start()
+    ///     {
+    ///         // 1) LoadAsync を使ってプレハブを直接取得して Instantiate する例
+    ///         var prefab = await _registry.LoadAsync<GameObject>("assets/prefabs/MyPrefab.prefab", destroyCancellationToken);
+    ///         Instantiate(prefab, Vector3.zero, Quaternion.identity);
+    ///
+    ///         // 2) InstantiateAsync を使って、プレハブから特定のコンポーネントを生成して受け取る例
+    ///         //    （例: プレハブに MyComponent がアタッチされている前提）
+    ///         var component = await _registry.InstantiateAsync<MyComponent>("assets/prefabs/MyPrefabWithComponent.prefab", transform, destroyCancellationToken);
+    ///         component.transform.localPosition = Vector3.up;
+    ///     }
+    ///
+    ///     private void OnDestroy()
+    ///     {
+    ///         _registry.Dispose();
+    ///     }
+    /// }
+    /// ]]>
+    /// </code>
+    /// </example>
     public class AssetsRegistry : IDisposable
     {
         private static readonly IEqualityComparer<AsyncOperationHandle> s_equalityComparer = EqualityComparer.Create<AsyncOperationHandle>(

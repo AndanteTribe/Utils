@@ -7,7 +7,6 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using AndanteTribe.Utils.Unity.Tasks.Internal;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace AndanteTribe.Utils.Unity.Tasks
@@ -15,6 +14,46 @@ namespace AndanteTribe.Utils.Unity.Tasks
     /// <summary>
     /// UniTask版<see cref="SemaphoreSlim"/>.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// using System;
+    /// using AndanteTribe.Utils.Unity.Tasks;
+    /// using Cysharp.Threading.Tasks;
+    /// using UnityEngine;
+    ///
+    /// public class SemaphoreExample : MonoBehaviour
+    /// {
+    ///     private async UniTaskVoid Start()
+    ///     {
+    ///         // 同時に最大2つまで処理を許可するセマフォ
+    ///         var semaphore = new UniTaskSemaphore(2, 2);
+    ///
+    ///         // 5つのワーカーを並列開始するが、同時実行は最大2つ
+    ///         var tasks = new UniTask[5];
+    ///         for (int i = 0; i < 5; i++)
+    ///         {
+    ///             int idx = i;
+    ///             tasks[i] = WorkerAsync(idx, semaphore);
+    ///         }
+    ///
+    ///         await UniTask.WhenAll(tasks);
+    ///     }
+    ///
+    ///     private async UniTask WorkerAsync(int id, UniTaskSemaphore sem)
+    ///     {
+    ///         // WaitScopeAsync は解放用の IDisposable ハンドルを返すので using で自動解放できる
+    ///         using (await sem.WaitScopeAsync())
+    ///         {
+    ///             Debug.Log($"Start {id}");
+    ///             await UniTask.Delay(TimeSpan.FromSeconds(1));
+    ///             Debug.Log($"End {id}");
+    ///         }
+    ///     }
+    /// }
+    /// ]]>
+    /// </code>
+    /// </example>
     [DebuggerDisplay("Current Count = {CurrentCount}")]
     public sealed class UniTaskSemaphore : IDisposable
     {

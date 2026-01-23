@@ -9,6 +9,28 @@ namespace AndanteTribe.Utils.Unity.UI
     /// <summary>
     /// uGUIの全入力を一時的に剥奪するなどの入力制御を行う.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// using UnityEngine;
+    /// using AndanteTribe.Utils.Unity.UI;
+    ///
+    /// public class UIBlockerSample : MonoBehaviour
+    /// {
+    ///     private readonly UIBlocker _blocker = new UIBlocker();
+    ///
+    ///     private void SomeOperation()
+    ///     {
+    ///         // 処理中に全入力を無効化し、using 終了で自動復帰させる
+    ///         using (_blocker.Disable())
+    ///         {
+    ///             // 長い処理や非同期処理の間、入力をブロックしたいときに使う
+    ///         }
+    ///     }
+    /// }
+    /// ]]>
+    /// </code>
+    /// </example>
     public sealed class UIBlocker
     {
         private readonly EventSystem _eventSystem = EventSystem.current;

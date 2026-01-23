@@ -11,6 +11,42 @@ using Object = UnityEngine.Object;
 
 namespace AndanteTribe.Utils.Unity.Tasks
 {
+    /// <summary>
+    /// Unityのゲームオブジェクトを再利用するためのプール.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// using System;
+    /// using AndanteTribe.Utils.Unity.Tasks;
+    /// using Cysharp.Threading.Tasks;
+    /// using UnityEngine;
+    ///
+    /// public class PoolExample : MonoBehaviour
+    /// {
+    ///     [SerializeReference]
+    ///     IObjectReference<MyComponent> prefab;
+    ///
+    ///     private async UniTaskVoid Start()
+    ///     {
+    ///         var pool = new GameObjectPool<MyComponent>(transform, prefab, capacity: 4);
+    ///
+    ///         // 事前確保
+    ///         await pool.PreallocateAsync(4);
+    ///
+    ///         // using スコープで取得して自動返却（Handle.Instance でインスタンスへアクセス）
+    ///         using (var handle = await pool.RentScopeAsync())
+    ///         {
+    ///             var instance = handle.Instance;
+    ///             instance.transform.position = Vector3.zero;
+    ///             await UniTask.Delay(TimeSpan.FromSeconds(1));
+    ///         } // scope を抜けると自動で Return される
+    ///     }
+    /// }
+    /// ]]>
+    /// </code>
+    /// </example>
+    /// <typeparam name="T"></typeparam>
     public sealed class GameObjectPool<T> : IDisposable, IReadOnlyCollection<T> where T : MonoBehaviour
     {
         /// <summary>

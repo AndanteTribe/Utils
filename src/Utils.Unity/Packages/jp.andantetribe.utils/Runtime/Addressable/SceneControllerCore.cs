@@ -15,7 +15,7 @@ using UnityEngine.SceneManagement;
 namespace AndanteTribe.Utils.Unity.Addressable
 {
     /// <summary>
-    /// 汎用シーン遷移実装クラス.
+    /// 汎用シーン遷移実装.
     /// </summary>
     public class SceneControllerCore<TEnum> where TEnum : unmanaged, Enum
     {

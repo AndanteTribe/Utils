@@ -12,6 +12,39 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace AndanteTribe.Utils.Unity.Addressable
 {
+    /// <summary>
+    /// Addressableのアドレスを利用したオブジェクト参照.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// using System.Threading;
+    /// using AndanteTribe.Utils.Unity.Addressable;
+    /// using Cysharp.Threading.Tasks;
+    /// using UnityEngine;
+    ///
+    /// public class SimpleAddressableSample : MonoBehaviour
+    /// {
+    ///     // IObjectReference として保持
+    ///     private readonly IObjectReference<GameObject> _reference
+    ///         = new AddressableObjectReference<GameObject>("assets/prefabs/MyPrefab.prefab");
+    ///
+    ///     private async UniTask Start()
+    ///     {
+    ///         // IObjectReference 経由で読み込んでインスタンス化
+    ///         var prefab = await _reference.LoadAsync(destoryCancellationToken);
+    ///         var instance = Instantiate(prefab, Vector3.zero, Quaternion.identity);
+    ///     }
+    ///
+    ///     private void OnDestroy()
+    ///     {
+    ///         _reference.Dispose();
+    ///     }
+    /// }
+    /// ]]>
+    /// </code>
+    /// </example>
+    /// <typeparam name="T"></typeparam>
     public sealed class AddressableObjectReference<T> : IObjectReference<T> where T : UnityEngine.Object
     {
         private readonly string _address;

@@ -11,7 +11,7 @@ using UnityEngine.AddressableAssets;
 namespace AndanteTribe.Utils.Unity.Addressable
 {
     /// <summary>
-    /// 汎用オーディオ再生クラス.
+    /// 汎用オーディオ再生実装.
     /// </summary>
     public partial class AudioPlayerCore : IDisposable
     {
