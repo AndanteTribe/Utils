@@ -18,8 +18,8 @@
 
 ## 2. Unity（`Utils.Unity` : Unity用の拡張）
 1. [NuGetForUnity](https://github.com/GlitchEnzo/NuGetForUnity) などで [Utils.Core](https://www.nuget.org/packages/AndanteTribe.Utils.Core) or [Utils.GameServices](https://www.nuget.org/packages/AndanteTribe.Utils.GameServices) をインストール
-  - [Utils.BackPort](https://www.nuget.org/packages/AndanteTribe.Utils.BackPort) は [Utils.Core](https://www.nuget.org/packages/AndanteTribe.Utils.Core) も [Utils.GameServices](https://www.nuget.org/packages/AndanteTribe.Utils.GameServices) も依存しているため、自動参照でインストールされるはず．
-  - `Utils.Unity` は `UniTask` など、インストールされたサードパーティーライブラリによって依存関係が若干変わる．  
+   - [Utils.BackPort](https://www.nuget.org/packages/AndanteTribe.Utils.BackPort) は [Utils.Core](https://www.nuget.org/packages/AndanteTribe.Utils.Core) も [Utils.GameServices](https://www.nuget.org/packages/AndanteTribe.Utils.GameServices) も依存しているため、自動参照でインストールされるはず．
+   - `Utils.Unity` は `UniTask` など、インストールされたサードパーティーライブラリによって依存関係が若干変わる．  
   [Utils.GameServices](https://www.nuget.org/packages/AndanteTribe.Utils.GameServices) がなくても依存関係が解決できるときもあるが、わからなければとりあえずインストールはあり．
 2. Unityの `Package Manager` 経由で以下URLからインストール．
 
