@@ -17,7 +17,7 @@ namespace AndanteTribe.Utils.Unity
         /// <example>
         /// <code>
         /// <![CDATA[
-        /// using MinimalUtility;
+        /// using AndanteTribe.Utils.Unity;
         /// using UnityEngine;
         ///
         /// public class SetSizeExample : MonoBehaviour
@@ -47,7 +47,7 @@ namespace AndanteTribe.Utils.Unity
         /// <example>
         /// <code>
         /// <![CDATA[
-        /// using MinimalUtility;
+        /// using AndanteTribe.Utils.Unity;
         /// using UnityEngine;
         ///
         /// public class SetSizeExample : MonoBehaviour
@@ -77,7 +77,7 @@ namespace AndanteTribe.Utils.Unity
         /// <example>
         /// <code>
         /// <![CDATA[
-        /// using MinimalUtility;
+        /// using AndanteTribe.Utils.Unity;
         /// using UnityEngine;
         ///
         /// public class SetWidthExample : MonoBehaviour
@@ -103,7 +103,7 @@ namespace AndanteTribe.Utils.Unity
         /// <example>
         /// <code>
         /// <![CDATA[
-        /// using MinimalUtility;
+        /// using AndanteTribe.Utils.Unity;
         /// using UnityEngine;
         ///
         /// public class SetHeightExample : MonoBehaviour
@@ -129,7 +129,7 @@ namespace AndanteTribe.Utils.Unity
         /// <example>
         /// <code>
         /// <![CDATA[
-        /// using MinimalUtility;
+        /// using AndanteTribe.Utils.Unity;
         /// using UnityEngine;
         ///
         /// public class GetSizeExample : MonoBehaviour
@@ -155,7 +155,7 @@ namespace AndanteTribe.Utils.Unity
         /// <example>
         /// <code>
         /// <![CDATA[
-        /// using MinimalUtility;
+        /// using AndanteTribe.Utils.Unity;
         /// using UnityEngine;
         ///
         /// public class SetFullStretchExample : MonoBehaviour
@@ -193,7 +193,7 @@ namespace AndanteTribe.Utils.Unity
         /// <code>
         /// <![CDATA[
         /// using System;
-        /// using MinimalUtility;
+        /// using AndanteTribe.Utils.Unity;
         /// using UnityEngine;
         ///
         /// public class GetWorldCornersExampleClass : MonoBehaviour
@@ -253,7 +253,7 @@ namespace AndanteTribe.Utils.Unity
         /// <code>
         /// <![CDATA[
         /// using System;
-        /// using MinimalUtility;
+        /// using AndanteTribe.Utils.Unity;
         /// using UnityEngine;
         ///
         /// public class GetLocalCornersExampleClass : MonoBehaviour

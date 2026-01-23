@@ -15,6 +15,37 @@ namespace AndanteTribe.Utils.Unity.Tasks
     /// <remarks>
     /// 複数の<see cref="UniTask{T}"/>を並列待機する挙動は<see cref="UniTask.WhenAll(UniTask{T}[])"/>と同じ.
     /// </remarks>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// using System;
+    /// using AndanteTribe.Utils.Unity;
+    /// using UnityEngine;
+    ///
+    /// public class Example : MonoBehaviour
+    /// {
+    ///     private void Start()
+    ///     {
+    ///         // リストを使った場合
+    ///         // var list = new List<UniTask>();
+    ///         // for (int i = 0; i < 10; i++)
+    ///         // {
+    ///         //     list.Add(UniTask.Delay(TimeSpan.FromSeconds(i)));
+    ///         // }
+    ///         // await UniTask.WhenAll(list);
+    ///
+    ///         // UniTaskBagを使った場合
+    ///         var bag = new UniTaskBag();
+    ///         for (int i = 0; i < 10; i++)
+    ///         {
+    ///            bag.Add(UniTask.Delay(TimeSpan.FromSeconds(i)));
+    ///         }
+    ///         await bag.BuildAsync();
+    ///     }
+    /// }
+    /// ]]>
+    /// </code>
+    /// </example>
     public sealed class UniTaskBag<T> : IUniTaskSource<T[]>
     {
         private T[] _result = Array.Empty<T>();

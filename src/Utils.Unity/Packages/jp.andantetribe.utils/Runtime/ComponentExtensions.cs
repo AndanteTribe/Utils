@@ -21,7 +21,7 @@ namespace AndanteTribe.Utils.Unity
         /// <code>
         /// <![CDATA[
         /// using System;
-        /// using MinimalUtility;
+        /// using AndanteTribe.Utils.Unity;
         /// using UnityEngine;
         ///
         /// public class GetComponentsInOnlyChildrenExample : MonoBehaviour
@@ -91,7 +91,7 @@ namespace AndanteTribe.Utils.Unity
         /// <example>
         /// <code>
         /// <![CDATA[
-        /// using MinimalUtility;
+        /// using AndanteTribe.Utils.Unity;
         /// using UnityEngine;
         ///
         /// public class SafeGetComponentExample : MonoBehaviour
