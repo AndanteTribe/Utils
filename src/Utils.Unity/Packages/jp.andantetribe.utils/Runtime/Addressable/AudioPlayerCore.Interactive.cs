@@ -15,10 +15,10 @@ namespace AndanteTribe.Utils.Unity.Addressable
 
         public async UniTask CrossFadeBGMAsync(string address, bool loop = true, CancellationToken cancellationToken = default)
         {
-            var clip = await _bgmRegistry.LoadAsync<AudioClip>(address, cancellationToken);
+            var clip = await BgmRegistry.LoadAsync<AudioClip>(address, cancellationToken);
 
             // 再生曲がなければフェードインで再生開始
-            if (_currentBgmChannelIndex != -1)
+            if (CurrentBgmChannelIndex == -1)
             {
                 var channel = GetAvailableBgmChannel();
                 channel.Stop();
@@ -35,7 +35,7 @@ namespace AndanteTribe.Utils.Unity.Addressable
                 return;
             }
 
-            var currentChannel = _bgmChannels[_currentBgmChannelIndex];
+            var currentChannel = _bgmChannels[CurrentBgmChannelIndex];
             var nextChannel = GetAvailableBgmChannel();
             nextChannel.Stop();
             nextChannel.clip = clip;

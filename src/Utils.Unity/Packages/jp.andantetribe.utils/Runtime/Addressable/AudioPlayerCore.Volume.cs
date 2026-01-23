@@ -38,7 +38,7 @@ namespace AndanteTribe.Utils.Unity.Addressable
                 });
             SeVolume
                 .CombineLatest(MasterVolume, static (seVolume, masterVolume) => seVolume * masterVolume)
-                .Subscribe(_seChannel, static (value, channel) => channel.volume = value);
+                .Subscribe(SeChannel, static (value, channel) => channel.volume = value);
         }
 
         partial void Deinitialize()
