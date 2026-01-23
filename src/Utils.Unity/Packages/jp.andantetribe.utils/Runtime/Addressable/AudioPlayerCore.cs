@@ -121,7 +121,12 @@ namespace AndanteTribe.Utils.Unity.Addressable
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private AudioSource GetAvailableBgmChannel() => _bgmChannels[(CurrentBgmChannelIndex + 1) % _bgmChannels.Length];
+        private AudioSource GetAvailableBgmChannel()
+        {
+            var nextIndex = (CurrentBgmChannelIndex + 1) % _bgmChannels.Length;
+            CurrentBgmChannelIndex = nextIndex;
+            return _bgmChannels[nextIndex];
+        }
 
         partial void Initialize();
         partial void Deinitialize();
