@@ -49,8 +49,7 @@ namespace AndanteTribe.Utils.Unity
                 sb.AppendLiteral(gameObject.scene.name ?? "Unsaved Scene");
             }
 
-            var current = gameObject.transform;
-            GetTransformPath(current, includeScene, ref sb);
+            GetTransformPath(gameObject.transform, includeScene, ref sb);
             return sb.ToStringAndClear();
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -62,14 +61,15 @@ namespace AndanteTribe.Utils.Unity
                     {
                         sb.AppendLiteral("/");
                     }
-                    sb.AppendLiteral(transform.name);
-                    return;
                 }
-
-                GetTransformPath(transform.parent, includeScene, ref sb);
-                sb.AppendLiteral("/");
+                else
+                {
+                    GetTransformPath(transform.parent, includeScene, ref sb);
+                    sb.AppendLiteral("/");
+                }
                 sb.AppendLiteral(transform.name);
             }
         }
     }
 }
+
