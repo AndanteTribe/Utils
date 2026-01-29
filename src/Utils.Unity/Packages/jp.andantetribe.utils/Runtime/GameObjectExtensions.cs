@@ -47,24 +47,18 @@ namespace AndanteTribe.Utils.Unity
             if (includeScene)
             {
                 sb.AppendLiteral(gameObject.scene.name ?? "Unsaved Scene");
+                sb.AppendLiteral("/");
             }
 
-            GetTransformPath(gameObject.transform, includeScene, ref sb);
+            GetTransformPath(gameObject.transform, ref sb);
             return sb.ToStringAndClear();
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            static void GetTransformPath(Transform transform, bool includeScene, ref DefaultInterpolatedStringHandler sb)
+            static void GetTransformPath(Transform transform, ref DefaultInterpolatedStringHandler sb)
             {
-                if (transform.parent == null)
+                if (transform.parent != null)
                 {
-                    if (includeScene)
-                    {
-                        sb.AppendLiteral("/");
-                    }
-                }
-                else
-                {
-                    GetTransformPath(transform.parent, includeScene, ref sb);
+                    GetTransformPath(transform.parent, ref sb);
                     sb.AppendLiteral("/");
                 }
                 sb.AppendLiteral(transform.name);
@@ -72,4 +66,5 @@ namespace AndanteTribe.Utils.Unity
         }
     }
 }
+
 
