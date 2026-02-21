@@ -21,7 +21,7 @@ jobs:
         - name: Unity Cache
           uses: AndanteTribe/Actions/actions/unity-cache@copilot/implement-nuget-for-unity-option
           with:
-            unity-project-path: src/LocalPrefs.Unity
+            unity-project-path: src/Utils.Unity
             use-nugetforunity: true
             nuget-packages-path: src/Utils.Unity/Packages/nuget-packages
         - name: Free disk space
