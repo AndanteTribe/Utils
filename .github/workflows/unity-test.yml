@@ -19,7 +19,7 @@ jobs:
           with:
             ref: ${{ github.event.pull_request.head.sha || github.sha }}
         - name: Unity Cache
-          uses: AndanteTribe/Actions/actions/unity-cache@copilot/implement-nuget-for-unity-option
+          uses: AndanteTribe/Actions/actions/unity-cache@feature/cache-nuget
           with:
             unity-project-path: src/Utils.Unity
             use-nugetforunity: true
