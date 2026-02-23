@@ -628,27 +628,6 @@
             <returns></returns>
             <exception cref="T:System.FormatException"></exception>
         </member>
-        <member name="T:AndanteTribe.Utils.IInitializable">
-            <summary>
-            初期化処理を提供するインターフェース.
-            </summary>
-            <exception cref="T:System.NotImplementedException">
-            <see cref="T:AndanteTribe.Utils.IInitializable"/>を実装する場合、<see cref="M:AndanteTribe.Utils.IInitializable.Initialize(System.Threading.CancellationToken)"/>または<see cref="M:AndanteTribe.Utils.IInitializable.InitializeAsync(System.Threading.CancellationToken)"/>のいずれかを実装する必要があります.
-            </exception>
-        </member>
-        <member name="M:AndanteTribe.Utils.IInitializable.Initialize(System.Threading.CancellationToken)">
-            <summary>
-            同期的に初期化処理を行う.
-            </summary>
-            <param name="cancellationToken">キャンセル用のトークン.</param>
-        </member>
-        <member name="M:AndanteTribe.Utils.IInitializable.InitializeAsync(System.Threading.CancellationToken)">
-            <summary>
-            非同期で初期化処理を行う.
-            </summary>
-            <param name="cancellationToken">キャンセル用のトークン.</param>
-            <returns>初期化が完了したら完了するタスク.</returns>
-        </member>
         <member name="T:AndanteTribe.Utils.MemoryExtensions">
             <summary>
             <see cref="T:System.Memory`1"/>, <see cref="T:System.ReadOnlyMemory`1"/>の拡張メソッド.

@@ -16,7 +16,7 @@ namespace AndanteTribe.Utils.Unity.Tasks
     /// <remarks>
     /// モックなどで活用できる.
     /// </remarks>
-    public class LoadProgressPresenter : IProgress<float>, IInitializable
+    public class LoadProgressPresenter : IProgress<float>
     {
         private readonly AsyncGUITrigger _trigger;
 
@@ -28,8 +28,11 @@ namespace AndanteTribe.Utils.Unity.Tasks
         /// <param name="gameObject"><see cref="AsyncGUITrigger"/>を取得するためのゲームオブジェクト.</param>
         public LoadProgressPresenter(GameObject gameObject) => _trigger = gameObject.GetAsyncGUITrigger();
 
-        /// <inheritdoc />
-        public async ValueTask InitializeAsync(CancellationToken cancellationToken)
+        /// <summary>
+        /// ロードの進捗率を表示するUIを開始します.
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        public async ValueTask StartAsync(CancellationToken cancellationToken)
         {
             await foreach (var _ in _trigger.WithCancellation(cancellationToken))
             {
