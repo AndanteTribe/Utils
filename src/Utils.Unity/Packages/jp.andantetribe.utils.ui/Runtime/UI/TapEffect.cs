@@ -1,6 +1,7 @@
 ﻿#if ENABLE_UGUI && ENABLE_UNITASK
 #nullable enable
 
+using AndanteTribe.Utils.Unity.Tasks.Internal;
 using System;
 using System.Collections.Generic;
 using System.Threading;

@@ -6,7 +6,7 @@ namespace AndanteTribe.Utils.Unity.Tasks.Internal
     /// <summary>
     /// スレッドセーフなプールを持つ参照タプル. <see cref="System.ValueTuple"/>でボクシングするような場面での使用を想定.
     /// </summary>
-    internal static class StateTuple
+    public static class StateTuple
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static StateTuple<T1> Create<T1>(T1 item1) => StateTuple<T1>.Create(item1);
@@ -18,7 +18,7 @@ namespace AndanteTribe.Utils.Unity.Tasks.Internal
         public static StateTuple<T1, T2, T3> Create<T1, T2, T3>(T1 item1, T2 item2, T3 item3) => StateTuple<T1, T2, T3>.Create(item1, item2, item3);
     }
 
-    internal sealed class StateTuple<T1>
+    public sealed class StateTuple<T1>
     {
         private static readonly ConcurrentQueue<StateTuple<T1>> s_pool = new();
 
@@ -29,7 +29,7 @@ namespace AndanteTribe.Utils.Unity.Tasks.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static StateTuple<T1> Create(T1 item1)
+        public static StateTuple<T1> Create(T1 item1)
         {
             if (s_pool.TryDequeue(out var result))
             {
@@ -47,7 +47,7 @@ namespace AndanteTribe.Utils.Unity.Tasks.Internal
         }
     }
 
-    internal sealed class StateTuple<T1, T2>
+    public sealed class StateTuple<T1, T2>
     {
         private static readonly ConcurrentQueue<StateTuple<T1, T2>> s_pool = new();
 
@@ -59,7 +59,7 @@ namespace AndanteTribe.Utils.Unity.Tasks.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static StateTuple<T1, T2> Create(T1 item1, T2 item2)
+        public static StateTuple<T1, T2> Create(T1 item1, T2 item2)
         {
             if (s_pool.TryDequeue(out var result))
             {
@@ -80,7 +80,7 @@ namespace AndanteTribe.Utils.Unity.Tasks.Internal
         }
     }
 
-    internal sealed class StateTuple<T1, T2, T3>
+    public sealed class StateTuple<T1, T2, T3>
     {
         private static readonly ConcurrentQueue<StateTuple<T1, T2, T3>> s_pool = new();
 
@@ -93,7 +93,7 @@ namespace AndanteTribe.Utils.Unity.Tasks.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static StateTuple<T1, T2, T3> Create(T1 item1, T2 item2, T3 item3)
+        public static StateTuple<T1, T2, T3> Create(T1 item1, T2 item2, T3 item3)
         {
             if (s_pool.TryDequeue(out var result))
             {

@@ -1,0 +1,25 @@
+{
+    "name": "Utils.R3",
+    "rootNamespace": "AndanteTribe.Utils.Unity.R3",
+    "references": [
+        "GUID:2294a65d721f9974ca66d13b434e6b7b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "R3.dll",
+        "Microsoft.Bcl.TimeProvider.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.cysharp.r3",
+            "expression": "",
+            "define": "ENABLE_R3"
+        }
+    ],
+    "noEngineReferences": false
+}
