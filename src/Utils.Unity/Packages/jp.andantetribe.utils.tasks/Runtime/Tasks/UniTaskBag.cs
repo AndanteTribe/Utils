@@ -1,6 +1,7 @@
 ﻿#if ENABLE_UNITASK
 #nullable enable
 
+using AndanteTribe.Utils.Unity.Tasks.Internal;
 using System;
 using System.Buffers;
 using System.Runtime.CompilerServices;

@@ -1,0 +1,26 @@
+{
+    "name": "Utils.VContainer",
+    "rootNamespace": "AndanteTribe.Utils.Unity.VContainer",
+    "references": [
+        "GUID:2294a65d721f9974ca66d13b434e6b7b",
+        "GUID:b0214a6008ed146ff8f122a6a9c2f6cc",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Utils.GameServices.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "jp.hadashikick.vcontainer",
+            "expression": "",
+            "define": "ENABLE_VCONTAINER"
+        }
+    ],
+    "noEngineReferences": false
+}

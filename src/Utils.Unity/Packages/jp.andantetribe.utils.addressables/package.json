@@ -1,0 +1,16 @@
+{
+  "name": "jp.andantetribe.utils.addressables",
+  "displayName": "AndanteTribe Utils Addressables",
+  "author": {
+    "name": "AndanteTribe",
+    "url": "https://github.com/AndanteTribe"
+  },
+  "version": "1.3.0",
+  "unity": "2022.3",
+  "description": "Addressables based utilities for AndanteTribe projects.",
+  "license": "MIT",
+  "dependencies": {
+    "jp.andantetribe.utils": "1.3.0",
+    "jp.andantetribe.utils.tasks": "1.3.0"
+  }
+}

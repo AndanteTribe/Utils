@@ -1,0 +1,47 @@
+{
+    "name": "Utils.Addressables",
+    "rootNamespace": "AndanteTribe.Utils.Unity.Addressable",
+    "references": [
+        "GUID:2294a65d721f9974ca66d13b434e6b7b",
+        "GUID:b1c2d3e4f5a6789012345678901234bc"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Utils.Core.dll",
+        "R3.dll",
+        "Microsoft.Bcl.TimeProvider.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.cysharp.unitask",
+            "expression": "",
+            "define": "ENABLE_UNITASK"
+        },
+        {
+            "name": "com.unity.addressables",
+            "expression": "",
+            "define": "ENABLE_ADDRESSABLES"
+        },
+        {
+            "name": "com.unity.modules.audio",
+            "expression": "",
+            "define": "ENABLE_AUDIO"
+        },
+        {
+            "name": "com.annulusgames.lit-motion",
+            "expression": "",
+            "define": "ENABLE_LITMOTION"
+        },
+        {
+            "name": "com.cysharp.r3",
+            "expression": "",
+            "define": "ENABLE_R3"
+        }
+    ],
+    "noEngineReferences": false
+}

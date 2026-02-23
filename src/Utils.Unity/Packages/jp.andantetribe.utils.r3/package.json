@@ -1,0 +1,15 @@
+{
+  "name": "jp.andantetribe.utils.r3",
+  "displayName": "AndanteTribe Utils R3",
+  "author": {
+    "name": "AndanteTribe",
+    "url": "https://github.com/AndanteTribe"
+  },
+  "version": "1.3.0",
+  "unity": "2022.3",
+  "description": "R3 Observable utilities for AndanteTribe projects.",
+  "license": "MIT",
+  "dependencies": {
+    "jp.andantetribe.utils": "1.3.0"
+  }
+}
