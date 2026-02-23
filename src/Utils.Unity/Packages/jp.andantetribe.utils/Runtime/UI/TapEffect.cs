@@ -2,12 +2,11 @@
 #nullable enable
 
 using System;
-using System.Collections.Generic;
+using System.Buffers;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Pool;
 using UnityEngine.UI;
 
 namespace AndanteTribe.Utils.Unity.UI
@@ -21,8 +20,9 @@ namespace AndanteTribe.Utils.Unity.UI
     public class TapEffect : Graphic
     {
         private const int MaxCountDefault = 10;
+        private Vector3[] _records = Array.Empty<Vector3>();
+        private int _recordsCount;
 
-        private readonly List<Vector3> _records = ListPool<Vector3>.Get();
         private GraphicsBuffer _graphicsBuffer = null!;
         private int _recordsID;
         private int _countID;
@@ -86,10 +86,7 @@ namespace AndanteTribe.Utils.Unity.UI
             _countID = Shader.PropertyToID("_Count");
             _durationID = Shader.PropertyToID("_Duration");
             _screen = new Rect(0, 0, Screen.width, Screen.height);
-            if (_records.Capacity < MaxCountDefault)
-            {
-                _records.Capacity = MaxCountDefault;
-            }
+            ArrayPool<Vector3>.Shared.Grow(ref _records, MaxCountDefault);
             LoadMaterialAsync(destroyCancellationToken).Forget();
 
             async UniTaskVoid LoadMaterialAsync(CancellationToken cancellationToken)
@@ -126,7 +123,7 @@ namespace AndanteTribe.Utils.Unity.UI
 
         private async UniTaskVoid OnLeftClickAsync()
         {
-            if (_records.Count >= MaxCount)
+            if (_recordsCount >= MaxCount)
             {
                 return;
             }
@@ -144,10 +141,12 @@ namespace AndanteTribe.Utils.Unity.UI
 
             var normalizedPos = Rect.PointToNormalized(_screen, screenPos);
             var record = new Vector3(normalizedPos.x, normalizedPos.y, Time.time);
-            _records.Add(record);
+            ArrayPool<Vector3>.Shared.Grow(ref _records, _recordsCount + 1);
+            _records[_recordsCount++] = record;
 
             await UniTask.Delay(TimeSpan.FromSeconds(_lifetime), cancellationToken: destroyCancellationToken);
-            _records.Remove(record);
+            var index = _records.AsSpan(0, _recordsCount).IndexOf(record);
+            _records[index] = _records[--_recordsCount];
         }
 
         private void Update()
@@ -161,10 +160,9 @@ namespace AndanteTribe.Utils.Unity.UI
             // update material
             if (material != null)
             {
-                var count = _records.Count;
-                material.SetInt(_countID, count);
+                material.SetInt(_countID, _recordsCount);
 
-                if (count > 0)
+                if (_recordsCount > 0)
                 {
                     _graphicsBuffer.SetData(_records);
                     material.SetFloat(_durationID, _lifetime);
@@ -195,7 +193,7 @@ namespace AndanteTribe.Utils.Unity.UI
 #endif
             _graphicsBuffer.Dispose();
             _material.Dispose();
-            ListPool<Vector3>.Release(_records);
+            ArrayPool<Vector3>.Shared.Return(_records);
 
             if (material != null)
             {
