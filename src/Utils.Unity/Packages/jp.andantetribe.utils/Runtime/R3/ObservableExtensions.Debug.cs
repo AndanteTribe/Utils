@@ -23,15 +23,15 @@ namespace AndanteTribe.Utils.Unity.R3
         public static Observable<T> Debug<T>(this Observable<T> source, string label = "")
         {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            var l = string.IsNullOrEmpty(label) ? "" : $"[{label}]";
+            var l = string.IsNullOrEmpty(label) ? "" : "[" + label + "]";
             return source
                 .Do(
                     state: l,
-                    onNext: static (x, lb) => UnityEngine.Debug.Log($"{lb}OnNext({x})"),
-                    onErrorResume: static (x, lb) => UnityEngine.Debug.Log($"{lb}OnErrorResume({x})"),
-                    onCompleted: static (x, lb) => UnityEngine.Debug.Log($"{lb}OnCompleted({x})"),
-                    onSubscribe: static lb => UnityEngine.Debug.Log($"{lb}OnSubscribe"),
-                    onDispose: static lb => UnityEngine.Debug.Log($"{lb}OnDispose"));
+                    onNext: static (x, lb) => UnityEngine.Debug.Log(lb + "OnNext(" + x + ")"),
+                    onErrorResume: static (x, lb) => UnityEngine.Debug.Log(lb + "OnErrorResume(" + x + ")"),
+                    onCompleted: static (x, lb) => UnityEngine.Debug.Log(lb + "OnCompleted(" + x + ")"),
+                    onSubscribe: static lb => UnityEngine.Debug.Log(lb + "OnSubscribe"),
+                    onDispose: static lb => UnityEngine.Debug.Log(lb + "OnDispose"));
 #else
             return source;
 #endif

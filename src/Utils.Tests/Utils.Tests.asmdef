@@ -12,6 +12,7 @@
         "Utils.Core.dll",
         "Utils.BackPort.dll",
         "Utils.GameServices.dll",
+        "Utils.GameServices.MessagePack.dll",
         "Utils.MasterServices.dll",
         "Utils.MasterSample.dll",
         "nunit.framework.dll",
