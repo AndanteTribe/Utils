@@ -1,6 +1,7 @@
 ﻿<Solution>
   <Project Path="src/Utils.Core/Utils.Core.csproj" />
   <Project Path="src/Utils.BackPort/Utils.BackPort.csproj" />
+  <Project Path="src/Utils.GameServices.MessagePack/Utils.GameServices.MessagePack.csproj" />
   <Project Path="src/Utils.GameServices/Utils.GameServices.csproj" />
   <Project Path="src/Utils.Csv/Utils.Csv.csproj" />
   <Project Path="src/Utils.MasterSample/Utils.MasterSample.csproj" />

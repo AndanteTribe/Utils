@@ -102,36 +102,58 @@
             <summary>
             マスターコンバート設定.
             </summary>
-            <param name="InputDirectoryPath">入力ディレクトリパス.</param>
-            <param name="Metadata">マスターメタデータ.</param>
-            <param name="BuilderFactory">データベースビルダーファクトリ.</param>
         </member>
-        <member name="M:AndanteTribe.Utils.MasterServices.MasterSettings.#ctor(System.String,MasterMemory.Meta.MetaDatabase,System.Func{MasterMemory.DatabaseBuilderBase})">
+        <member name="F:AndanteTribe.Utils.MasterServices.MasterSettings.InputDirectoryPath">
             <summary>
-            マスターコンバート設定.
+            入力ディレクトリパス.
             </summary>
-            <param name="InputDirectoryPath">入力ディレクトリパス.</param>
-            <param name="Metadata">マスターメタデータ.</param>
-            <param name="BuilderFactory">データベースビルダーファクトリ.</param>
         </member>
-        <member name="P:AndanteTribe.Utils.MasterServices.MasterSettings.InputDirectoryPath">
-            <summary>入力ディレクトリパス.</summary>
+        <member name="F:AndanteTribe.Utils.MasterServices.MasterSettings.Metadata">
+            <summary>
+            マスターメタデータ.
+            </summary>
         </member>
-        <member name="P:AndanteTribe.Utils.MasterServices.MasterSettings.Metadata">
-            <summary>マスターメタデータ.</summary>
+        <member name="F:AndanteTribe.Utils.MasterServices.MasterSettings.BuilderType">
+            <summary>
+            マスタービルダークラスの型.
+            </summary>
         </member>
-        <member name="P:AndanteTribe.Utils.MasterServices.MasterSettings.BuilderFactory">
-            <summary>データベースビルダーファクトリ.</summary>
-        </member>
-        <member name="P:AndanteTribe.Utils.MasterServices.MasterSettings.MaxLanguageCount">
+        <member name="F:AndanteTribe.Utils.MasterServices.MasterSettings.MaxLanguageCount">
             <summary>
             ローカライズ対応している最大言語数.
             </summary>
         </member>
-        <member name="P:AndanteTribe.Utils.MasterServices.MasterSettings.LanguageIndex">
+        <member name="F:AndanteTribe.Utils.MasterServices.MasterSettings.LanguageIndex">
             <summary>
             ローカライズ出力する言語インデックス.
             </summary>
+        </member>
+        <member name="P:AndanteTribe.Utils.MasterServices.MasterSettings.CustomResolver">
+            <summary>
+            MessagePackのカスタムフォーマッタリゾルバを指定します.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.MasterServices.MasterSettings.Create``1(System.String,MasterMemory.Meta.MetaDatabase,MessagePack.IFormatterResolver)">
+            <summary>
+            マスターコンバート設定を作成します.
+            </summary>
+            <param name="inputDirectoryPath"></param>
+            <param name="metadata"></param>
+            <param name="customResolver"></param>
+            <typeparam name="TBuilder"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:AndanteTribe.Utils.MasterServices.MasterSettings.Create``1(System.String,MasterMemory.Meta.MetaDatabase,System.UInt32,System.UInt32,MessagePack.IFormatterResolver)">
+            <summary>
+            マスターコンバート設定を作成します(ローカライズ対応).
+            </summary>
+            <param name="inputDirectoryPath"></param>
+            <param name="metadata"></param>
+            <param name="maxLanguageCount"></param>
+            <param name="languageIndex"></param>
+            <param name="customResolver"></param>
+            <typeparam name="TBuilder"></typeparam>
+            <returns></returns>
         </member>
     </members>
 </doc>

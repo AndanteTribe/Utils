@@ -30,6 +30,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Utils.Csv\Utils.Csv.csproj" />
       <ProjectReference Include="..\Utils.Core\Utils.Core.csproj" />
+      <ProjectReference Include="..\Utils.GameServices.MessagePack\Utils.GameServices.MessagePack.csproj" />
       <ProjectReference Include="..\Utils.GameServices\Utils.GameServices.csproj" />
     </ItemGroup>
 

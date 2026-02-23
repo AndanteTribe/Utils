@@ -5,38 +5,40 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using AndanteTribe.Utils.GameServices;
+using AndanteTribe.Utils.GameServices.MessagePack;
 using AndanteTribe.Utils.MasterSample;
 using AndanteTribe.Utils.MasterSample.Enums;
 using AndanteTribe.Utils.MasterSample.Units;
 using AndanteTribe.Utils.MasterServices;
+using MessagePack;
+using MessagePack.Resolvers;
 using NUnit.Framework;
 
 namespace AndanteTribe.Utils.Tests
 {
     public class MasterServicesTest
     {
+        private static readonly IFormatterResolver s_resolver = CompositeResolver.Create(
+            GameServiceResolver.Shared, MasterSampleResolver.Instance, StandardResolver.Instance);
+
         private const uint MaxLanguageCount = 2;
         private static readonly MasterSettings[] s_testCases =
         {
-            new MasterSettings(
-                GetMasterDirectoryPath(),
-                MemoryDatabase.GetMetaDatabase(),
-                static () => new DatabaseBuilder()
-            )
-            {
-                MaxLanguageCount = MaxLanguageCount,
-                LanguageIndex = (uint)Language.Japanese,
-            },
-            new MasterSettings(
-                GetMasterDirectoryPath(),
-                MemoryDatabase.GetMetaDatabase(),
-                static () => new DatabaseBuilder()
-            )
-            {
-                MaxLanguageCount = MaxLanguageCount,
-                LanguageIndex = (uint)Language.English,
-            },
+            MasterSettings.Create<DatabaseBuilder>(
+                GetMasterDirectoryPath(), MemoryDatabase.GetMetaDatabase(), MaxLanguageCount, (uint)Language.Japanese, MasterSampleResolver.Instance),
+            MasterSettings.Create<DatabaseBuilder>(
+                GetMasterDirectoryPath(), MemoryDatabase.GetMetaDatabase(), MaxLanguageCount, (uint)Language.English, MasterSampleResolver.Instance),
+            MasterSettings.Create<DatabaseBuilder>(
+                GetMasterDirectoryPath(), MemoryDatabase.GetMetaDatabase(), MaxLanguageCount, (uint)Language.Japanese, s_resolver),
+            MasterSettings.Create<DatabaseBuilder>(
+                GetMasterDirectoryPath(), MemoryDatabase.GetMetaDatabase(), MaxLanguageCount, (uint)Language.English, s_resolver),
         };
+
+        [SetUp]
+        public void Setup()
+        {
+            MessagePackSerializer.DefaultOptions = MessagePackSerializer.DefaultOptions.WithResolver(s_resolver);
+        }
 
         [Test]
         [TestCaseSource(nameof(s_testCases))]

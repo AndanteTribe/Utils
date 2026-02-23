@@ -36,7 +36,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="MessagePack" Version="3.1.4" />
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+            <_Parameter1>Utils.GameServices.MessagePack</_Parameter1>
+        </AssemblyAttribute>
     </ItemGroup>
-
 </Project>
