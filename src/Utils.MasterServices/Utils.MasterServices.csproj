@@ -7,7 +7,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <OutputType>Library</OutputType>
         <RootNamespace>AndanteTribe.Utils.MasterServices</RootNamespace>
-        <Version>1.2.2</Version>
+        <Version>1.3.0</Version>
         <AssemblyName>Utils.MasterServices</AssemblyName>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
