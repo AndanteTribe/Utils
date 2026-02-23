@@ -25,13 +25,9 @@ namespace AndanteTribe.Utils.Tests
         private static readonly MasterSettings[] s_testCases =
         {
             MasterSettings.Create<DatabaseBuilder>(
-                GetMasterDirectoryPath(), MemoryDatabase.GetMetaDatabase(), MaxLanguageCount, (uint)Language.Japanese, MasterSampleResolver.Instance),
+                GetMasterDirectoryPath(), MemoryDatabase.GetMetaDatabase(), MaxLanguageCount, (uint)Language.Japanese),
             MasterSettings.Create<DatabaseBuilder>(
-                GetMasterDirectoryPath(), MemoryDatabase.GetMetaDatabase(), MaxLanguageCount, (uint)Language.English, MasterSampleResolver.Instance),
-            MasterSettings.Create<DatabaseBuilder>(
-                GetMasterDirectoryPath(), MemoryDatabase.GetMetaDatabase(), MaxLanguageCount, (uint)Language.Japanese, s_resolver),
-            MasterSettings.Create<DatabaseBuilder>(
-                GetMasterDirectoryPath(), MemoryDatabase.GetMetaDatabase(), MaxLanguageCount, (uint)Language.English, s_resolver),
+                GetMasterDirectoryPath(), MemoryDatabase.GetMetaDatabase(), MaxLanguageCount, (uint)Language.English),
         };
 
         [SetUp]

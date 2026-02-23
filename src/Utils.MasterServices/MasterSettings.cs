@@ -54,6 +54,7 @@ public record MasterSettings
         BuilderType = builderType;
         MaxLanguageCount = maxLanguageCount;
         LanguageIndex = languageIndex;
+        CustomResolver = customResolver;
     }
 
     /// <summary>

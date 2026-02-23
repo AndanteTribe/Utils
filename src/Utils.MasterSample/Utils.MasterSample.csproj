@@ -11,7 +11,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Utils.GameServices.MessagePack\Utils.GameServices.MessagePack.csproj" />
       <ProjectReference Include="..\Utils.GameServices\Utils.GameServices.csproj" />
     </ItemGroup>
 
