@@ -1,6 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using AndanteTribe.Utils.Internal;
 
 namespace AndanteTribe.Utils;
 
@@ -30,8 +30,9 @@ public static class FormatHelper
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static (string[] literal, (int index, string format)[] embed) AnalyzeFormat(in ReadOnlySpan<char> format)
     {
-        var literals = new ValueList<string>();
-        var indices = new ValueList<(int index, string format)>();
+        var literalsBuffer = Array.Empty<string>();
+        var indicesBuffer = Array.Empty<(int index, string format)>();
+        var (literalCount, indexCount) = (0, 0);
 
         try
         {
@@ -42,7 +43,8 @@ public static class FormatHelper
                 var countUntilNextBrace = remainder.IndexOfAny('{', '}');
                 if (countUntilNextBrace < 0)
                 {
-                    literals.Add(remainder.ToString());
+                    ArrayPool<string>.Shared.Grow(ref literalsBuffer, literalCount + 1);
+                    literalsBuffer[literalCount++] = remainder.ToString();
                     break;
                 }
 
@@ -51,12 +53,13 @@ public static class FormatHelper
                     throw new FormatException("開き中括弧がありません。");
                 }
 
-                literals.Add(remainder.Slice(0, countUntilNextBrace).ToString());
+                ArrayPool<string>.Shared.Grow(ref literalsBuffer, literalCount + 1);
+                literalsBuffer[literalCount++] = remainder[..countUntilNextBrace].ToString();
 
                 pos += countUntilNextBrace;
                 pos++;
 
-                var endBrace = format.Slice(pos).IndexOf('}');
+                var endBrace = format[pos..].IndexOf('}');
                 if (endBrace < 0)
                 {
                     throw new FormatException("閉じ中括弧がありません。");
@@ -64,8 +67,8 @@ public static class FormatHelper
 
                 var inside = format.Slice(pos, endBrace);
                 var split = inside.IndexOf(':');
-                var i = split < 0 ? inside : inside.Slice(0, split);
-                var f = split < 0 ? ReadOnlySpan<char>.Empty : inside.Slice(split + 1);
+                var i = split < 0 ? inside : inside[..split];
+                var f = split < 0 ? ReadOnlySpan<char>.Empty : inside[(split + 1)..];
 
                 foreach (var c in i)
                 {
@@ -75,16 +78,17 @@ public static class FormatHelper
                     }
                 }
 
-                indices.Add((int.Parse(i), f.ToString()));
+                ArrayPool<(int index, string format)>.Shared.Grow(ref indicesBuffer, indexCount + 1);
+                indicesBuffer[indexCount++] = (int.Parse(i), f.ToString());
                 pos += endBrace + 1;
             }
 
-            return (literals.Count == 0 ? [] : literals.AsSpan().ToArray(), indices.Count == 0 ? [] : indices.AsSpan().ToArray());
+            return (literalCount == 0 ? [] : literalsBuffer.AsSpan(0, literalCount).ToArray(), indexCount == 0 ? [] : indicesBuffer.AsSpan(0, indexCount).ToArray());
         }
         finally
         {
-            literals.Clear();
-            indices.Clear();
+            ArrayPool<string>.Shared.Return(literalsBuffer);
+            ArrayPool<(int index, string format)>.Shared.Return(indicesBuffer);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

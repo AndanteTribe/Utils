@@ -15,7 +15,7 @@ public struct Container : IDisposable
     /// </summary>
     public Container()
     {
-        _bindings = ArrayPool<(Type type, object instance)>.Shared.Rent(4);
+        _bindings = [];
     }
 
     /// <summary>
@@ -25,13 +25,7 @@ public struct Container : IDisposable
     /// <typeparam name="T">参照型.インターフェイスも登録可.nullは非許容.</typeparam>
     public void Bind<T>(T instance) where T : class
     {
-        if (_count >= _bindings.Length)
-        {
-            var newArray = ArrayPool<(Type type, object instance)>.Shared.Rent(_bindings.Length + 1);
-            _bindings.AsSpan().CopyTo(newArray);
-            ArrayPool<(Type type, object instance)>.Shared.Return(_bindings);
-            _bindings = newArray;
-        }
+        ArrayPool<(Type type, object instance)>.Shared.Grow(ref _bindings, _count + 1);
         _bindings[_count++] = (typeof(T), instance);
     }
 

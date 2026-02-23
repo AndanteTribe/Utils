@@ -9,6 +9,31 @@ namespace AndanteTribe.Utils.Tests
 {
     public class CoreUtilsTest
     {
+        // A deterministic ArrayPool used for testing: always returns a fresh, zeroed array
+        private sealed class DeterministicArrayPool<T> : ArrayPool<T>
+        {
+            public override T[] Rent(int minimumLength) => new T[minimumLength];
+
+            public override void Return(T[] array, bool clearArray = false)
+            {
+                // no-op: we intentionally don't reuse arrays to make behavior deterministic for tests
+            }
+        }
+
+        // Recording pool to capture returned arrays for inspection in tests
+        private sealed class RecordingArrayPool<T> : ArrayPool<T>
+        {
+            public readonly List<T[]> Returned = new List<T[]>();
+
+            public override T[] Rent(int minimumLength) => new T[minimumLength];
+
+            public override void Return(T[] array, bool clearArray = false)
+            {
+                // record the returned array for later assertions
+                Returned.Add(array);
+            }
+        }
+
         [Test]
         [TestCase(new[] { 1, 2, 3, 4, 5 })]
         [TestCase(new int[0])]
@@ -1029,6 +1054,173 @@ namespace AndanteTribe.Utils.Tests
             for (int i = 0; i < 20; i++)
             {
                 Assert.That(array[i], Is.EqualTo(i * 0.5));
+            }
+        }
+
+        // 以下、ArrayPool.Grow のユースケースを網羅するテスト
+        [Test]
+        public void ArrayPoolGrow_IncreasesSize_WhenSmallerThanMinimum()
+        {
+            var pool = new DeterministicArrayPool<int>();
+            int[] array = pool.Rent(3);
+            try
+            {
+                array[0] = 1;
+                array[1] = 2;
+                array[2] = 3;
+                // remember original reference
+                int[] before = array;
+                // Grow to at least 10
+                pool.Grow(ref array, 10);
+                Assert.That(array, Is.Not.Null);
+                Assert.That(array.Length, Is.GreaterThanOrEqualTo(10));
+                // should be a new instance (grown)
+                Assert.That(array, Is.Not.SameAs(before));
+                // existing elements preserved
+                Assert.That(array[0], Is.EqualTo(1));
+                Assert.That(array[1], Is.EqualTo(2));
+                Assert.That(array[2], Is.EqualTo(3));
+                // writable
+                array[9] = 99;
+                Assert.That(array[9], Is.EqualTo(99));
+            }
+            finally
+            {
+                try { pool.Return(array); } catch { }
+            }
+        }
+
+        [Test]
+        public void ArrayPoolGrow_FromEmptyArray_Works()
+        {
+            var pool = ArrayPool<string>.Shared;
+            string[] array = Array.Empty<string>();
+            // Grow to 5
+            pool.Grow(ref array, 5);
+            Assert.That(array, Is.Not.Null);
+            Assert.That(array.Length, Is.GreaterThanOrEqualTo(5));
+            // assign and read
+            array[0] = "hello";
+            Assert.That(array[0], Is.EqualTo("hello"));
+            try { ArrayPool<string>.Shared.Return(array); } catch { }
+        }
+
+        [Test]
+        public void ArrayPoolGrow_NoOp_WhenAlreadyLargeEnough()
+        {
+            var pool = ArrayPool<int>.Shared;
+            int[] array = pool.Rent(10);
+            try
+            {
+                int[] before = array;
+                pool.Grow(ref array, 5);
+                // should remain same instance
+                Assert.That(array, Is.SameAs(before));
+            }
+            finally
+            {
+                try { pool.Return(array); } catch { }
+            }
+        }
+
+        [Test]
+        public void ArrayPoolGrow_ZeroOrNegativeMinimum_DoesNotThrow_AndNoOp()
+        {
+            var pool = ArrayPool<int>.Shared;
+            int[] array = pool.Rent(4);
+            try
+            {
+                int[] before = array;
+                pool.Grow(ref array, 0);
+                Assert.That(array, Is.SameAs(before));
+
+                pool.Grow(ref array, -1);
+                Assert.That(array, Is.SameAs(before));
+            }
+            finally
+            {
+                try { pool.Return(array); } catch { }
+            }
+        }
+
+        [Test]
+        public void ArrayPoolGrow_PreservesReferenceTypeElements()
+        {
+            var pool = ArrayPool<object>.Shared;
+            object[] array = pool.Rent(2);
+            try
+            {
+                var obj = new object();
+                array[0] = obj;
+                pool.Grow(ref array, 5);
+                Assert.That(array[0], Is.SameAs(obj));
+            }
+            finally
+            {
+                try { ArrayPool<object>.Shared.Return(array); } catch { }
+            }
+        }
+
+        [Test]
+        public void ArrayPoolGrow_ClearsOldArrayOnReturn_ForReferenceTypes()
+        {
+            var pool = new RecordingArrayPool<string>();
+            string[] array = pool.Rent(3);
+            try
+            {
+                array[0] = "hello";
+                array[1] = "world";
+                // Grow to 5
+                pool.Grow(ref array, 5);
+                Assert.That(array, Is.Not.Null);
+                Assert.That(array.Length, Is.GreaterThanOrEqualTo(5));
+                // ensure the old array was returned and cleared
+                Assert.That(pool.Returned.Count, Is.GreaterThanOrEqualTo(1));
+                var old = pool.Returned[0];
+                Assert.That(old.Length, Is.EqualTo(3));
+                // cleared to nulls
+                for (int i = 0; i < old.Length; i++)
+                {
+                    Assert.That(old[i], Is.Null);
+                }
+                // ensure new array preserved original elements
+                Assert.That(array[0], Is.EqualTo("hello"));
+                Assert.That(array[1], Is.EqualTo("world"));
+            }
+            finally
+            {
+                try { pool.Return(array); } catch { }
+            }
+        }
+
+        [Test]
+        public void ArrayPoolGrow_ClearsOldArrayOnReturn_ForValueTypes()
+        {
+            var pool = new RecordingArrayPool<int>();
+            int[] array = pool.Rent(3);
+            try
+            {
+                array[0] = 42;
+                array[1] = 7;
+                // Grow to 6
+                pool.Grow(ref array, 6);
+                Assert.That(array, Is.Not.Null);
+                Assert.That(array.Length, Is.GreaterThanOrEqualTo(6));
+                Assert.That(pool.Returned.Count, Is.GreaterThanOrEqualTo(1));
+                var old = pool.Returned[0];
+                Assert.That(old.Length, Is.EqualTo(3));
+                // cleared to default (0)
+                for (int i = 0; i < old.Length; i++)
+                {
+                    Assert.That(old[i], Is.EqualTo(0));
+                }
+                // ensure new array preserved original elements
+                Assert.That(array[0], Is.EqualTo(42));
+                Assert.That(array[1], Is.EqualTo(7));
+            }
+            finally
+            {
+                try { pool.Return(array); } catch { }
             }
         }
 
