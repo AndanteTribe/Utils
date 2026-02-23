@@ -7,7 +7,7 @@ on:
         type: string
         required: true
         default: "1.0.0"
-        
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -53,6 +53,7 @@ jobs:
             ./src/Utils.Core/Utils.Core.csproj
             ./src/Utils.BackPort/Utils.BackPort.csproj
             ./src/Utils.GameServices/Utils.GameServices.csproj
+            ./src/Utils.GameServices.MessagePack/Utils.GameServices.MessagePack.csproj
             ./src/Utils.Csv/Utils.Csv.csproj
             ./src/Utils.MasterServices/Utils.MasterServices.csproj
           )
@@ -70,7 +71,7 @@ jobs:
     - name: commit and push
       run: |
           VERSION="${{ github.event.inputs.version }}"
-          
+
           git add \
             ./bin/package.json \
             ./bin/Utils.Core.dll \
@@ -79,6 +80,8 @@ jobs:
             ./bin/Utils.BackPort.xml \
             ./bin/Utils.GameServices.dll \
             ./bin/Utils.GameServices.xml \
+            ./bin/Utils.GameServices.MessagePack.dll \
+            ./bin/Utils.GameServices.MessagePack.xml \
             ./bin/Utils.Csv.dll \
             ./bin/Utils.Csv.xml \
             ./bin/Utils.MasterServices.dll \
@@ -87,6 +90,7 @@ jobs:
             ./src/Utils.Core/Utils.Core.csproj \
             ./src/Utils.BackPort/Utils.BackPort.csproj \
             ./src/Utils.GameServices/Utils.GameServices.csproj \
+            ./src/Utils.GameServices.MessagePack/Utils.GameServices.MessagePack.csproj \
             ./src/Utils.Csv/Utils.Csv.csproj \
             ./src/Utils.MasterServices/Utils.MasterServices.csproj
           git commit -m "chore: bump version to ${VERSION}"
@@ -98,7 +102,7 @@ jobs:
       run: |
         VERSION="${{ github.event.inputs.version }}"
         BRANCH="feature/v$VERSION"
-    
+
         gh pr create \
           --base main \
           --head "$BRANCH" \
