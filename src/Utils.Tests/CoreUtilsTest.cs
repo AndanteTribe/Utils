@@ -1032,6 +1032,106 @@ namespace AndanteTribe.Utils.Tests
             }
         }
 
+        // 以下、ArrayPool.Grow のユースケースを網羅するテスト
+        [Test]
+        public void ArrayPoolGrow_IncreasesSize_WhenSmallerThanMinimum()
+        {
+            var pool = ArrayPool<int>.Shared;
+            int[] array = pool.Rent(3);
+            try
+            {
+                array[0] = 1;
+                array[1] = 2;
+                array[2] = 3;
+                // Grow to at least 10
+                pool.Grow(ref array, 10);
+                Assert.That(array, Is.Not.Null);
+                Assert.That(array.Length, Is.GreaterThanOrEqualTo(10));
+                // existing elements preserved
+                Assert.That(array[0], Is.EqualTo(1));
+                Assert.That(array[1], Is.EqualTo(2));
+                Assert.That(array[2], Is.EqualTo(3));
+                // writable
+                array[9] = 99;
+                Assert.That(array[9], Is.EqualTo(99));
+            }
+            finally
+            {
+                try { ArrayPool<int>.Shared.Return(array); } catch { }
+            }
+        }
+
+        [Test]
+        public void ArrayPoolGrow_FromEmptyArray_Works()
+        {
+            var pool = ArrayPool<string>.Shared;
+            string[] array = Array.Empty<string>();
+            // Grow to 5
+            pool.Grow(ref array, 5);
+            Assert.That(array, Is.Not.Null);
+            Assert.That(array.Length, Is.GreaterThanOrEqualTo(5));
+            // assign and read
+            array[0] = "hello";
+            Assert.That(array[0], Is.EqualTo("hello"));
+            try { ArrayPool<string>.Shared.Return(array); } catch { }
+        }
+
+        [Test]
+        public void ArrayPoolGrow_NoOp_WhenAlreadyLargeEnough()
+        {
+            var pool = ArrayPool<int>.Shared;
+            int[] array = pool.Rent(10);
+            try
+            {
+                int[] before = array;
+                pool.Grow(ref array, 5);
+                // should remain same instance
+                Assert.That(array, Is.SameAs(before));
+            }
+            finally
+            {
+                try { ArrayPool<int>.Shared.Return(array); } catch { }
+            }
+        }
+
+        [Test]
+        public void ArrayPoolGrow_ZeroOrNegativeMinimum_DoesNotThrow_AndNoOp()
+        {
+            var pool = ArrayPool<int>.Shared;
+            int[] array = pool.Rent(4);
+            try
+            {
+                int[] before = array;
+                pool.Grow(ref array, 0);
+                Assert.That(array, Is.SameAs(before));
+
+                pool.Grow(ref array, -1);
+                Assert.That(array, Is.SameAs(before));
+            }
+            finally
+            {
+                try { ArrayPool<int>.Shared.Return(array); } catch { }
+            }
+        }
+
+        [Test]
+        public void ArrayPoolGrow_PreservesReferenceTypeElements()
+        {
+            var pool = ArrayPool<object>.Shared;
+            object[] array = pool.Rent(2);
+            try
+            {
+                var obj = new object();
+                array[0] = obj;
+                pool.Grow(ref array, 5);
+                Assert.That(array[0], Is.SameAs(obj));
+            }
+            finally
+            {
+                try { ArrayPool<object>.Shared.Return(array); } catch { }
+            }
+        }
+
         [Test]
         public void FormatHelper_SimpleLiteral()
         {

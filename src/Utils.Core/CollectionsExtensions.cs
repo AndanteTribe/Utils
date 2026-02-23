@@ -44,6 +44,59 @@ public static class CollectionsExtensions
         System.Runtime.InteropServices.CollectionsMarshal.AsSpan(list);
 
     /// <summary>
+    /// <see cref="ArrayPool{T}"/>から借りた配列を必要に応じて拡張します.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// using System;
+    /// using System.Buffers;
+    ///
+    /// public class Example
+    /// {
+    ///    public static void Main()
+    ///    {
+    ///        var pool = ArrayPool<int>.Shared;
+    ///        // 既存の配列が小さい場合に Grow で拡張する
+    ///        int[] buffer = pool.Rent(3);
+    ///        try
+    ///        {
+    ///            // 最低 10 要素が必要になった
+    ///            pool.Grow(ref buffer, 10);
+    ///            Console.WriteLine(buffer.Length); // => >= 10
+    ///        }
+    ///        finally
+    ///        {
+    ///            // テストや実運用では必ず Return する
+    ///            pool.Return(buffer);
+    ///        }
+    ///    }
+    /// }
+    /// ]]>
+    /// </code>
+    /// </example>
+    /// <param name="pool"></param>
+    /// <param name="array"></param>
+    /// <param name="minimumLength"></param>
+    /// <typeparam name="T"></typeparam>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Grow<T>(this ArrayPool<T> pool, ref T[] array, int minimumLength)
+    {
+        if (array.Length < minimumLength)
+        {
+            var newArray = pool.Rent(minimumLength);
+            if (array.Length == 0)
+            {
+                var temp = array.AsSpan();
+                temp.CopyTo(newArray);
+                temp.Clear();
+            }
+            pool.Return(array);
+            array = newArray;
+        }
+    }
+
+    /// <summary>
     /// <see cref="ArrayPool{T}"/>から借りた配列を返却するためのハンドルを取得します.
     /// </summary>
     /// <remarks>
