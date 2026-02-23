@@ -4,10 +4,12 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
 using AndanteTribe.Utils.GameServices;
+using AndanteTribe.Utils.GameServices.MessagePack;
 using MasterMemory;
 using MasterMemory.Meta;
 using MessagePack;
 using MessagePack.Formatters;
+using MessagePack.Resolvers;
 
 namespace AndanteTribe.Utils.MasterServices;
 
@@ -53,19 +55,14 @@ public static class MasterConverter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IReadOnlyCollection<char> GetAllCharacters(MasterSettings settings)
     {
-        var option = MessagePackSerializer.DefaultOptions;
         var hashset = new HashSet<char>();
         var resolver = new CollectAllCharactersResolver(MessagePackSerializerOptions.Standard.Resolver, hashset);
-        MessagePackSerializer.DefaultOptions = option.WithResolver(resolver);
+        settings = settings with
+        {
+            CustomResolver = settings.CustomResolver == null ? resolver : CompositeResolver.Create(resolver, settings.CustomResolver),
+        };
 
-        try
-        {
-            LoadCore(settings);
-        }
-        finally
-        {
-            MessagePackSerializer.DefaultOptions = option;
-        }
+        LoadCore(settings);
 
         return hashset;
     }
@@ -73,7 +70,10 @@ public static class MasterConverter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static DatabaseBuilderBase LoadCore(MasterSettings settings)
     {
-        var builder = settings.BuilderFactory();
+        var resolver = settings.CustomResolver == null
+            ? CompositeResolver.Create(GameServiceResolver.Shared, MessagePackSerializer.DefaultOptions.Resolver)
+            : CompositeResolver.Create(settings.CustomResolver, GameServiceResolver.Shared, MessagePackSerializer.DefaultOptions.Resolver);
+        var builder = (DatabaseBuilderBase)Activator.CreateInstance(settings.BuilderType, resolver);
         var actions = new List<Action>();
         var container = new ConcurrentBag<(Type, IList<object>)>();
 
@@ -144,7 +144,7 @@ public static class MasterConverter
     internal class CollectAllCharactersResolver(IFormatterResolver innerResolver, HashSet<char> hashset) : IFormatterResolver, IMessagePackFormatter<string?>, IMessagePackFormatter<LocalizeFormat?>
     {
         private readonly object _lock = new();
-        private readonly IMessagePackFormatter<LocalizeFormat?> _localizeFormatter = GameServiceResolver.Instance.GetFormatter<LocalizeFormat?>()!;
+        private readonly IMessagePackFormatter<LocalizeFormat?> _localizeFormatter = GameServiceResolver.Shared.GetFormatter<LocalizeFormat?>()!;
 
         public IMessagePackFormatter<T>? GetFormatter<T>()
         {

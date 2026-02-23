@@ -1,34 +1,27 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using MessagePack;
 
 namespace AndanteTribe.Utils.GameServices;
 
 /// <summary>
 /// ローカライズ用のフォーマット形式キャッシュ.
 /// </summary>
-[MessagePackObject(AllowPrivate = true)]
-public partial record LocalizeFormat
+public record LocalizeFormat
 {
-    [Key(0)]
-    private readonly string[] _literal;
+    internal readonly string[] _literal;
 
-    [Key(1)]
-    private readonly (int index, string format)[] _embed;
+    internal readonly (int index, string format)[] _embed;
 
-    [Key(2)]
     internal readonly int _literalLength;
 
     /// <summary>
     /// リテラル部分の配列.
     /// </summary>
-    [IgnoreMember]
     public ReadOnlySpan<string> Literal => _literal.AsSpan();
 
     /// <summary>
     /// 埋め込み部分の配列.
     /// </summary>
-    [IgnoreMember]
     public ReadOnlySpan<(int index, string format)> Embed => _embed.AsSpan();
 
     /// <summary>

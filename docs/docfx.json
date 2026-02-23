@@ -16,6 +16,12 @@
           ]
         },
         {
+          "src": "../src/Utils.GameServices.MessagePack",
+          "files": [
+              "*.cs"
+          ]
+        },
+        {
           "src": "../src/Utils.Csv",
           "files": [
             "*.cs"

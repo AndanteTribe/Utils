@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Utils.GameServices.MessagePack</name>
+    </assembly>
+    <members>
+        <member name="T:AndanteTribe.Utils.GameServices.MessagePack.GameServiceResolver">
+            <summary>
+            <see cref="N:AndanteTribe.Utils.GameServices"/>オブジェクトの<see cref="T:MessagePack.IFormatterResolver"/>.
+            </summary>
+        </member>
+        <member name="F:AndanteTribe.Utils.GameServices.MessagePack.GameServiceResolver.Shared">
+            <summary>
+            <see cref="T:AndanteTribe.Utils.GameServices.MessagePack.GameServiceResolver"/>の共有インスタンス.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.GameServices.MessagePack.GameServiceResolver.GetFormatter``1">
+            <inheritdoc />
+        </member>
+        <member name="T:AndanteTribe.Utils.GameServices.MessagePack.LocalizeFormatFormatter">
+            <summary>
+            <see cref="T:AndanteTribe.Utils.GameServices.LocalizeFormat"/>の<see cref="T:MessagePack.Formatters.IMessagePackFormatter`1"/>.
+            </summary>
+        </member>
+        <member name="M:AndanteTribe.Utils.GameServices.MessagePack.LocalizeFormatFormatter.Serialize(MessagePack.MessagePackWriter@,AndanteTribe.Utils.GameServices.LocalizeFormat,MessagePack.MessagePackSerializerOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:AndanteTribe.Utils.GameServices.MessagePack.LocalizeFormatFormatter.Deserialize(MessagePack.MessagePackReader@,MessagePack.MessagePackSerializerOptions)">
+            <inheritdoc />
+        </member>
+        <member name="T:AndanteTribe.Utils.GameServices.MessagePack.MasterIdFormatter`1">
+            <summary>
+            <see cref="T:AndanteTribe.Utils.GameServices.MasterId`1"/>の<see cref="T:MessagePack.Formatters.IMessagePackFormatter`1"/>.
+            </summary>
+            <typeparam name="TGroup"></typeparam>
+        </member>
+        <member name="M:AndanteTribe.Utils.GameServices.MessagePack.MasterIdFormatter`1.Serialize(MessagePack.MessagePackWriter@,AndanteTribe.Utils.GameServices.MasterId{`0},MessagePack.MessagePackSerializerOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:AndanteTribe.Utils.GameServices.MessagePack.MasterIdFormatter`1.Deserialize(MessagePack.MessagePackReader@,MessagePack.MessagePackSerializerOptions)">
+            <inheritdoc />
+        </member>
+        <member name="T:MessagePack.GeneratedMessagePackResolver">
+            <summary>A MessagePack resolver that uses generated formatters for types in this assembly.</summary>
+        </member>
+        <member name="F:MessagePack.GeneratedMessagePackResolver.Instance">
+            <summary>An instance of this resolver that only returns formatters specifically generated for types in this assembly.</summary>
+        </member>
+    </members>
+</doc>

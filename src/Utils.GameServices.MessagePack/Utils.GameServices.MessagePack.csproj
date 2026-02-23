@@ -1,18 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.1;net6.0</TargetFrameworks>
+        <TargetFramework>netstandard2.1</TargetFramework>
         <LangVersion>14</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <OutputType>Library</OutputType>
-        <RootNamespace>AndanteTribe.Utils.GameServices</RootNamespace>
+        <RootNamespace>AndanteTribe.Utils.GameServices.MessagePack</RootNamespace>
         <Version>1.2.2</Version>
-        <AssemblyName>Utils.GameServices</AssemblyName>
+        <AssemblyName>Utils.GameServices.MessagePack</AssemblyName>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-
+        
         <!-- NuGet Packaging -->
-        <PackageId>AndanteTribe.Utils.GameServices</PackageId>
+        <PackageId>AndanteTribe.Utils.GameServices.MessagePack</PackageId>
         <PackageVersion>$(Version)</PackageVersion>
         <Authors>AndanteTribe</Authors>
         <Copyright>© AndanteTribe</Copyright>
@@ -24,20 +24,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Remove=".gitignore" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)' != 'net6.0'">
-        <ProjectReference Include="..\Utils.BackPort\Utils.BackPort.csproj" />
+      <ProjectReference Include="..\Utils.GameServices\Utils.GameServices.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Utils.Core\Utils.Core.csproj" />
+      <PackageReference Include="MessagePack" Version="3.1.4" />
     </ItemGroup>
 
-    <ItemGroup>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-            <_Parameter1>Utils.GameServices.MessagePack</_Parameter1>
-        </AssemblyAttribute>
-    </ItemGroup>
 </Project>

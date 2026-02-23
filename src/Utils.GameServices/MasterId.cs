@@ -1,5 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
-using MessagePack;
 
 namespace AndanteTribe.Utils.GameServices;
 
@@ -12,8 +11,7 @@ namespace AndanteTribe.Utils.GameServices;
 /// <param name="Id">ID.</param>
 /// <param name="Group">グループ.</param>
 /// <typeparam name="TGroup"></typeparam>
-[MessagePackObject]
-public readonly record struct MasterId<TGroup>([property: Key(0)] TGroup Group, [property: Key(1)] uint Id)
+public readonly record struct MasterId<TGroup>(TGroup Group, uint Id)
     : IEquatable<MasterId<TGroup>>, IComparable<MasterId<TGroup>>, ISpanFormattable where TGroup : unmanaged, Enum
 {
     private int GroupId
