@@ -68,18 +68,18 @@ namespace AndanteTribe.Utils.Unity.Addressable
                     }
                 }
 
-                var bag = new UniTaskBag();
-                foreach (var info in activeScenes)
+                await using (var bag = new UniTaskBag())
                 {
-                    if (!sceneName.HasBitFlags(info.SceneName))
+                    foreach (var info in activeScenes)
                     {
-                        bag.Add(Addressables.UnloadSceneAsync(info.SceneInstance)
-                            .ToUniTask(progress!, cancellationToken: cancellationToken, autoReleaseWhenCanceled: true));
-                        _activeScenes.Remove(info);
+                        if (!sceneName.HasBitFlags(info.SceneName))
+                        {
+                            bag.Add(Addressables.UnloadSceneAsync(info.SceneInstance)
+                                .ToUniTask(progress!, cancellationToken: cancellationToken, autoReleaseWhenCanceled: true));
+                            _activeScenes.Remove(info);
+                        }
                     }
                 }
-
-                await bag.BuildAsync();
 
                 CurrentScene = sceneName;
             }
@@ -142,17 +142,15 @@ namespace AndanteTribe.Utils.Unity.Addressable
 
         private async UniTask UnloadAllCoreAsync(IProgress<float>? progress, CancellationToken cancellationToken)
         {
-            var bag = new UniTaskBag();
             try
             {
+                await using var bag = new UniTaskBag();
                 foreach (var info in _activeScenes)
                 {
                     bag.Add(Addressables.UnloadSceneAsync(info.SceneInstance)
                         .ToUniTask(progress!, cancellationToken: cancellationToken, autoReleaseWhenCanceled: true));
                 }
                 _activeScenes.Clear();
-
-                await bag.BuildAsync();
             }
             finally
             {
