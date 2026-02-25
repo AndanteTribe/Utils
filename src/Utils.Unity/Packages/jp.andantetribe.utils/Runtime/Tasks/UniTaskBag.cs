@@ -70,9 +70,9 @@ namespace AndanteTribe.Utils.Unity.Tasks
         }
 
         /// <inheritdoc />
-        UniTask IUniTaskAsyncDisposable.DisposeAsync()
+        public UniTask DisposeAsync()
         {
-            if (_task == null)
+            if (_tasks == null)
             {
                 return UniTask.CompletedTask;
             }
