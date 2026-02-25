@@ -55,7 +55,6 @@ namespace AndanteTribe.Utils.Unity.Tasks
         /// <see cref="UniTask"/>をバッグに追加する.
         /// </summary>
         /// <param name="task">追加する<see cref="UniTask"/>.</param>
-        /// <exception cref="InvalidOperationException"><see cref="BuildAsync"/>が呼び出された後に追加しようとした場合.</exception>
         public void Add(UniTask task)
         {
             if (_tasks == null)
@@ -71,8 +70,13 @@ namespace AndanteTribe.Utils.Unity.Tasks
         }
 
         /// <inheritdoc />
-        public UniTask DisposeAsync()
+        UniTask IUniTaskAsyncDisposable.DisposeAsync()
         {
+            if (_task == null)
+            {
+                return UniTask.CompletedTask;
+            }
+
             try
             {
                 return UniTask.WhenAll(_tasks);
