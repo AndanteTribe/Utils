@@ -25,5 +25,4 @@ jobs:
           -e UNITY_LICENSE \
           -v "${{ github.workspace }}/src/Utils.Unity:/project" \
           unityci/editor:6000.3.2f1-linux-il2cpp-3.2.1 \
-          /opt/Unity/Editor/Unity \
           -batchmode -quit -projectPath /project -logFile -
