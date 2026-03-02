@@ -23,11 +23,18 @@ jobs:
         UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
         UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
       run: |
-        # Extract serial from license file (same method used by game-ci/unity-test-runner internally)
-        UNITY_SERIAL=$(echo "$UNITY_LICENSE" | \
-          grep -oP '(?<=<DeveloperData Value=")[^"]+' | \
-          base64 -d | \
-          cut -b5-)
+        # Extract serial using the same algorithm as game-ci/unity-test-runner (getSerialFromLicenseFile).
+        # Uses Node.js Buffer.from().toString('binary').slice(4) to correctly handle binary garbage bytes
+        # in positions 1-4 — bash's `cut -b5-` is broken when garbage bytes include a newline (0x0A).
+        UNITY_SERIAL=$(node -e "
+          const license = require('fs').readFileSync('/dev/stdin', 'utf8');
+          const startKey = '<DeveloperData Value=\"';
+          const endKey = '\"/>';
+          const si = license.indexOf(startKey) + startKey.length;
+          const ei = license.indexOf(endKey, si);
+          const serial = Buffer.from(license.slice(si, ei), 'base64').toString('binary').slice(4);
+          process.stdout.write(serial);
+        " <<< "$UNITY_LICENSE")
         if [[ -z "$UNITY_SERIAL" ]]; then
           echo "::error ::Failed to extract Unity serial from UNITY_LICENSE. Check that UNITY_LICENSE secret is set correctly."
           exit 1
