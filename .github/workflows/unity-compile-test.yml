@@ -26,6 +26,7 @@ jobs:
         # Extract serial using the same algorithm as game-ci/unity-test-runner (getSerialFromLicenseFile).
         # Uses Node.js Buffer.from().toString('binary').slice(4) to correctly handle binary garbage bytes
         # in positions 1-4 — bash's `cut -b5-` is broken when garbage bytes include a newline (0x0A).
+        export UNITY_SERIAL
         UNITY_SERIAL=$(node -e "
           const license = require('fs').readFileSync('/dev/stdin', 'utf8');
           const startKey = '<DeveloperData Value=\"';
