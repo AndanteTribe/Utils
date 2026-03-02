@@ -20,9 +20,41 @@ jobs:
     - name: Run Unity in Docker
       env:
         UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+        UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
       run: |
+        # Extract serial using the same algorithm as game-ci/unity-test-runner (getSerialFromLicenseFile).
+        # Uses Node.js Buffer.from().toString('binary').slice(4) to correctly handle binary garbage bytes
+        # in positions 1-4 — bash's `cut -b5-` is broken when garbage bytes include a newline (0x0A).
+        export UNITY_SERIAL
+        UNITY_SERIAL=$(node -e "
+          const license = require('fs').readFileSync('/dev/stdin', 'utf8');
+          const startKey = '<DeveloperData Value=\"';
+          const endKey = '\"/>';
+          const si = license.indexOf(startKey) + startKey.length;
+          const ei = license.indexOf(endKey, si);
+          const serial = Buffer.from(license.slice(si, ei), 'base64').toString('binary').slice(4);
+          process.stdout.write(serial);
+        " <<< "$UNITY_LICENSE")
+        if [[ -z "$UNITY_SERIAL" ]]; then
+          echo "::error ::Failed to extract Unity serial from UNITY_LICENSE. Check that UNITY_LICENSE secret is set correctly."
+          exit 1
+        fi
+        mkdir -p /tmp/BlankProject
         docker run --rm \
-          -e UNITY_LICENSE \
-          -v "${{ github.workspace }}/src/Utils.Unity:/project" \
-          unityci/editor:6000.3.2f1-linux-il2cpp-3.2.1 -- \
-          -batchmode -quit -projectPath /project -logFile -
+          -e UNITY_SERIAL \
+          -e UNITY_EMAIL \
+          -e UNITY_PASSWORD \
+          -v "/tmp/BlankProject:/BlankProject" \
+          -v "${{ github.workspace }}:/workspace" \
+          unityci/editor:6000.3.2f1-linux-il2cpp-3.2.1 \
+          bash -c 'dbus-uuidgen > /etc/machine-id && \
+            mkdir -p /var/lib/dbus && \
+            ln -sf /etc/machine-id /var/lib/dbus/machine-id && \
+            mkdir -p /BlankProject/Assets && \
+            unity-editor -logFile /dev/stdout -quit \
+              -serial "$UNITY_SERIAL" \
+              -username "$UNITY_EMAIL" \
+              -password "$UNITY_PASSWORD" \
+              -projectPath /BlankProject && \
+            unity-editor -batchmode -quit -projectPath /workspace/src/Utils.Unity -logFile /dev/stdout'
