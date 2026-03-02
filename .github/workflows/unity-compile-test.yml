@@ -17,20 +17,35 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Unity Cache
-      uses: AndanteTribe/Actions/actions/unity-cache@main
-      with:
-        unity-project-path: src/Utils.Unity
-        use-nugetforunity: true
-        nuget-packages-path: src/Utils.Unity/Packages/nuget-packages
-
-    - uses: game-ci/unity-test-runner@v4
+    - name: Run Unity in Docker
       env:
+        UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
         UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-      with:
-        projectPath: src/Utils.Unity
-        githubToken: ${{ secrets.GITHUB_TOKEN }}
-        unityVersion: auto
-        testMode: editmode
+      run: |
+        # Extract serial from license file (same method used by game-ci/unity-test-runner internally)
+        UNITY_SERIAL=$(echo "$UNITY_LICENSE" | \
+          grep -oP '(?<=<DeveloperData Value=")[^"]+' | \
+          base64 -d | \
+          cut -b5-)
+        if [[ -z "$UNITY_SERIAL" ]]; then
+          echo "::error ::Failed to extract Unity serial from UNITY_LICENSE. Check that UNITY_LICENSE secret is set correctly."
+          exit 1
+        fi
+        mkdir -p /tmp/BlankProject
+        docker run --rm \
+          -e UNITY_SERIAL \
+          -e UNITY_EMAIL \
+          -e UNITY_PASSWORD \
+          -v "/tmp/BlankProject:/BlankProject" \
+          -v "${{ github.workspace }}/src/Utils.Unity:/project" \
+          unityci/editor:6000.3.2f1-linux-il2cpp-3.2.1 \
+          bash -c 'dbus-uuidgen > /etc/machine-id && \
+            mkdir -p /var/lib/dbus && \
+            ln -sf /etc/machine-id /var/lib/dbus/machine-id && \
+            unity-editor -logFile /dev/stdout -quit \
+              -serial "$UNITY_SERIAL" \
+              -username "$UNITY_EMAIL" \
+              -password "$UNITY_PASSWORD" \
+              -projectPath /BlankProject && \
+            unity-editor -batchmode -quit -projectPath /project -logFile /dev/stdout'
