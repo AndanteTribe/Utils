@@ -1,0 +1,28 @@
+name: unity-compile-test
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+  push:
+    branches:
+      - main
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Run Unity in Docker
+      env:
+        UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      run: |
+        docker run --rm \
+          -e UNITY_LICENSE \
+          -v "${{ github.workspace }}/src/Utils.Unity:/project" \
+          unityci/editor:6000.3.2f1-linux-il2cpp-3.2.1 -- \
+          -batchmode -quit -projectPath /project -logFile -
