@@ -17,12 +17,20 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Run Unity in Docker
+    - name: Unity Cache
+      uses: AndanteTribe/Actions/actions/unity-cache@main
+      with:
+        unity-project-path: src/Utils.Unity
+        use-nugetforunity: true
+        nuget-packages-path: src/Utils.Unity/Packages/nuget-packages
+
+    - uses: game-ci/unity-test-runner@v4
       env:
+        UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+        UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-      run: |
-        docker run --rm \
-          -e UNITY_LICENSE \
-          -v "${{ github.workspace }}/src/Utils.Unity:/project" \
-          unityci/editor:6000.3.2f1-linux-il2cpp-3.2.1 \
-          unity-editor -batchmode -quit -projectPath /project -logFile -
+      with:
+        projectPath: src/Utils.Unity
+        githubToken: ${{ secrets.GITHUB_TOKEN }}
+        unityVersion: auto
+        testMode: editmode
