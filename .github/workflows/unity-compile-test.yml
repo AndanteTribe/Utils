@@ -46,7 +46,7 @@ jobs:
           -e UNITY_EMAIL \
           -e UNITY_PASSWORD \
           -v "/tmp/BlankProject:/BlankProject" \
-          -v "${{ github.workspace }}/src/Utils.Unity:/project" \
+          -v "${{ github.workspace }}:/workspace" \
           unityci/editor:6000.3.2f1-linux-il2cpp-3.2.1 \
           bash -c 'dbus-uuidgen > /etc/machine-id && \
             mkdir -p /var/lib/dbus && \
@@ -57,4 +57,4 @@ jobs:
               -username "$UNITY_EMAIL" \
               -password "$UNITY_PASSWORD" \
               -projectPath /BlankProject && \
-            unity-editor -batchmode -quit -projectPath /project -logFile /dev/stdout'
+            unity-editor -batchmode -quit -projectPath /workspace/src/Utils.Unity -logFile /dev/stdout'
